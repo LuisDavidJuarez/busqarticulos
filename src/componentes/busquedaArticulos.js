@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from 'react';
+import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   MDBDropdown,
@@ -23,9 +24,30 @@ function useArticulos(){
     return articulos
     
   }
+
   export default function Articulos(){
 
     const articulos = useArticulos()
+    const [ModalArticulo, setModalArticulo]=useState(false);
+    const [articuloSeleccionado, setarticuloSeleccionado]=useState({
+        Articulo: '',
+        Descripcion1: '',
+        Familia: '',
+        Cantidad: '',
+        PrecioLista: '',
+        DescuentosCascada: '',
+        PrecioConDescuento: ''
+      })
+
+    const abrirCerrarModalArticulo=()=> {
+      setModalArticulo(!ModalArticulo);
+    }
+
+    const seleccionarArticulo=(articulo, caso)=>{
+        setarticuloSeleccionado(articulo);
+      (caso==="Ver")&&
+      abrirCerrarModalArticulo();
+    }
   
     return (
         <body class="container-fluid">
@@ -95,20 +117,24 @@ function useArticulos(){
                                 <th scope="col">Precio de Lista</th>
                                 <th scope="col">Descuentos en Cascada</th>
                                 <th scope="col">Precio Con Descuento</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                             </thead>
                             <tbody className="text-danger border border-dark" align="center">
-                            {articulos.map(item => (
-                                <tr key={item.Articulo}>
-                                <td>{item.Articulo}</td>
-                                <td align="left">{item.Descripcion1}</td>
-                                <td align="left">{item.Familia}</td>
-                                <td>{item.Cantidad}</td>
-                                <td>$ {item.PrecioLista}</td>
-                                <td>{item.DescuentosCascada} %</td>
-                                <td>$ {item.PrecioConDescuento}</td>
-                                </tr>
-                            ))}
+                                {articulos.map(item => (
+                                    <tr key={item.Articulo}>
+                                        <td>{item.Articulo}</td>
+                                        <td align="left">{item.Descripcion1}</td>
+                                        <td align="left">{item.Familia}</td>
+                                        <td>{item.Cantidad}</td>
+                                        <td>$ {item.PrecioLista}</td>
+                                        <td>{item.DescuentosCascada} %</td>
+                                        <td>$ {item.PrecioConDescuento}</td>
+                                        <td>
+                                            <button className="btn btn-danger text-warning" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</button>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                         <div class="text-warning" align="center">
@@ -117,16 +143,16 @@ function useArticulos(){
                         <table className="table table-bordered border border-dark table-striped text-warning">
                             <tbody className="text-danger border border-dark">
                             {articulos.map(item => (
-                                <tr key={item.Articulo}>
-                                <td>{item.Articulo}</td>
-                                <td>{item.Descripcion1}</td>
-                                <td>{item.Familia}</td>
-                                <td>{item.Cantidad}</td>
-                                <td>{item.PrecioLista}</td>
-                                <td>{item.DescuentosCascada}</td>
-                                <td>{item.PrecioConDescuento}</td>
-                                </tr>
-                            ))}
+                                    <tr key={item.Articulo}>
+                                        <td>{item.Articulo}</td>
+                                        <td align="left">{item.Descripcion1}</td>
+                                        <td align="left">{item.Familia}</td>
+                                        <td>{item.Cantidad}</td>
+                                        <td>$ {item.PrecioLista}</td>
+                                        <td>{item.DescuentosCascada} %</td>
+                                        <td>$ {item.PrecioConDescuento}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                         <div>                        
@@ -183,6 +209,57 @@ function useArticulos(){
                     Dirección: {window.location.href} |Base de Datos: Local/Linea
                 </div>
             </div>
+
+            <Modal isOpen={ModalArticulo}>
+            <ModalHeader>
+                <div class="text-warning bg-danger border border-dark">
+                    <p align="center"><h4>Datos del Articulo</h4></p>
+                </div>
+            </ModalHeader>
+            <ModalBody>
+                <div className="row" align="center">
+                    <div class="col-sm-6">
+                        <labe >Articulo:</labe><br />
+                        <input type="text" className="form-control" readOnly name="articulo" value={articuloSeleccionado && articuloSeleccionado.Articulo}/> <br />
+                    </div>
+                    <div class="col-sm-6">
+                        <labe>Familia:</labe><br />
+                        <input type="text" className="form-control"  readOnly name="familia" value={articuloSeleccionado && articuloSeleccionado.Familia}/> <br />
+                    </div>                       
+                </div>
+                <div className="row" align="center">
+                    <div class="col-sm-9 my-3">                        
+                        <labe>Descripción:</labe><br />
+                        <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion1}/> <br />
+                    </div>
+                    <div class="col-sm-3 my-3">
+                        <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`} 
+                                        alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%"/>
+                    </div>
+                </div>
+                <div className="row" align="center">
+                    <div class="col-sm-3 my-3"> <br /> 
+                        <labe>Cantidad:</labe><br />
+                        <input type="text" className="form-control"  readOnly name="cantidad" value={articuloSeleccionado && articuloSeleccionado.Cantidad}/> <br />
+                    </div>
+                    <div class="col-sm-3 my-3"> <br />
+                        <labe>Precio:</labe><br />
+                        <input type="text" className="form-control"  readOnly name="PrecioLista" value={'$ ' + articuloSeleccionado && articuloSeleccionado.PrecioLista}/> <br />
+                    </div>
+                    <div class="col-sm-3 my-3"> <br />
+                        <labe>Descuento:</labe><br />
+                        <input type="text" className="form-control"  readOnly name="DescuentosCascada" value={articuloSeleccionado && articuloSeleccionado.DescuentosCascada + " %"}/> <br />
+                    </div>
+                    <div class="col-sm-3 my-3">
+                        <labe>Precio Con Descuento:</labe><br />
+                        <input type="text" className="form-control"  readOnly name="PrecioConDescuento" value={"$$ " + articuloSeleccionado && articuloSeleccionado.PrecioConDescuento}/> <br />
+                    </div>
+                </div>
+            </ModalBody>
+            <ModalFooter>
+                    <button className="btn btn-danger text-warning" onClick={()=>abrirCerrarModalArticulo()}>Cerrar</button>
+            </ModalFooter>
+            </Modal> 
         </body>
     )
   }
