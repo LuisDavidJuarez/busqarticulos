@@ -52,7 +52,7 @@ function useArticulos(){
     }
   
     return (
-        <body class="container-fluid">
+        <body className="cuerpo container-fluid">
             <head>
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"></link>
                 <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet" />
@@ -214,7 +214,7 @@ function useArticulos(){
 
             <Modal isOpen={ModalArticulo}>
             <ModalBody>
-                <div class="text-warning bg-danger border border-dark" align="center">
+                <div class="custom-bg border border-dark" align="center">
                     <p><h4>Datos del Articulo</h4></p>
                 </div>
                 <div className="row" align="center">
