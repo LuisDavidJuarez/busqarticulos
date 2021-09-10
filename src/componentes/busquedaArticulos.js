@@ -1,6 +1,8 @@
 import React, { useState, useEffect} from 'react';
-import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
+import { Modal, ModalBody, ModalFooter } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './busquedaArticulos.css'
+
 import {
   MDBDropdown,
   MDBDropdownMenu,
@@ -57,8 +59,8 @@ function useArticulos(){
                 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
             </head>
             <div align="center">
-                <div class="text-warning" align="center">
-                    <h5 className="bg-danger border border-dark">Pantalla Busqueda por Descripción</h5>
+                <div class="custom-bg" align="center">
+                    <h5 className="">Pantalla Busqueda por Descripción</h5>
                 </div>
                 <div class="row container-fluid">
                     <div class="col-sm-1 border border-dark" align="center">
@@ -107,18 +109,18 @@ function useArticulos(){
                 
                 <div class="row container-fluid pt-0" align="top">
                     <div class="col-sm-8 my-3 border border-dark">
-                        <table className="table table-bordered table-striped text-warning">
-                            <thead className="bg-danger text-warning border border-dark" align="center">
-                            <tr>
-                                <th scope="col">Articulo</th>
-                                <th scope="col">Descripcion</th>
-                                <th scope="col">Familia</th>
-                                <th scope="col">Cantidad</th>
-                                <th scope="col">Precio de Lista</th>
-                                <th scope="col">Descuentos en Cascada</th>
-                                <th scope="col">Precio Con Descuento</th>
-                                <th scope="col">Acciones</th>
-                            </tr>
+                        <table className="table table-bordered table-striped ">
+                            <thead className="custom-bg" align="center">
+                                <tr>
+                                    <th scope="col">Articulo</th>
+                                    <th scope="col">Descripcion</th>
+                                    <th scope="col">Familia</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Precio de Lista</th>
+                                    <th scope="col">Descuentos en Cascada</th>
+                                    <th scope="col">Precio Con Descuento</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
                             </thead>
                             <tbody className="text-danger border border-dark" align="center">
                                 {articulos.map(item => (
@@ -131,14 +133,14 @@ function useArticulos(){
                                         <td>{item.DescuentosCascada} %</td>
                                         <td>$ {item.PrecioConDescuento}</td>
                                         <td>
-                                            <button className="btn btn-danger text-warning" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</button>
+                                            <button className="custom-bg" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</button>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                        <div class="text-warning" align="center">
-                            <h5 className="bg-danger border border-dark">Articulos Sugeridos</h5>
+                        <div class="custom-bg" align="center">
+                            <h5>Articulos Sugeridos</h5>
                         </div>
                         <table className="table table-bordered border border-dark table-striped text-warning">
                             <tbody className="text-danger border border-dark">
@@ -155,8 +157,8 @@ function useArticulos(){
                                 ))}
                             </tbody>
                         </table>
-                        <div>                        
-                            <table className="table table-bordered border border-dark bg-danger text-warning">
+                        <div className="custom-bg">                        
+                            <table className="table table-bordered" style={{color:"#fbd134"}}>
                                 <tr>
                                     <td>{"<<"}</td>
                                     <td>1</td>
@@ -183,7 +185,7 @@ function useArticulos(){
                         <p></p>
                         <div className="border border-dark">
                             <table className="table table-bordered table-striped text-warning">
-                                <thead className="bg-danger text-warning border border-dark">
+                                <thead className="custom-bg">
                                     <tr>
                                         <th scope="col">Articulo</th>
                                         <th scope="col">Cantidad</th>
@@ -196,7 +198,7 @@ function useArticulos(){
                                         <td>{item.Cantidad}</td>
                                         </tr>
                                     ))}
-                                    <tr className="bg-danger text-warning border border-dark">
+                                    <tr className="custom-bg">
                                         <td></td>                                        
                                         <td>Ver Mas..</td>                                        
                                     </tr>
@@ -205,18 +207,16 @@ function useArticulos(){
                         </div >
                     </div>
                 </div>
-                <div class="text-warning bg-danger border border-dark" align="left">
+                <div class="custom-bg" align="left">
                     Dirección: {window.location.href} |Base de Datos: Local/Linea
                 </div>
             </div>
 
             <Modal isOpen={ModalArticulo}>
-            <ModalHeader>
-                <div class="text-warning bg-danger border border-dark">
-                    <p align="center"><h4>Datos del Articulo</h4></p>
-                </div>
-            </ModalHeader>
             <ModalBody>
+                <div class="text-warning bg-danger border border-dark" align="center">
+                    <p><h4>Datos del Articulo</h4></p>
+                </div>
                 <div className="row" align="center">
                     <div class="col-sm-6">
                         <labe >Articulo:</labe><br />
@@ -228,11 +228,11 @@ function useArticulos(){
                     </div>                       
                 </div>
                 <div className="row" align="center">
-                    <div class="col-sm-9 my-3">                        
+                    <div class="col-sm-8 my-3">                        
                         <labe>Descripción:</labe><br />
                         <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion1}/> <br />
                     </div>
-                    <div class="col-sm-3 my-3">
+                    <div class="col-sm-4 my-3 ">
                         <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`} 
                                         alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%"/>
                     </div>
@@ -257,9 +257,9 @@ function useArticulos(){
                 </div>
             </ModalBody>
             <ModalFooter>
-                    <button className="btn btn-danger text-warning" onClick={()=>abrirCerrarModalArticulo()}>Cerrar</button>
+                    <button className="custom-bg" onClick={()=>abrirCerrarModalArticulo()}>Cerrar</button>
             </ModalFooter>
-            </Modal> 
+            </Modal>
         </body>
     )
   }
