@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import DataTable from 'react-data-table-component';
 import './busquedaArticulos.css'
 
 import {
@@ -8,7 +9,8 @@ import {
   MDBDropdownMenu,
   MDBDropdownToggle,
   MDBDropdownItem,
-  MDBDropdownLink
+  MDBDropdownLink,
+  MDBBtn
 } from 'mdb-react-ui-kit';
 
 function useArticulos(){
@@ -50,6 +52,80 @@ function useArticulos(){
       (caso==="Ver")&&
       abrirCerrarModalArticulo();
     }
+
+    const columnasDisponibles=[        
+        {
+            name:'Articulo',
+            selector: 'Articulo',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Cantidad',
+            selector: 'Cantidad',
+            sortable: true,
+            grow:1
+        }
+    ]
+
+    const columnasArticulos=[
+        {
+            name:'Articulo',
+            selector: 'Articulo',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Descripción',
+            selector: 'Descripcion1',
+            sortable: true,
+            left: true,
+            grow:2
+        },
+        {
+            name:'Familia',
+            selector: 'Familia',
+            sortable: true, 
+            left: true,
+            grow:2
+        },
+        {
+            name:'Cantidad',
+            selector: 'Cantidad',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Precio',
+            selector: 'PrecioLista',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Descuento',
+            selector: 'DescuentosCascada',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Nuevo Precio',
+            selector: 'PrecioConDescuento',
+            sortable: true,
+            grow:1
+        },
+        {
+            name:'Acciones',
+            selector: 'Acciones',
+            grow:1
+        }
+    ]
+
+    const PaginacionOpciones = {
+        rowsPerPageText: 'Filas por Pagina',
+        rangeSeparatorText: 'de',
+        SelectAllRowsItem: true,
+        SelectAllRowsItemText: 'Todos'
+    }
   
     return (
         <body className="cuerpo container-fluid">
@@ -65,7 +141,7 @@ function useArticulos(){
                 <div class="row container-fluid">
                     <div class="col-sm-1 border border-dark" align="center">
                         <div class="row container-fluid"><p></p></div>
-                        <img src="images/page/menu.png" alt="Menu" width="40%" className="img-fluid"/>
+                        <img src="images/page/menu.png" alt="Menu" width="80%" className="img-fluid"/>
                     </div>
                     <div class="col-sm-1 border border-dark">
                         <img src="images/page/logoweb.png" alt="Menu" width="100%" className="img-fluid"/>
@@ -73,7 +149,7 @@ function useArticulos(){
                     <div class="col-sm-8 border border-dark">
                         <div class="row container-fluid"><p></p></div>
                         <div class="row container-fluid">
-                            <div class="col-sm-2 container-fluid">
+                            <div class="col-sm-1 container-fluid">
                                 <MDBDropdown group className='shadow-0'>
                                     <MDBDropdownToggle tag='a' className='btn btn-outline-danger text-dark container-fluid"'>
                                         Tipo
@@ -91,17 +167,17 @@ function useArticulos(){
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
                             </div>
-                            <div class="col-sm-9 container-fluid">
+                            <div class="col-sm-9 my-1 container-fluid">
                                 <input type="text" className="form-control border-danger" name="busqueda" onChange=""/>
                             </div>                            
-                            <div class="col-sm-1 container-fluid"></div>
+                            <div class="col-sm-1 my-1 container-fluid"></div>
                         </div>
                     </div>
-                    <div class="col-sm-1 border border-dark">
+                    <div class="col-sm-1 my-1 border border-dark">
                         <div class="row container-fluid"><p></p></div>
                         <img src="images/page/carrito.png" alt="Menu" width="60%" className="img-fluid"/>
                     </div>
-                    <div class="col-sm-1 border border-dark">
+                    <div class="col-sm-1 my-1 border border-dark">
                         <div class="row container-fluid"><p></p></div>
                         <img src="images/page/descuento.png" alt="Menu" width="60%" className="img-fluid"/>
                     </div>
@@ -109,101 +185,75 @@ function useArticulos(){
                 
                 <div class="row container-fluid pt-0" align="top">
                     <div class="col-sm-8 my-3 border border-dark">
-                        <table className="table table-bordered table-striped ">
-                            <thead className="custom-bg" align="center">
-                                <tr>
-                                    <th scope="col">Articulo</th>
-                                    <th scope="col">Descripcion</th>
-                                    <th scope="col">Familia</th>
-                                    <th scope="col">Cantidad</th>
-                                    <th scope="col">Precio de Lista</th>
-                                    <th scope="col">Descuentos en Cascada</th>
-                                    <th scope="col">Precio Con Descuento</th>
-                                    <th scope="col">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-danger border border-dark" align="center">
-                                {articulos.map(item => (
-                                    <tr key={item.Articulo}>
-                                        <td>{item.Articulo}</td>
-                                        <td align="left">{item.Descripcion1}</td>
-                                        <td align="left">{item.Familia}</td>
-                                        <td>{item.Cantidad}</td>
-                                        <td>$ {item.PrecioLista}</td>
-                                        <td>{item.DescuentosCascada} %</td>
-                                        <td>$ {item.PrecioConDescuento}</td>
-                                        <td>
-                                            <button className="custom-bg" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</button>
-                                        </td>
-                                    </tr>
+                        <DataTable 
+                            class="custom-table"
+                            columns={columnasArticulos}
+                            pagination
+                            paginationComponentOptions={PaginacionOpciones}
+                            fixedHeader
+                            fixedHeaderScrollHeight="60%"
+                            striped
+                            data={articulos.map(item => (
+                                    {
+                                        Articulo: item.Articulo,
+                                        Descripcion1: item.Descripcion1,
+                                        Familia: item.Familia,
+                                        Cantidad: item.Cantidad,
+                                        PrecioLista: "$ " + item.PrecioLista,
+                                        DescuentosCascada: item.DescuentosCascada + " %",
+                                        PrecioConDescuento: "$ " + item.PrecioConDescuento,
+                                        Acciones: 
+                                        <MDBBtn className="btn-danger text-warning" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</MDBBtn>
+                                    }
                                 ))}
-                            </tbody>
-                        </table>
-                        <div class="custom-bg" align="center">
-                            <h5>Articulos Sugeridos</h5>
-                        </div>
-                        <table className="table table-bordered border border-dark table-striped text-warning">
-                            <tbody className="text-danger border border-dark">
-                            {articulos.map(item => (
-                                    <tr key={item.Articulo}>
-                                        <td>{item.Articulo}</td>
-                                        <td align="left">{item.Descripcion1}</td>
-                                        <td align="left">{item.Familia}</td>
-                                        <td>{item.Cantidad}</td>
-                                        <td>$ {item.PrecioLista}</td>
-                                        <td>{item.DescuentosCascada} %</td>
-                                        <td>$ {item.PrecioConDescuento}</td>
-                                    </tr>
+                        />
+
+                        <DataTable 
+                            title="Articulos Sugeridos"
+                            className="custom-bg"
+                            columns={columnasArticulos}
+                            pagination
+                            paginationComponentOptions={PaginacionOpciones}
+                            fixedHeader
+                            fixedHeaderScrollHeight="60%"
+                            striped
+                            data={articulos.map(item => (
+                                    {
+                                        Articulo: item.Articulo,
+                                        Descripcion1: item.Descripcion1,
+                                        Familia: item.Familia,
+                                        Cantidad: item.Cantidad,
+                                        PrecioLista: "$ " + item.PrecioLista,
+                                        DescuentosCascada: item.DescuentosCascada + " %",
+                                        PrecioConDescuento: "$ " + item.PrecioConDescuento,
+                                        Acciones: 
+                                        <MDBBtn className="btn-danger text-warning" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</MDBBtn>
+                                    }
                                 ))}
-                            </tbody>
-                        </table>
-                        <div className="custom-bg">                        
-                            <table className="table table-bordered" style={{color:"#fbd134"}}>
-                                <tr>
-                                    <td>{"<<"}</td>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>4</td>
-                                    <td>5</td>
-                                    <td>6</td>
-                                    <td>7</td>
-                                    <td>8</td>
-                                    <td>9</td>
-                                    <td>10</td>
-                                    <td>11</td>
-                                    <td>{">>"}</td>
-                                </tr>
-                            </table>
-                        </div>
+                        />
                     </div>
-                    <div class="col-sm-4 my-3">
+                    <div class="col-sm-4 my-1">
                         <div className="border border-dark">
                             <img src={`${process.env.PUBLIC_URL}/images/articulos/CAD13600.png`} 
                                 alt="CAD13600" width="80%" className="img-fluid bordered"/>                            
                         </div >
                         <p></p>
                         <div className="border border-dark">
-                            <table className="table table-bordered table-striped text-warning">
-                                <thead className="custom-bg">
-                                    <tr>
-                                        <th scope="col">Articulo</th>
-                                        <th scope="col">Cantidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-danger border border-dark">
-                                    {articulos.map(item => (
-                                        <tr key={item.Articulo}>
-                                        <td>{item.Articulo}</td>
-                                        <td>{item.Cantidad}</td>
-                                        </tr>
+                            <DataTable 
+                                className="custom-bg"
+                                columns={columnasDisponibles}
+                                pagination
+                                paginationComponentOptions={PaginacionOpciones}
+                                fixedHeader
+                                fixedHeaderScrollHeight="60%"
+                                striped
+                                data={articulos.map(item => (
+                                        {
+                                            Articulo: item.Articulo,
+                                            Cantidad: item.Cantidad
+                                        }
                                     ))}
-                                    <tr className="custom-bg">
-                                        <td></td>                                        
-                                        <td>Ver Mas..</td>                                        
-                                    </tr>
-                                </tbody>
-                            </table>                         
+                            />   
                         </div >
                     </div>
                 </div>
