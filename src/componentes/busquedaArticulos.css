@@ -8,25 +8,18 @@
     border-color:black;
 }
 
+button.custom-bg{
+    border-radius: 10%;
+}
+
+.TablaPrincipal{
+    align-items: center;
+    border: black;
+    color:#fbd134;
+    background-color: #d11a2c;
+    border-color:black;
+}
+
 div.custom-bg{
     border-radius: 2%;
 }
-
-button.custom-bg{
-    border-radius: 15%;
-}
-
-Header.custom-bg{
-    color:#fbd134;
-    background-color: #d11a2c;
-}
-
-title.custom-bg{
-    color:#fbd134;
-    background-color: #d11a2c;
-}
-
-table.child-dt thead {
-    color:#fbd134;
-    background-color: #d11a2c;
-  }

@@ -12,7 +12,7 @@ import {
   MDBDropdownLink,
   MDBBtn
 } from 'mdb-react-ui-kit';
-
+import { TableCell } from '@material-ui/core';
 function useArticulos(){
 
     const [articulos, setArticulos] = useState([])
@@ -55,10 +55,14 @@ function useArticulos(){
 
     const columnasDisponibles=[        
         {
-            name:'Articulo',
+            name:'Articulo:',
             selector: 'Articulo',
             sortable: true,
-            grow:1
+            grow:1,
+            getProps: {
+                style: {
+                  backgroundColor: 'danger',
+              }}
         },
         {
             name:'Cantidad',
@@ -70,51 +74,44 @@ function useArticulos(){
 
     const columnasArticulos=[
         {
-            name:'Articulo',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Articulo</h6></TableCell>,
             selector: 'Articulo',
-            sortable: true,
             grow:1
         },
         {
-            name:'Descripción',
+            name:<TableCell className="custom-bg col-sm-2"><h6>Descripción</h6></TableCell>,
             selector: 'Descripcion1',
-            sortable: true,
             left: true,
             grow:2
         },
         {
-            name:'Familia',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Familia</h6></TableCell>,
             selector: 'Familia',
-            sortable: true, 
             left: true,
             grow:2
         },
         {
-            name:'Cantidad',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Cantidad</h6></TableCell>,
             selector: 'Cantidad',
-            sortable: true,
             grow:1
         },
         {
-            name:'Precio',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Precio</h6></TableCell>,
             selector: 'PrecioLista',
-            sortable: true,
             grow:1
         },
         {
-            name:'Descuento',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Desc</h6></TableCell>,
             selector: 'DescuentosCascada',
-            sortable: true,
             grow:1
         },
         {
-            name:'Nuevo Precio',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Nuevo <br />Precio</h6></TableCell>,
             selector: 'PrecioConDescuento',
-            sortable: true,
             grow:1
         },
         {
-            name:'Acciones',
+            name:<TableCell className="custom-bg col-sm-1"><h6>Acciones</h6></TableCell>,
             selector: 'Acciones',
             grow:1
         }
@@ -130,7 +127,6 @@ function useArticulos(){
     return (
         <body className="cuerpo container-fluid">
             <head>
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"></link>
                 <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
             </head>
@@ -185,13 +181,15 @@ function useArticulos(){
                 
                 <div class="row container-fluid pt-0" align="top">
                     <div class="col-sm-8 my-3 border border-dark">
+                        
                         <DataTable 
-                            class="custom-table"
+                            className="tablaPrincipal"
                             columns={columnasArticulos}
                             pagination
                             paginationComponentOptions={PaginacionOpciones}
-                            fixedHeader
-                            fixedHeaderScrollHeight="60%"
+                            //noTableHead
+                            //fixedHeader
+                            //fixedHeaderScrollHeight="60%"
                             striped
                             data={articulos.map(item => (
                                     {
@@ -203,19 +201,22 @@ function useArticulos(){
                                         DescuentosCascada: item.DescuentosCascada + " %",
                                         PrecioConDescuento: "$ " + item.PrecioConDescuento,
                                         Acciones: 
-                                        <MDBBtn className="btn-danger text-warning" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</MDBBtn>
+                                        <MDBBtn className="custom-bg" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}><h6>Ver</h6></MDBBtn>
                                     }
                                 ))}
                         />
 
+                        
+
                         <DataTable 
-                            title="Articulos Sugeridos"
+                            title={<div className="custom-bg"><h4>Articulos Sugeridos</h4></div>}
                             className="custom-bg"
                             columns={columnasArticulos}
                             pagination
                             paginationComponentOptions={PaginacionOpciones}
-                            fixedHeader
-                            fixedHeaderScrollHeight="60%"
+                            noTableHead
+                            //fixedHeader
+                            //fixedHeaderScrollHeight="60%"
                             striped
                             data={articulos.map(item => (
                                     {
@@ -227,7 +228,7 @@ function useArticulos(){
                                         DescuentosCascada: item.DescuentosCascada + " %",
                                         PrecioConDescuento: "$ " + item.PrecioConDescuento,
                                         Acciones: 
-                                        <MDBBtn className="btn-danger text-warning" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}>Ver</MDBBtn>
+                                        <MDBBtn className="custom-bg" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}><h6>Ver</h6></MDBBtn>
                                     }
                                 ))}
                         />
