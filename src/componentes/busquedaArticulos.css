@@ -6,20 +6,17 @@
     color:#fbd134;
     background-color: #d11a2c;
     border-color:black;
+    font-weight: bold;
 }
 
 button.custom-bg{
     border-radius: 10%;
 }
 
-.TablaPrincipal{
-    align-items: center;
-    border: black;
-    color:#fbd134;
-    background-color: #d11a2c;
-    border-color:black;
-}
-
 div.custom-bg{
     border-radius: 2%;
+}
+
+.custom-invisible{
+    visibility: collapse;
 }

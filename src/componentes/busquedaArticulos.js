@@ -1,7 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import DataTable from 'react-data-table-component';
 import './busquedaArticulos.css'
 
 import {
@@ -9,10 +8,20 @@ import {
   MDBDropdownMenu,
   MDBDropdownToggle,
   MDBDropdownItem,
-  MDBDropdownLink,
-  MDBBtn
+  MDBDropdownLink
 } from 'mdb-react-ui-kit';
-import { TableCell } from '@material-ui/core';
+import { 
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    TablePagination,
+    TableFooter 
+ } from '@material-ui/core';
+
 function useArticulos(){
 
     const [articulos, setArticulos] = useState([])
@@ -43,6 +52,18 @@ function useArticulos(){
         PrecioConDescuento: ''
       })
 
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
+
     const abrirCerrarModalArticulo=()=> {
       setModalArticulo(!ModalArticulo);
     }
@@ -51,77 +72,6 @@ function useArticulos(){
         setarticuloSeleccionado(articulo);
       (caso==="Ver")&&
       abrirCerrarModalArticulo();
-    }
-
-    const columnasDisponibles=[        
-        {
-            name:'Articulo:',
-            selector: 'Articulo',
-            sortable: true,
-            grow:1,
-            getProps: {
-                style: {
-                  backgroundColor: 'danger',
-              }}
-        },
-        {
-            name:'Cantidad',
-            selector: 'Cantidad',
-            sortable: true,
-            grow:1
-        }
-    ]
-
-    const columnasArticulos=[
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Articulo</h6></TableCell>,
-            selector: 'Articulo',
-            grow:1
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-2"><h6>Descripción</h6></TableCell>,
-            selector: 'Descripcion1',
-            left: true,
-            grow:2
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Familia</h6></TableCell>,
-            selector: 'Familia',
-            left: true,
-            grow:2
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Cantidad</h6></TableCell>,
-            selector: 'Cantidad',
-            grow:1
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Precio</h6></TableCell>,
-            selector: 'PrecioLista',
-            grow:1
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Desc</h6></TableCell>,
-            selector: 'DescuentosCascada',
-            grow:1
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Nuevo <br />Precio</h6></TableCell>,
-            selector: 'PrecioConDescuento',
-            grow:1
-        },
-        {
-            name:<TableCell className="custom-bg col-sm-1"><h6>Acciones</h6></TableCell>,
-            selector: 'Acciones',
-            grow:1
-        }
-    ]
-
-    const PaginacionOpciones = {
-        rowsPerPageText: 'Filas por Pagina',
-        rangeSeparatorText: 'de',
-        SelectAllRowsItem: true,
-        SelectAllRowsItemText: 'Todos'
     }
   
     return (
@@ -132,17 +82,17 @@ function useArticulos(){
             </head>
             <div align="center">
                 <div class="custom-bg" align="center">
-                    <h5 className="">Pantalla Busqueda por Descripción</h5>
+                    <h3>Pantalla Busqueda por Descripción</h3>
                 </div>
                 <div class="row container-fluid">
-                    <div class="col-sm-1 border border-dark" align="center">
+                    <div class="col-sm-1 my-1 border border-dark" align="center">
                         <div class="row container-fluid"><p></p></div>
                         <img src="images/page/menu.png" alt="Menu" width="80%" className="img-fluid"/>
                     </div>
-                    <div class="col-sm-1 border border-dark">
+                    <div class="col-sm-1 my-1 border border-dark">
                         <img src="images/page/logoweb.png" alt="Menu" width="100%" className="img-fluid"/>
                     </div>
-                    <div class="col-sm-8 border border-dark">
+                    <div class="col-sm-8 my-1 border border-dark">
                         <div class="row container-fluid"><p></p></div>
                         <div class="row container-fluid">
                             <div class="col-sm-1 container-fluid">
@@ -180,81 +130,153 @@ function useArticulos(){
                 </div>
                 
                 <div class="row container-fluid pt-0" align="top">
-                    <div class="col-sm-8 my-3 border border-dark">
+                    <div class="col-sm-9 my-3 border border-dark">
+                    <TableContainer component={Paper} className="responsive">
+                        <Table aria-label="simple table">
+                            <TableHead class="custom-bg">
+                                <TableRow className="custom-bg">
+                                    <TableCell className="text-warning"><h4>#</h4></TableCell>
+                                    <TableCell className="text-warning"><h5>Articulo</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Descripción</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Familia</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Cantidad</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Precio Lista</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Desc</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Nuevo Precio</h5></TableCell>
+                                    <TableCell className="text-warning"><h5>Acciones</h5></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => (
+                                <TableRow key={i} value={row.Articulo}>
+                                    <TableCell >{i + 1}</TableCell>
+                                    <TableCell component="th" scope="row">
+                                        {row.Articulo}
+                                    </TableCell>
+                                    <TableCell >{row.Descripcion1}</TableCell>
+                                    <TableCell >{row.Familia}</TableCell>
+                                    <TableCell >{row.Cantidad}</TableCell>
+                                    <TableCell >{"$ " + row.PrecioLista}</TableCell>
+                                    <TableCell >{row.DescuentosCascada + " %"}</TableCell>
+                                    <TableCell >{"$ " + row.PrecioConDescuento}</TableCell>
+                                    <TableCell >
+                                        <button class="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
+                                        &nbsp;&nbsp;
+                                        <button class="custom-bg" type="button" ><h6>Agregar</h6></button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TableFooter>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={articulos.length}
+                                rowsPerPage={rowsPerPage}
+                                rowsPerPageText="Filas por Pagina"
+                                rangeSeparatorText= 'de'
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </TableFooter>
+                        <div className="custom-bg"><h4>Articulos Sugeridos</h4></div>
                         
-                        <DataTable 
-                            className="tablaPrincipal"
-                            columns={columnasArticulos}
-                            pagination
-                            paginationComponentOptions={PaginacionOpciones}
-                            //noTableHead
-                            //fixedHeader
-                            //fixedHeaderScrollHeight="60%"
-                            striped
-                            data={articulos.map(item => (
-                                    {
-                                        Articulo: item.Articulo,
-                                        Descripcion1: item.Descripcion1,
-                                        Familia: item.Familia,
-                                        Cantidad: item.Cantidad,
-                                        PrecioLista: "$ " + item.PrecioLista,
-                                        DescuentosCascada: item.DescuentosCascada + " %",
-                                        PrecioConDescuento: "$ " + item.PrecioConDescuento,
-                                        Acciones: 
-                                        <MDBBtn className="custom-bg" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}><h6>Ver</h6></MDBBtn>
-                                    }
-                                ))}
-                        />
-
-                        
-
-                        <DataTable 
-                            title={<div className="custom-bg"><h4>Articulos Sugeridos</h4></div>}
-                            className="custom-bg"
-                            columns={columnasArticulos}
-                            pagination
-                            paginationComponentOptions={PaginacionOpciones}
-                            noTableHead
-                            //fixedHeader
-                            //fixedHeaderScrollHeight="60%"
-                            striped
-                            data={articulos.map(item => (
-                                    {
-                                        Articulo: item.Articulo,
-                                        Descripcion1: item.Descripcion1,
-                                        Familia: item.Familia,
-                                        Cantidad: item.Cantidad,
-                                        PrecioLista: "$ " + item.PrecioLista,
-                                        DescuentosCascada: item.DescuentosCascada + " %",
-                                        PrecioConDescuento: "$ " + item.PrecioConDescuento,
-                                        Acciones: 
-                                        <MDBBtn className="custom-bg" type="button" onClick={()=>seleccionarArticulo(item, "Ver")}><h6>Ver</h6></MDBBtn>
-                                    }
-                                ))}
-                        />
+                    <TableContainer component={Paper} className="responsive">
+                        <Table aria-label="simple table">
+                            <TableHead class="custom-invisible">
+                                <TableRow className="custom-bg">
+                                    <TableCell className="text-white"><h4>#</h4></TableCell>
+                                    <TableCell className="text-white"><h5>Articulo</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Descripción</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Familia</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Cantidad</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Precio Lista</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Desc</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Nuevo Precio</h5></TableCell>
+                                    <TableCell className="text-white"><h5>Acciones</h5></TableCell>  
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => (
+                                <TableRow key={i} value={row.Articulo}>
+                                    <TableCell>{i + 1}</TableCell>
+                                    <TableCell component="th" scope="row">
+                                        {row.Articulo}
+                                    </TableCell>
+                                    <TableCell>{row.Descripcion1}</TableCell>
+                                    <TableCell>{row.Familia}</TableCell>
+                                    <TableCell>{row.Cantidad}</TableCell>
+                                    <TableCell>{"$ " + row.PrecioLista}</TableCell>
+                                    <TableCell>{row.DescuentosCascada + " %"}</TableCell>
+                                    <TableCell>{"$ " + row.PrecioConDescuento}</TableCell>
+                                    <TableCell>
+                                        <button class="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
+                                        &nbsp;&nbsp;
+                                        <button class="custom-bg" type="button" ><h6>Agregar</h6></button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TableFooter>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={articulos.length}
+                                rowsPerPage={rowsPerPage}
+                                rowsPerPageText="Filas por Pagina"
+                                rangeSeparatorText= 'de'
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </TableFooter>
                     </div>
-                    <div class="col-sm-4 my-1">
+                    <div class="col-sm-3 my-1">
                         <div className="border border-dark">
                             <img src={`${process.env.PUBLIC_URL}/images/articulos/CAD13600.png`} 
                                 alt="CAD13600" width="80%" className="img-fluid bordered"/>                            
                         </div >
                         <p></p>
                         <div className="border border-dark">
-                            <DataTable 
-                                className="custom-bg"
-                                columns={columnasDisponibles}
-                                pagination
-                                paginationComponentOptions={PaginacionOpciones}
-                                fixedHeader
-                                fixedHeaderScrollHeight="60%"
-                                striped
-                                data={articulos.map(item => (
-                                        {
-                                            Articulo: item.Articulo,
-                                            Cantidad: item.Cantidad
-                                        }
+                            
+                            <TableContainer component={Paper} className="responsive">
+                                <Table aria-label="simple table">
+                                    <TableHead class="custom-bg">
+                                        <TableRow className="custom-bg">
+                                            <TableCell className="text-warning">Articulo</TableCell>
+                                            <TableCell className="text-warning">Cantidad</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                    {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                                        <TableRow key={row.Articulo}>
+                                            <TableCell component="th" scope="row">
+                                                {row.Articulo}
+                                            </TableCell>
+                                            <TableCell >{row.Cantidad}</TableCell>
+                                        </TableRow>
                                     ))}
-                            />   
+                                    </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <TableFooter>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={articulos.length}
+                                rowsPerPage={rowsPerPage}
+                                rowsPerPageText="Filas por Pagina"
+                                rangeSeparatorText= 'de'
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </TableFooter>
                         </div >
                     </div>
                 </div>
