@@ -85,39 +85,43 @@ function useArticulos(){
                     <h3>Pantalla Busqueda por Descripción</h3>
                 </div>
                 <div class="row container-fluid">
-                    <div class="col-sm-1 my-1 border border-dark" align="center">
+                    <div class="col-sm-1 my-1 border border-dark container-fluid" align="center">
                         <div class="row container-fluid"><p></p></div>
-                        <img src="images/page/menu.png" alt="Menu" width="80%" className="img-fluid"/>
+                        <img src="images/page/menu.png" responsive="true" alt="Menu" width="60%" className="img-fluid"/>
                     </div>
                     <div class="col-sm-1 my-1 border border-dark">
-                        <img src="images/page/logoweb.png" alt="Menu" width="100%" className="img-fluid"/>
+                        <div class="row container-fluid"><p></p></div>
+                        <img src="images/page/logoweb.png" alt="Menu" width="60%" className="img-fluid"/>
                     </div>
                     <div class="col-sm-8 my-1 border border-dark">
-                        <div class="row container-fluid"><p></p></div>
-                        <div class="row container-fluid">
-                            <div class="col-sm-1 container-fluid">
-                                <MDBDropdown group className='shadow-0'>
-                                    <MDBDropdownToggle tag='a' className='btn btn-outline-danger text-dark container-fluid"'>
-                                        Tipo
-                                    </MDBDropdownToggle>
-                                    <MDBDropdownMenu>
-                                        <MDBDropdownItem>
-                                        <MDBDropdownLink href="#">Descripción</MDBDropdownLink>
-                                        </MDBDropdownItem>
-                                        <MDBDropdownItem>
-                                        <MDBDropdownLink href="#">Sustancia Activa o  Padecimiento</MDBDropdownLink>
-                                        </MDBDropdownItem>
-                                        <MDBDropdownItem>
-                                        <MDBDropdownLink href="#">Articulo o Codigo EAN</MDBDropdownLink>
-                                        </MDBDropdownItem>
-                                    </MDBDropdownMenu>
+                        <div class="col-sm-12 my-1 row"></div>
+                        <div class="col-sm-12 my-1 row">
+                            <div class="col-sm-2 my-1 row">
+                                <MDBDropdown dropright>
+                                        <MDBDropdownToggle basic class="custom-drop">
+                                            Tipo de Busqueda >
+                                        </MDBDropdownToggle>
+                                        <MDBDropdownMenu>
+                                            <MDBDropdownItem>
+                                            <MDBDropdownLink href="#"><h6>Descripción</h6></MDBDropdownLink>
+                                            </MDBDropdownItem>
+                                            <MDBDropdownItem>
+                                            <MDBDropdownLink href="#"><h6>Sustancia Activa o  Padecimiento</h6></MDBDropdownLink>
+                                            </MDBDropdownItem>
+                                            <MDBDropdownItem>
+                                            <MDBDropdownLink href="#"><h6>Articulo o Codigo EAN</h6></MDBDropdownLink>
+                                            </MDBDropdownItem>
+                                        </MDBDropdownMenu>
                                 </MDBDropdown>
                             </div>
-                            <div class="col-sm-9 my-1 container-fluid">
+                            <div class="col-sm-1 my-1 row">
+                            </div>
+                            <div class="col-sm-8 my-1 row">
                                 <input type="text" className="form-control border-danger" name="busqueda" onChange=""/>
-                            </div>                            
-                            <div class="col-sm-1 my-1 container-fluid"></div>
-                        </div>
+                            </div>  
+                            <div class="col-sm-1 my-1 row">
+                            </div> 
+                        </div>                         
                     </div>
                     <div class="col-sm-1 my-1 border border-dark">
                         <div class="row container-fluid"><p></p></div>
@@ -139,11 +143,11 @@ function useArticulos(){
                                     <TableCell className="text-warning"><h5>Articulo</h5></TableCell>
                                     <TableCell className="text-warning"><h5>Descripción</h5></TableCell>
                                     <TableCell className="text-warning"><h5>Familia</h5></TableCell>
-                                    <TableCell className="text-warning"><h5>Cantidad</h5></TableCell>
-                                    <TableCell className="text-warning"><h5>Precio Lista</h5></TableCell>
-                                    <TableCell className="text-warning"><h5>Desc</h5></TableCell>
-                                    <TableCell className="text-warning"><h5>Nuevo Precio</h5></TableCell>
-                                    <TableCell className="text-warning"><h5>Acciones</h5></TableCell>
+                                    <TableCell align="center" className="text-warning"><h5>Cantidad</h5></TableCell>
+                                    <TableCell align="center" className="text-warning"><h5>Precio Lista</h5></TableCell>
+                                    <TableCell align="center" className="text-warning"><h5>Desc</h5></TableCell>
+                                    <TableCell align="center" className="text-warning"><h5>Nuevo Precio</h5></TableCell>
+                                    <TableCell align="center" className="text-warning"><h5>Acciones</h5></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -153,13 +157,13 @@ function useArticulos(){
                                     <TableCell component="th" scope="row">
                                         {row.Articulo}
                                     </TableCell>
-                                    <TableCell >{row.Descripcion1}</TableCell>
-                                    <TableCell >{row.Familia}</TableCell>
-                                    <TableCell >{row.Cantidad}</TableCell>
-                                    <TableCell >{"$ " + row.PrecioLista}</TableCell>
-                                    <TableCell >{row.DescuentosCascada + " %"}</TableCell>
-                                    <TableCell >{"$ " + row.PrecioConDescuento}</TableCell>
-                                    <TableCell >
+                                    <TableCell>{row.Descripcion1}</TableCell>
+                                    <TableCell>{row.Familia}</TableCell>
+                                    <TableCell align="center">{row.Cantidad}</TableCell>
+                                    <TableCell align="center" >{"$ " + row.PrecioLista}</TableCell>
+                                    <TableCell align="center" >{row.DescuentosCascada + " %"}</TableCell>
+                                    <TableCell align="center" >{"$ " + row.PrecioConDescuento}</TableCell>
+                                    <TableCell align="center">
                                         <button class="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
                                         &nbsp;&nbsp;
                                         <button class="custom-bg" type="button" ><h6>Agregar</h6></button>
@@ -188,15 +192,15 @@ function useArticulos(){
                         <Table aria-label="simple table">
                             <TableHead class="custom-invisible">
                                 <TableRow className="custom-bg">
-                                    <TableCell className="text-white"><h4>#</h4></TableCell>
-                                    <TableCell className="text-white"><h5>Articulo</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Descripción</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Familia</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Cantidad</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Precio Lista</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Desc</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Nuevo Precio</h5></TableCell>
-                                    <TableCell className="text-white"><h5>Acciones</h5></TableCell>  
+                                    <TableCell><h4>#</h4></TableCell>
+                                    <TableCell><h5>Articulo</h5></TableCell>
+                                    <TableCell><h5>Descripción</h5></TableCell>
+                                    <TableCell><h5>Familia</h5></TableCell>
+                                    <TableCell><h5>Cantidad</h5></TableCell>
+                                    <TableCell><h5>Precio Lista</h5></TableCell>
+                                    <TableCell><h5>Desc</h5></TableCell>
+                                    <TableCell><h5>Nuevo Precio</h5></TableCell>
+                                    <TableCell><h5>Acciones</h5></TableCell>  
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -208,11 +212,11 @@ function useArticulos(){
                                     </TableCell>
                                     <TableCell>{row.Descripcion1}</TableCell>
                                     <TableCell>{row.Familia}</TableCell>
-                                    <TableCell>{row.Cantidad}</TableCell>
-                                    <TableCell>{"$ " + row.PrecioLista}</TableCell>
-                                    <TableCell>{row.DescuentosCascada + " %"}</TableCell>
-                                    <TableCell>{"$ " + row.PrecioConDescuento}</TableCell>
-                                    <TableCell>
+                                    <TableCell align="center" >{row.Cantidad}</TableCell>
+                                    <TableCell align="center" >{"$ " + row.PrecioLista}</TableCell>
+                                    <TableCell align="center" >{row.DescuentosCascada + " %"}</TableCell>
+                                    <TableCell align="center" >{"$ " + row.PrecioConDescuento}</TableCell>
+                                    <TableCell align="center" >
                                         <button class="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
                                         &nbsp;&nbsp;
                                         <button class="custom-bg" type="button" ><h6>Agregar</h6></button>
@@ -248,8 +252,8 @@ function useArticulos(){
                                 <Table aria-label="simple table">
                                     <TableHead class="custom-bg">
                                         <TableRow className="custom-bg">
-                                            <TableCell className="text-warning">Articulo</TableCell>
-                                            <TableCell className="text-warning">Cantidad</TableCell>
+                                            <TableCell className="text-warning"><h5>Articulo</h5></TableCell>
+                                            <TableCell className="text-warning"><h5>Cantidad</h5></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>

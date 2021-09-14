@@ -20,3 +20,11 @@ div.custom-bg{
 .custom-invisible{
     visibility: collapse;
 }
+
+.custom-drop{
+    color:#fbd134;
+    font-family:Arial, Helvetica, sans-serif;
+    background-color: #d11a2c;
+    border-color: #d11a2c;
+    border-radius: 10%;
+}
