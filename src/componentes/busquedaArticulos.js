@@ -29,12 +29,12 @@ import {
     const [ModalArticulo, setModalArticulo]=useState(false);
     const [articuloSeleccionado, setarticuloSeleccionado]=useState({
         Articulo: '',
-        Descripcion1: '',
-        Familia: '',
-        Cantidad: '',
-        PrecioLista: '',
-        DescuentosCascada: '',
-        PrecioConDescuento: ''
+        Codigo: '',
+        Descripcion: '',
+        Precio: '',
+        Descuento: '',
+        Existencia: '',
+        Gen_Pat: ''
       })
 
     const [page, setPage] = React.useState(0);
@@ -60,10 +60,10 @@ import {
       abrirCerrarModalArticulo();
     }
 
-    const asignarSugerido = (sugerido) => {
+    const asignarSugerido = (textosugerido) => {
         setDatosBusqueda({
           ...datosBusqueda,
-          [sugerido]: sugerido
+          sugerido: textosugerido
         });
         //window.location.refresh(true);
       }
@@ -96,7 +96,7 @@ import {
         textoabuscar: '',
         tipo:1,
         sucursal: 23,
-        sugerido: 'OPE002255'
+        sugerido: ''
       })
 
       const peticionGetArticulo=async (datosBusqueda)=>{
@@ -199,7 +199,7 @@ import {
                                 <TableRow key={i} value={row.Articulo}>
                                     <TableCell>{(page * rowsPerPage) + (i + 1)}</TableCell>
                                     <TableCell component="th" scope="row">
-                                        <p className="tipoOpe">{row.Articulo}</p>
+                                        <text className="tipoOpe">{row.Articulo}</text><br />
                                         {row.Codigo}
                                     </TableCell>
                                     <TableCell>{row.Descripcion}</TableCell>
@@ -249,7 +249,7 @@ import {
                                     <TableRow key={i} value={row.Articulo} className="custom-data">
                                         <TableCell>{(page * rowsPerPage) + (i + 1)}</TableCell>
                                         <TableCell component="th" scope="row">
-                                            <p className="tipoOpe">{row.Articulo}</p>
+                                            <text className="tipoOpe">{row.Articulo}</text><br />
                                             {row.Codigo}
                                         </TableCell>
                                         <TableCell>{row.Descripcion}</TableCell>
