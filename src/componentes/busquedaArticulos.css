@@ -1,12 +1,13 @@
 .cuerpo{
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .custom-bg{
-    color:#fbd134;
-    background-color: #d11a2c;
-    border-color:black;
-    font-weight: bold;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    color:#fbd134 !important;
+    background-color: #d11a2c !important;
+    border-color:black !important;
+    font-weight: bold !important;
 }
 
 button.custom-bg{
@@ -22,9 +23,17 @@ div.custom-bg{
 }
 
 .custom-drop{
-    color:#fbd134;
-    font-family:Arial, Helvetica, sans-serif;
-    background-color: #d11a2c;
-    border-color: #d11a2c;
+    color:#d11a2c !important;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    background-color: white !important;
+    border-color: #d11a2c !important;
     border-radius: 10%;
+}
+
+.custom-data{
+    text-size-adjust: small I !important;
+}
+
+.tipoOpe{
+    font-weight: bold !important;
 }
