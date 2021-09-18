@@ -323,9 +323,9 @@ import {
                         <div className="border border-dark">
                             
                             <div align="center" className="custom-bg row container-fluid">
-                                    <label>Disponibles</label>
-                                </div>
-                            <TableContainer component={Paper} className="responsive">
+                                <label>Disponibles</label>
+                            </div>
+                            <TableContainer component={Paper} className="responsive"> 
                                 <Table aria-label="simple table">
                                     <TableHead className="custom-bg">
                                         <TableRow className="custom-bg">
@@ -398,52 +398,52 @@ import {
             </Modal>
             
             <Modal isOpen={ModalArticulo}>
-            <ModalBody>
-                <div className="custom-bg border border-dark" align="center">
-                <h4><p>Datos del Articulo</p></h4>
-                </div>
-                <div className="row" align="center">
-                    <div className="col-sm-6">
-                        <label>Articulo:</label><br />
-                        <input type="text" className="form-control" readOnly name="articulo" value={articuloSeleccionado && articuloSeleccionado.Articulo}/> <br />
+                <ModalBody>
+                    <div className="custom-bg border border-dark" align="center">
+                    <h4><p>Datos del Articulo</p></h4>
                     </div>
-                    <div className="col-sm-6">
-                        <label>Codigo:</label><br />
-                        <input type="text" className="form-control"  readOnly name="codigo" value={articuloSeleccionado && articuloSeleccionado.Codigo}/> <br />
-                    </div>                       
-                </div>
-                <div className="row" align="center">
-                    <div className="col-sm-8 my-3">                        
-                        <label>Descripción:</label><br />
-                        <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion}/> <br />
+                    <div className="row" align="center">
+                        <div className="col-sm-6">
+                            <label>Articulo:</label><br />
+                            <input type="text" className="form-control" readOnly name="articulo" value={articuloSeleccionado && articuloSeleccionado.Articulo}/> <br />
+                        </div>
+                        <div className="col-sm-6">
+                            <label>Codigo:</label><br />
+                            <input type="text" className="form-control"  readOnly name="codigo" value={articuloSeleccionado && articuloSeleccionado.Codigo}/> <br />
+                        </div>                       
                     </div>
-                    <div className="col-sm-4 my-3 ">
-                        <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`} 
-                                        alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%"/>
+                    <div className="row" align="center">
+                        <div className="col-sm-8 my-3">                        
+                            <label>Descripción:</label><br />
+                            <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion}/> <br />
+                        </div>
+                        <div className="col-sm-4 my-3 ">
+                            <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`} 
+                                            alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%"/>
+                        </div>
                     </div>
-                </div>
-                <div className="row" align="center">
-                    <div className="col-sm-3 my-3"> <br />
-                        <label>Precio:</label><br />
-                        <input type="text" className="form-control"  readOnly name="precio" value={'$ ' + articuloSeleccionado && articuloSeleccionado.Precio}/> <br />
+                    <div className="row" align="center">
+                        <div className="col-sm-3 my-3"> <br />
+                            <label>Precio:</label><br />
+                            <input type="text" className="form-control"  readOnly name="precio" value={'$ ' + articuloSeleccionado && articuloSeleccionado.Precio}/> <br />
+                        </div>
+                        <div className="col-sm-3 my-3"> <br />
+                            <label>Descuento:</label><br />
+                            <input type="text" className="form-control"  readOnly name="descuento" value={articuloSeleccionado && articuloSeleccionado.Descuento + " %"}/> <br />
+                        </div>
+                        <div className="col-sm-3 my-3">
+                            <label>Precio Con Descuento:</label><br />
+                            <input type="text" className="form-control"  readOnly name="PrecioConDescuento" value={"$$ " + articuloSeleccionado && articuloSeleccionado.PrecioConDescuento}/> <br />
+                        </div>
+                        <div className="col-sm-3 my-3"> <br /> 
+                            <label>Existencia:</label><br />
+                            <input type="text" className="form-control"  readOnly name="Existencia" value={articuloSeleccionado && articuloSeleccionado.Existencia}/> <br />
+                        </div>
                     </div>
-                    <div className="col-sm-3 my-3"> <br />
-                        <label>Descuento:</label><br />
-                        <input type="text" className="form-control"  readOnly name="descuento" value={articuloSeleccionado && articuloSeleccionado.Descuento + " %"}/> <br />
-                    </div>
-                    <div className="col-sm-3 my-3">
-                        <label>Precio Con Descuento:</label><br />
-                        <input type="text" className="form-control"  readOnly name="PrecioConDescuento" value={"$$ " + articuloSeleccionado && articuloSeleccionado.PrecioConDescuento}/> <br />
-                    </div>
-                    <div className="col-sm-3 my-3"> <br /> 
-                        <label>Existencia:</label><br />
-                        <input type="text" className="form-control"  readOnly name="Existencia" value={articuloSeleccionado && articuloSeleccionado.Existencia}/> <br />
-                    </div>
-                </div>
-            </ModalBody>
-            <ModalFooter>
-                    <button className="custom-bg" onClick={()=>abrirCerrarModalArticulo()}>Cerrar</button>
-            </ModalFooter>
+                </ModalBody>
+                <ModalFooter>
+                        <button className="custom-bg" onClick={()=>abrirCerrarModalArticulo()}>Cerrar</button>
+                </ModalFooter>
             </Modal>
         </body>
     )
