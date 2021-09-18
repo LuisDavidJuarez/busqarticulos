@@ -19,11 +19,6 @@ import {
     TableFooter
  } from '@material-ui/core';
 
- 
-import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
-
-
   export default function Articulos(){
 
     const [articulos, setArticulos] = useState([])
@@ -32,6 +27,7 @@ import Stack from '@mui/material/Stack';
 
     const baseUrl="https://localhost:44371/api/BusquedaArticulos";
     const [ModalArticulo, setModalArticulo]=useState(false);
+    const [ModalSucursal, setModalSucursal]=useState(false);
     const [articuloSeleccionado, setarticuloSeleccionado]=useState({
         Articulo: '',
         Codigo: '',
@@ -66,15 +62,31 @@ import Stack from '@mui/material/Stack';
         setPage2(0);
     };
 
+    const [page3, setPage3] = React.useState(0);
+    const [rowsPerPage3, setRowsPerPage3] = React.useState(5);
+
+    const handleChangePage3 = (event, newPage) => {
+        setPage3(newPage);
+    };
+
+  const handleChangeRowsPerPage3 = (event) => {
+      setRowsPerPage3(+event.target.value);
+      setPage3(0);
+  };
+
     const abrirCerrarModalArticulo=()=> {
       setModalArticulo(!ModalArticulo);
     }
 
+    const abrirCerrarModalSucursal=()=> {
+      setModalSucursal(!ModalSucursal);
+    }
+
     const seleccionarArticulo=(articulo, caso)=>{
         setarticuloSeleccionado(articulo);
+        abrirCerrarModalArticulo();
+      (caso==="Sugerir")&& 
         asignarSugerido(articulo.Articulo);
-      (caso==="Ver")&&
-      abrirCerrarModalArticulo();
     }
 
     const asignarSugerido = (textosugerido) => {
@@ -82,7 +94,6 @@ import Stack from '@mui/material/Stack';
           ...datosBusqueda,
           sugerido: textosugerido
         });
-        //window.location.refresh(true);
       }
     
     const OpcionesBusq = [
@@ -122,6 +133,7 @@ import Stack from '@mui/material/Stack';
                                   "/" + datosBusqueda.textoabuscar)
         .then(response=>{
           setArticulos(response.data);
+          setPage(0);
         }).catch(error=>{
           console.log(error);
         })}
@@ -132,6 +144,7 @@ import Stack from '@mui/material/Stack';
                                       "/" + datosBusqueda.sugerido)
           .then(response=>{
             setSugeridos(response.data);
+            setPage2(0);
           }).catch(error=>{
             console.log(error);
           })
@@ -229,7 +242,7 @@ import Stack from '@mui/material/Stack';
                                     <TableCell align="center" >{row.Existencia}</TableCell>                                        
                                     <TableCell>{row.Gen_Pat}</TableCell>
                                     <TableCell align="center">
-                                        <button className="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
+                                        <button className="custom-bg" type="button" onClick={()=>seleccionarArticulo(row, "Sugerir")}><h6>Ver</h6></button>
                                         &nbsp;&nbsp;
                                         <button className="custom-bg" type="button" ><h6>+</h6></button>
                                     </TableCell>
@@ -239,20 +252,17 @@ import Stack from '@mui/material/Stack';
                             </Table>
                         </TableContainer>
                         <TableFooter>
-                            <Stack spacing={2}>
-                                <Pagination count={10} shape="rounded" />
-                                <Pagination count={10} variant="outlined" shape="rounded" />
-                            </Stack>
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25]}
-                                component="div"
-                                count={articulos.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                            />
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 25]}
+                                    component="div"
+                                    count={articulos.length}
+                                    page={page}
+                                    rowsPerPage={rowsPerPage}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
                         </TableFooter>
+                        
                         <div className="custom-bg"><h4>Articulos Sugeridos</h4></div>
                         
                     <TableContainer component={Paper} className="responsive">
@@ -319,12 +329,12 @@ import Stack from '@mui/material/Stack';
                                 <Table aria-label="simple table">
                                     <TableHead className="custom-bg">
                                         <TableRow className="custom-bg">
-                                            <TableCell ><h6>Sucursal</h6></TableCell>
-                                            <TableCell ><h6>Existencia</h6></TableCell>
+                                            <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
+                                            <TableCell className="custom-bg"><label>Existencia</label></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                    {disponibles.slice(5, 5 + 5).map((row) => (
+                                    {disponibles.slice(0,5).map((row) => (
                                         <TableRow key={row.Sucursal}>
                                             <TableCell component="th" scope="row">
                                                 {row.Sucursal}
@@ -335,19 +345,58 @@ import Stack from '@mui/material/Stack';
                                     </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <TableFooter>
-                                </TableFooter>
                                 <div align="right" className="custom-bg row container-fluid">
-                                    <label onClick={()=>abrirCerrarModalArticulo()}>ver mas</label>
+                                    <label onClick={()=>abrirCerrarModalSucursal()}>ver mas</label>
                                 </div>
                         </div >
                     </div>
                 </div>
                 <div className="custom-bg" align="left">
-                    Dirección: {window.location.href} |Base de Datos: Local/Linea
+                    <label>
+                        Dirección: {window.location.href} || Base de Datos: Local/Linea || Sucursal: {OpcionesBusq.sucursal}
+                    </label>
                 </div>
             </div>
 
+            <Modal isOpen={ModalSucursal}>
+            <ModalBody>
+                <TableContainer component={Paper} className="responsive">
+                    <Table aria-label="simple table">
+                        <TableHead className="custom-bg">
+                            <TableRow className="custom-bg">
+                                <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
+                                <TableCell className="custom-bg"><label>Existencia</label></TableCell>
+                            </TableRow>
+                        </TableHead>
+                    <TableBody>
+                    {disponibles.slice(page3 * rowsPerPage3, page3 * rowsPerPage3 + rowsPerPage3).map((row) => (
+                        <TableRow key={row.Sucursal}>
+                            <TableCell component="th" scope="row">
+                                {row.Sucursal}
+                            </TableCell>
+                            <TableCell >{row.Existencia}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                    </Table>
+                    <TableFooter>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={disponibles.length}
+                                page={page3}
+                                rowsPerPage={rowsPerPage3}
+                                onPageChange={handleChangePage3}
+                                onRowsPerPageChange={handleChangeRowsPerPage3}
+                            />
+                    </TableFooter>
+                </TableContainer>
+            </ModalBody>
+            <ModalFooter>
+                    <button className="custom-bg" onClick={()=>abrirCerrarModalSucursal()}>Cerrar</button>
+            </ModalFooter>
+            </Modal>
+            
             <Modal isOpen={ModalArticulo}>
             <ModalBody>
                 <div className="custom-bg border border-dark" align="center">
