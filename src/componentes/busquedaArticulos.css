@@ -1,13 +1,19 @@
 .cuerpo{
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
 }
 
 .custom-bg{
     font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
     color:#fbd134 !important;
     background-color: #d11a2c !important;
     border-color:black !important;
     font-weight: bold !important;
+}
+
+label.custom-bg{
+    color:#fbd134 !important;
 }
 
 button.custom-bg{
@@ -19,7 +25,7 @@ div.custom-bg{
 }
 
 .custom-invisible{
-    visibility: collapse;
+    visibility: collapse !important;
 }
 
 .custom-drop{
@@ -27,7 +33,7 @@ div.custom-bg{
     font-family:Verdana, Geneva, Tahoma, sans-serif !important;
     background-color: white !important;
     border-color: #d11a2c !important;
-    border-radius: 10%;
+    border-radius: 5%;
 }
 
 .custom-data{
