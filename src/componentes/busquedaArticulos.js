@@ -14,9 +14,9 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TableFooter,
     Paper,
-    TablePagination,
-    TableFooter
+    TablePagination
  } from '@material-ui/core';
 
   export default function Articulos(){
@@ -24,6 +24,7 @@ import {
     const [articulos, setArticulos] = useState([])
     const [sugeridos, setSugeridos] = useState([])
     const [disponibles, setDisponibles] = useState([])
+    const [autocompletar, setAutocompletar] = useState([])
 
     const baseUrl="https://localhost:44371/api/BusquedaArticulos";
     const [ModalArticulo, setModalArticulo]=useState(false);
@@ -127,6 +128,28 @@ import {
         sugerido: ''
       })
 
+      const asignarBusqueda = (opcion) => {
+        setDatosBusqueda({
+          ...datosBusqueda,
+          textoabuscar: obtenerValor(opcion)
+        });
+      }
+
+      function obtenerValor(opcion){
+          if(datosBusqueda.tipo === 1){
+              return opcion.Descripcion;
+          }
+          else if(datosBusqueda.tipo === 2){
+              return opcion.SustanciaActiva;
+          }
+          else if(datosBusqueda.tipo === 3){
+              return opcion.Articulo;
+          }
+          else {
+              return "";
+          }
+      }
+
       const peticionGetArticulo=async (datosBusqueda)=>{
         await axios.get(baseUrl + "/" + datosBusqueda.sucursal + 
                                   "/" + datosBusqueda.tipo + 
@@ -160,11 +183,22 @@ import {
         })
     }
 
+    const peticionGetAutocompletar=async(datosBusqueda)=>{
+        await axios.get(baseUrl + "/" + datosBusqueda.tipo + 
+                                  "/" + datosBusqueda.textoabuscar)
+      .then(response=>{
+        setAutocompletar(response.data);
+      }).catch(error=>{
+        console.log(error);
+      })
+  }
+
       useEffect(()=>{
         if(datosBusqueda.textoabuscar.length > 2){
           peticionGetArticulo(datosBusqueda);
           peticionGetSugeridos(datosBusqueda);
           peticionGetDisponibles(datosBusqueda);
+          peticionGetAutocompletar(datosBusqueda);
         }
       }, [datosBusqueda])
   
@@ -188,8 +222,7 @@ import {
                     <div className="col-sm-8 my-1 border border-dark">
                         <div className="col-sm-12 my-1 row">
                             <div className="col-sm-4 my-1 row">
-                                <select name="tipo" onChange={handleChange} className="custom-drop" readOnly>
-                                    <option value='0' header>Seleccione</option>
+                                <select name="tipo" onChange={handleChange} className="custom-drop">
                                     {OpcionesBusq.map((opcion)=> (
                                             <option  value={opcion.value}>{opcion.label}</option>
                                         ))}
@@ -198,7 +231,13 @@ import {
                             <div className="col-sm-1 my-1 row">
                             </div>
                             <div className="col-sm-6 my-1 row">
-                                <input type="text" className="form-control border-danger" name="textoabuscar" onChange={handleChange} />
+                                <input type="text" className="custom-drop" name="textoabuscar" 
+                                    onChange={handleChange} />
+                                <select name="Autocompletar" className="custom-drop nonbordered">
+                                    {autocompletar.map((opcion)=> (
+                                            <option onClick={()=>asignarBusqueda(opcion)}>{opcion.Articulo + " - " + opcion.Descripcion}</option>
+                                        ))}
+                                </select>
                             </div>  
                             <div className="col-sm-1 my-1 row">
                             </div> 

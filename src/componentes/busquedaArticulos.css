@@ -43,3 +43,11 @@ div.custom-bg{
 .tipoOpe{
     font-weight: bold !important;
 }
+
+.listaAutocompletar{
+    color:#d11a2c !important;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    background-color: white !important;
+    border-color: #d11a2c !important;
+    border-radius: 5%;
+}
