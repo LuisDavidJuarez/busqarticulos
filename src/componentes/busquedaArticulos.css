@@ -51,3 +51,9 @@ div.custom-bg{
     border-color: #d11a2c !important;
     border-radius: 5%;
 }
+
+.avatar-bg{
+    color:#fbd134 !important;
+    background-color: #d11a2c !important;
+    cursor: pointer;
+}

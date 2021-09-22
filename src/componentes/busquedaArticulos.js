@@ -16,7 +16,8 @@ import {
     TableRow,
     TableFooter,
     Paper,
-    TablePagination
+    TablePagination,
+    Avatar
 } from '@material-ui/core';
 
 export default function Articulos() {
@@ -31,6 +32,7 @@ export default function Articulos() {
     const [ModalSucursal, setModalSucursal] = useState(false);
     const [verAutoCompletar, setVerAutoCompletar] = useState(true);
     const [TextoCompleto, setTextoCompleto] = useState('');
+    const [Sucursal, setSucursal] = useState(23);
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
         Articulo: '',
         Codigo: '',
@@ -120,8 +122,12 @@ export default function Articulos() {
             ...datosBusqueda,
             [name]: value
         })
-        if (name !== "tipo"){
+        if (name !== "tipo") {
             setTextoCompleto(value);
+        }
+        else {
+            setTextoCompleto("");
+            setVerAutoCompletar(true);
         }
         console.log(value, datosBusqueda);
     }
@@ -135,24 +141,9 @@ export default function Articulos() {
     const [datosBusqueda, setDatosBusqueda] = useState({
         textoabuscar: '',
         tipo: 1,
-        sucursal: 23,
+        sucursal: Sucursal,
         sugerido: ''
     })
-
-    function obtenerValor(opcion) {
-        if (datosBusqueda.tipo === 1) {
-            return opcion.Descripcion;
-        }
-        else if (datosBusqueda.tipo === 2) {
-            return opcion.SustanciaActiva;
-        }
-        else if (datosBusqueda.tipo === 3) {
-            return opcion.Articulo;
-        }
-        else {
-            return "";
-        }
-    }
 
     const peticionGetArticulo = async (datosBusqueda) => {
         await axios.get(baseUrl + "/" + datosBusqueda.sucursal +
@@ -196,11 +187,12 @@ export default function Articulos() {
             }).catch(error => {
                 console.log(error);
             })
-        
+
         setVerAutoCompletar(false);
     }
 
     useEffect(() => {
+        setSucursal(23);
         if (datosBusqueda.textoabuscar.length > 2) {
 
             peticionGetArticulo(datosBusqueda);
@@ -233,31 +225,32 @@ export default function Articulos() {
                     </div>
                     <div className="col-sm-8 my-1 border border-dark">
                         <div className="col-sm-12 my-1 row">
-                            <div className="col-sm-4 my-1 row">
+                            <div className="col-sm-3 my-1 row">
                                 <select name="tipo" onChange={handleChange} className="custom-drop">
                                     {OpcionesBusq.map((opcion) => (
-                                        <option value={opcion.value}>{opcion.label}</option>
+                                        <option className="text-dark" value={opcion.value}>{opcion.label}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="col-sm-1 my-1 row">
-                            </div>
-                            <div className="col-sm-7 my-1 row">
+                            <div className="col-sm-5 my-1 row">
 
-                                <div className="col-sm-7 my-1 row">
-                                    <input type="text" className="custom-drop" name="textoabuscar"
-                                        onChange={handleChange} value={TextoCompleto} />
-                                </div>
-                                <div hidden={verAutoCompletar} className="col-sm-5 my-1 row">
+                                <input type="text" className="custom-drop" name="textoabuscar"
+                                    onChange={handleChange} value={TextoCompleto} />
+                            </div>
+                            <div hidden={verAutoCompletar} className="col-sm-4 my-1 row">
+
+                                {autocompletar.length !== 0 && (
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
-                                            <option align="left">
-                                                {obtenerValor(opcion)}
+                                            <option
+                                                value={opcion.Articulo}
+                                                align="left"
+                                            >
+                                                {opcion.Articulo + ": " + opcion.Descripcion}
                                             </option>
                                         ))}
                                     </select>
-                                </div>
-
+                                )}
                             </div>
                         </div>
                     </div>
@@ -280,15 +273,23 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Descripción</label></TableCell>
                                         <TableCell><label className="custom-bg">Precio <br />Desc</label></TableCell>
                                         <TableCell><label className="custom-bg">Precio <br />Final</label></TableCell>
-                                        <TableCell><label className="custom-bg">Existencia</label></TableCell>
-                                        <TableCell><label className="custom-bg">Tipo Comisión</label></TableCell>
+                                        <TableCell><label className="custom-bg">Exist</label></TableCell>
+                                        <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => (
                                         <TableRow key={i} value={row.Articulo}>
-                                            <TableCell>{(page * rowsPerPage) + (i + 1)}</TableCell>
+                                            <TableCell>
+                                                <Avatar
+                                                    className="avatar-bg"
+                                                    src='.'
+                                                    onClick={() => seleccionarArticulo(row, "Sugerir")}
+                                                >
+                                                    {(page * rowsPerPage) + (i + 1)}
+                                                </Avatar>
+                                            </TableCell>
                                             <TableCell component="th" scope="row">
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
@@ -299,9 +300,10 @@ export default function Articulos() {
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell>{row.Gen_Pat}</TableCell>
                                             <TableCell align="center">
-                                                <button className="custom-bg" type="button" onClick={() => seleccionarArticulo(row, "Sugerir")}><h6>Ver</h6></button>
-                                                &nbsp;&nbsp;
-                                                <button className="custom-bg" type="button" ><h6>+</h6></button>
+                                                <Avatar
+                                                    className="avatar-bg"
+                                                    src='.'
+                                                >+</Avatar>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -331,15 +333,23 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Descripción</label></TableCell>
                                         <TableCell><label className="custom-bg">Precio <br />Desc</label></TableCell>
                                         <TableCell><label className="custom-bg">Precio <br />Final</label></TableCell>
-                                        <TableCell><label className="custom-bg">Existencia</label></TableCell>
-                                        <TableCell><label className="custom-bg">Tipo Comisión</label></TableCell>
+                                        <TableCell><label className="custom-bg">Exist</label></TableCell>
+                                        <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {sugeridos.slice(page2 * rowsPerPage2, page2 * rowsPerPage2 + rowsPerPage2).map((row, i) => (
                                         <TableRow key={i} value={row.Articulo}>
-                                            <TableCell>{(page * rowsPerPage) + (i + 1)}</TableCell>
+                                            <TableCell>
+                                                <Avatar
+                                                    className="avatar-bg"
+                                                    src='.'
+                                                    onClick={() => seleccionarArticulo(row, "Ver")}
+                                                >
+                                                    {(page * rowsPerPage) + (i + 1)}
+                                                </Avatar>
+                                            </TableCell>
                                             <TableCell component="th" scope="row">
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
@@ -350,9 +360,10 @@ export default function Articulos() {
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell>{row.Gen_Pat}</TableCell>
                                             <TableCell align="center">
-                                                <button className="custom-bg" type="button" onClick={() => seleccionarArticulo(row, "Ver")}><h6>Ver</h6></button>
-                                                &nbsp;&nbsp;
-                                                <button className="custom-bg" type="button" ><h6>+</h6></button>
+                                                <Avatar
+                                                    className="avatar-bg"
+                                                    src='.'
+                                                >+</Avatar>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -410,7 +421,7 @@ export default function Articulos() {
                 </div>
                 <div className="custom-bg" align="left">
                     <label>
-                        Dirección: {window.location.href} || Base de Datos: Local/Linea || Sucursal: {OpcionesBusq.sucursal}
+                        Dirección: {window.location.href} || Base de Datos: Local/Linea || Sucursal: {Sucursal}
                     </label>
                 </div>
             </div>
