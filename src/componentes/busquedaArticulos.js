@@ -122,20 +122,19 @@ export default function Articulos() {
             ...datosBusqueda,
             [name]: value
         })
-        if (name !== "tipo") {
-            setTextoCompleto(value);
-        }
-        else {
+        if (name === "tipo") {
             setTextoCompleto("");
             setVerAutoCompletar(true);
         }
-        console.log(value, datosBusqueda);
+        else {
+            setTextoCompleto(value);
+        }
     }
 
     const handleChangeSelect = e => {
         setTextoCompleto(e.target.value);
-        console.log(e.target.value, datosBusqueda);
         setVerAutoCompletar(true);
+        console.log(e.target.value, datosBusqueda)
     }
 
     const [datosBusqueda, setDatosBusqueda] = useState({
@@ -179,7 +178,7 @@ export default function Articulos() {
             })
     }
 
-    const peticionGetAutocompletar = async (datosBusqueda) => {
+    const peticionGetAutocompletar = async (datosBusqueda, TextoCompleto) => {
         await axios.get(baseUrl + "/" + datosBusqueda.tipo +
             "/" + datosBusqueda.textoabuscar)
             .then(response => {
@@ -187,8 +186,12 @@ export default function Articulos() {
             }).catch(error => {
                 console.log(error);
             })
-
-        setVerAutoCompletar(false);
+        if (TextoCompleto !== "") {
+            setVerAutoCompletar(false);
+        }
+        else {
+            setVerAutoCompletar(true);
+        }
     }
 
     useEffect(() => {
@@ -218,7 +221,13 @@ export default function Articulos() {
                 </div>
                 <div className="row container-fluid">
                     <div className="col-sm-1 my-1 border border-dark container-fluid" align="center">
-                        <img src="images/page/menu.png" responsive="true" alt="Menu" width="60%" className="img-fluid" />
+                        <img
+                            src="images/page/menu.png"
+                            responsive="true"
+                            alt="Menu"
+                            width="60%"
+                            className="img-fluid"
+                        />
                     </div>
                     <div className="col-sm-1 my-1 border border-dark">
                         <img src="images/page/logoweb.png" alt="Menu" width="60%" className="img-fluid" />
@@ -238,15 +247,25 @@ export default function Articulos() {
                                     onChange={handleChange} value={TextoCompleto} />
                             </div>
                             <div hidden={verAutoCompletar} className="col-sm-4 my-1 row">
-
                                 {autocompletar.length !== 0 && (
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
                                             <option
-                                                value={opcion.Articulo}
+                                                value={(() => {
+                                                    switch (datosBusqueda.tipo) {
+                                                        case 1:
+                                                            return opcion.Descripcion;
+                                                        case 2:
+                                                            return opcion.SustanciaActiva;
+                                                        case 3:
+                                                            return opcion.Articulo;
+                                                        default:
+                                                            return '';
+                                                    }
+                                                })()}
                                                 align="left"
                                             >
-                                                {opcion.Articulo + ": " + opcion.Descripcion}
+                                                {opcion.Articulo + ": " + opcion.Descripcion + "(" + opcion.SustanciaActiva + ")"}
                                             </option>
                                         ))}
                                     </select>
