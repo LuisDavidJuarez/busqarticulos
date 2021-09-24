@@ -57,3 +57,21 @@ div.custom-bg{
     background-color: #d11a2c !important;
     cursor: pointer;
 }
+
+.allIcons {
+    margin-top: 5%;
+    height: 80%;
+    width: 80%;
+}
+
+.IconX{
+    height:max-content;
+    width: max-content;
+}
+
+.allImg {
+    margin-top: 5%;
+    height: 80%;
+    width: 80%;
+
+}

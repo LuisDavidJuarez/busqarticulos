@@ -19,6 +19,8 @@ import {
     TablePagination,
     Avatar
 } from '@material-ui/core';
+import * as ImIcons from "react-icons/im";
+import * as TiIcons from "react-icons/ti";
 
 export default function Articulos() {
 
@@ -30,6 +32,7 @@ export default function Articulos() {
     const baseUrl = "https://localhost:44371/api/BusquedaArticulos";
     const [ModalArticulo, setModalArticulo] = useState(false);
     const [ModalSucursal, setModalSucursal] = useState(false);
+    const [CambiarTipo, setCambiarTipo] = useState(false);
     const [verAutoCompletar, setVerAutoCompletar] = useState(true);
     const [TextoCompleto, setTextoCompleto] = useState('');
     const [Sucursal, setSucursal] = useState(23);
@@ -42,6 +45,10 @@ export default function Articulos() {
         Existencia: '',
         Gen_Pat: ''
     })
+
+    function financial(x) {
+        return Number.parseFloat(x).toFixed(2);
+    }
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -90,15 +97,17 @@ export default function Articulos() {
     const seleccionarArticulo = (articulo, caso) => {
         setarticuloSeleccionado(articulo);
         abrirCerrarModalArticulo();
-        (caso === "Sugerir") &&
+        if(caso === "Sugerir"){
             asignarSugerido(articulo.Articulo);
+        }
     }
 
     const asignarSugerido = (textosugerido) => {
         setDatosBusqueda({
             ...datosBusqueda,
-            sugerido: textosugerido
+            "sugerido": textosugerido
         });
+
     }
 
     const OpcionesBusq = [
@@ -118,12 +127,18 @@ export default function Articulos() {
 
     const handleChange = e => {
         const { name, value } = e.target;
+        console.log(name, value, datosBusqueda)
         setDatosBusqueda({
             ...datosBusqueda,
             [name]: value
         })
         if (name === "tipo") {
             setTextoCompleto("");
+            setDatosBusqueda({
+                ...datosBusqueda,
+            ...datosBusqueda,
+            "textoabuscar": TextoCompleto
+            })
             setVerAutoCompletar(true);
         }
         else {
@@ -133,8 +148,8 @@ export default function Articulos() {
 
     const handleChangeSelect = e => {
         setTextoCompleto(e.target.value);
+        setCambiarTipo(true);
         setVerAutoCompletar(true);
-        console.log(e.target.value, datosBusqueda)
     }
 
     const [datosBusqueda, setDatosBusqueda] = useState({
@@ -144,19 +159,37 @@ export default function Articulos() {
         sugerido: ''
     })
 
-    const peticionGetArticulo = async (datosBusqueda) => {
+    const peticionGetArticulo = async (datosBusqueda, CambiarTipo) => {
+        var tipo = datosBusqueda.tipo;
+        if (CambiarTipo) {
+            tipo = 3;
+            setDatosBusqueda({
+                ...datosBusqueda,
+                "textoabuscar": TextoCompleto
+            })
+        }
         await axios.get(baseUrl + "/" + datosBusqueda.sucursal +
-            "/" + datosBusqueda.tipo +
+            "/" + tipo +
             "/" + datosBusqueda.textoabuscar)
             .then(response => {
                 setArticulos(response.data);
                 setPage(0);
+                if (tipo === 3) {
+                    if (CambiarTipo) {
+                        if (Object.keys(response.data).length === 1) {
+                            setTextoCompleto("");
+                            setCambiarTipo(false);
+                            setVerAutoCompletar(true);
+                        }
+                    }
+                }
             }).catch(error => {
                 console.log(error);
-            })
+            });
     }
 
     const peticionGetSugeridos = async (datosBusqueda) => {
+        console.log("peticionGetSugeridos antes: ", datosBusqueda);
         await axios.get(baseUrl + "/Sugeridos" +
             "/" + datosBusqueda.sucursal +
             "/" + datosBusqueda.sugerido)
@@ -166,6 +199,7 @@ export default function Articulos() {
             }).catch(error => {
                 console.log(error);
             })
+        console.log("peticionGetSugeridos antes: ", datosBusqueda);
     }
 
     const peticionGetDisponibles = async (datosBusqueda) => {
@@ -198,7 +232,7 @@ export default function Articulos() {
         setSucursal(23);
         if (datosBusqueda.textoabuscar.length > 2) {
 
-            peticionGetArticulo(datosBusqueda);
+            peticionGetArticulo(datosBusqueda, CambiarTipo);
             peticionGetAutocompletar(datosBusqueda);
 
             (datosBusqueda.sugerido !== "") &&
@@ -207,7 +241,8 @@ export default function Articulos() {
             (datosBusqueda.sugerido !== "") &&
                 peticionGetDisponibles(datosBusqueda);
         }
-    }, [datosBusqueda])
+        //eslint-disable-next-line
+    }, [datosBusqueda, CambiarTipo])
 
     return (
         <body className="cuerpo container-fluid">
@@ -221,16 +256,13 @@ export default function Articulos() {
                 </div>
                 <div className="row container-fluid">
                     <div className="col-sm-1 my-1 border border-dark container-fluid" align="center">
-                        <img
-                            src="images/page/menu.png"
+                        <ImIcons.ImMenu
                             responsive="true"
                             alt="Menu"
-                            width="60%"
-                            className="img-fluid"
-                        />
+                            className="allIcons" />
                     </div>
                     <div className="col-sm-1 my-1 border border-dark">
-                        <img src="images/page/logoweb.png" alt="Menu" width="60%" className="img-fluid" />
+                        <img src="/images/pages/logoweb.png" alt="Logo" className="allImg" />
                     </div>
                     <div className="col-sm-8 my-1 border border-dark">
                         <div className="col-sm-12 my-1 row">
@@ -251,18 +283,7 @@ export default function Articulos() {
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
                                             <option
-                                                value={(() => {
-                                                    switch (datosBusqueda.tipo) {
-                                                        case 1:
-                                                            return opcion.Descripcion;
-                                                        case 2:
-                                                            return opcion.SustanciaActiva;
-                                                        case 3:
-                                                            return opcion.Articulo;
-                                                        default:
-                                                            return '';
-                                                    }
-                                                })()}
+                                                value={opcion.Articulo}
                                                 align="left"
                                             >
                                                 {opcion.Articulo + ": " + opcion.Descripcion + "(" + opcion.SustanciaActiva + ")"}
@@ -274,10 +295,10 @@ export default function Articulos() {
                         </div>
                     </div>
                     <div className="col-sm-1 my-1 border border-dark">
-                        <img src="images/page/carrito.png" alt="Menu" width="60%" className="img-fluid" />
+                        <TiIcons.TiShoppingCart className="allIcons" />
                     </div>
                     <div className="col-sm-1 my-1 border border-dark">
-                        <img src="images/page/descuento.png" alt="Menu" width="60%" className="img-fluid" />
+                        <img src="/images/pages/descuento.png" alt="Desc" className="allImg" />
                     </div>
                 </div>
 
@@ -288,10 +309,11 @@ export default function Articulos() {
                                 <TableHead className="custom-bg">
                                     <TableRow className="custom-bg">
                                         <TableCell><label className="custom-bg">#</label></TableCell>
-                                        <TableCell><label className="custom-bg">Articulo <br />Código</label></TableCell>
+                                        <TableCell><label className="custom-bg">Articulo<br />Código</label></TableCell>
                                         <TableCell><label className="custom-bg">Descripción</label></TableCell>
-                                        <TableCell><label className="custom-bg">Precio <br />Desc</label></TableCell>
-                                        <TableCell><label className="custom-bg">Precio <br />Final</label></TableCell>
+                                        <TableCell><label className="custom-bg">Precio</label></TableCell>
+                                        <TableCell><label className="custom-bg">Ahorro</label></TableCell>
+                                        <TableCell><label className="custom-bg">Precio<br />Final</label></TableCell>
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
@@ -314,7 +336,8 @@ export default function Articulos() {
                                                 {row.Codigo}
                                             </TableCell>
                                             <TableCell>{row.Descripcion}</TableCell>
-                                            <TableCell align="center" >{"$ " + row.Precio}<br />{row.Descuento + " %"}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + row.PrecioConDescuento}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell>{row.Gen_Pat}</TableCell>
@@ -348,10 +371,11 @@ export default function Articulos() {
                                 <TableHead className="custom-invisible">
                                     <TableRow className="custom-bg">
                                         <TableCell><label className="custom-bg">#</label></TableCell>
-                                        <TableCell><label className="custom-bg">Articulo <br />Código</label></TableCell>
+                                        <TableCell><label className="custom-bg">Articulo<br />Código</label></TableCell>
                                         <TableCell><label className="custom-bg">Descripción</label></TableCell>
-                                        <TableCell><label className="custom-bg">Precio <br />Desc</label></TableCell>
-                                        <TableCell><label className="custom-bg">Precio <br />Final</label></TableCell>
+                                        <TableCell><label className="custom-bg">Precio</label></TableCell>
+                                        <TableCell><label className="custom-bg">Ahorro</label></TableCell>
+                                        <TableCell><label className="custom-bg">Precio<br />Final</label></TableCell>
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
@@ -374,7 +398,8 @@ export default function Articulos() {
                                                 {row.Codigo}
                                             </TableCell>
                                             <TableCell>{row.Descripcion}</TableCell>
-                                            <TableCell align="center" >{"$ " + row.Precio}<br />{row.Descuento + " %"}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + row.PrecioConDescuento}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell>{row.Gen_Pat}</TableCell>
