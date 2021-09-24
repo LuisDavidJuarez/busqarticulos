@@ -74,18 +74,6 @@ export default function Articulos() {
         setPage2(0);
     };
 
-    const [page3, setPage3] = React.useState(0);
-    const [rowsPerPage3, setRowsPerPage3] = React.useState(5);
-
-    const handleChangePage3 = (event, newPage) => {
-        setPage3(newPage);
-    };
-
-    const handleChangeRowsPerPage3 = (event) => {
-        setRowsPerPage3(+event.target.value);
-        setPage3(0);
-    };
-
     const abrirCerrarModalArticulo = () => {
         setModalArticulo(!ModalArticulo);
     }
@@ -100,6 +88,7 @@ export default function Articulos() {
         if(caso === "Sugerir"){
             asignarSugerido(articulo.Articulo);
         }
+        console.log(datosBusqueda, articulo);
     }
 
     const asignarSugerido = (textosugerido) => {
@@ -165,7 +154,8 @@ export default function Articulos() {
             tipo = 3;
             setDatosBusqueda({
                 ...datosBusqueda,
-                "textoabuscar": TextoCompleto
+                "textoabuscar": TextoCompleto,
+                "sugerido" : TextoCompleto
             })
         }
         await axios.get(baseUrl + "/" + datosBusqueda.sucursal +
@@ -437,21 +427,27 @@ export default function Articulos() {
                             <div align="center" className="custom-bg row container-fluid">
                                 <label>Disponibles</label>
                             </div>
-                            <TableContainer component={Paper} className="responsive">
-                                <Table aria-label="simple table">
+                            <TableContainer compontent={Paper} className="responsive" >
+                                <Table className="TablaDisponibles" aria-label="simple table">
                                     <TableHead className="custom-bg">
                                         <TableRow className="custom-bg">
                                             <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
                                             <TableCell className="custom-bg"><label>Existencia</label></TableCell>
                                         </TableRow>
                                     </TableHead>
-                                    <TableBody>
-                                        {disponibles.slice(0, 5).map((row) => (
-                                            <TableRow key={row.Sucursal}>
-                                                <TableCell component="th" scope="row">
+                                </Table>
+                            </TableContainer>
+                            <TableContainer compontent={Paper} className="TablaContainer responsive" style={{maxHeight: 120}}>
+                                <Table className="TablaDisponibles" aria-label="simple table">
+                                    <TableBody class="bodyDisponibles">
+                                        {disponibles.slice(0, 10).map((row) => (
+                                            <TableRow class="rowDisponibles" key={row.Sucursal}>
+                                                <TableCell class="CellDisponibles" component="th" scope="row">
                                                     {row.Sucursal}
                                                 </TableCell>
-                                                <TableCell >{row.Existencia}</TableCell>
+                                                <TableCell class="CellDisponibles" component="th" scope="row">
+                                                    {row.Existencia}
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -480,8 +476,12 @@ export default function Articulos() {
                                     <TableCell className="custom-bg"><label>Existencia</label></TableCell>
                                 </TableRow>
                             </TableHead>
+                        </Table>
+                    </TableContainer>
+                    <TableContainer component={Paper} className="TablaContainerModalSuc responsive" style={{maxHeight: 350}}>
+                        <Table aria-label="simple table">
                             <TableBody>
-                                {disponibles.slice(page3 * rowsPerPage3, page3 * rowsPerPage3 + rowsPerPage3).map((row) => (
+                                {disponibles.map((row) => (
                                     <TableRow key={row.Sucursal}>
                                         <TableCell component="th" scope="row">
                                             {row.Sucursal}
@@ -491,17 +491,6 @@ export default function Articulos() {
                                 ))}
                             </TableBody>
                         </Table>
-                        <TableFooter>
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25]}
-                                component="div"
-                                count={disponibles.length}
-                                page={page3}
-                                rowsPerPage={rowsPerPage3}
-                                onPageChange={handleChangePage3}
-                                onRowsPerPageChange={handleChangeRowsPerPage3}
-                            />
-                        </TableFooter>
                     </TableContainer>
                 </ModalBody>
                 <ModalFooter>

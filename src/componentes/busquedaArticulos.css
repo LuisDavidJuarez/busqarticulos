@@ -75,3 +75,13 @@ div.custom-bg{
     width: 80%;
 
 }
+
+.rowDisponibles{
+    height:  10px !important;
+    text-align: center;
+}
+
+.CellDisponibles.rowDisponibles{
+    height:auto !important;
+    text-align: center;
+}
