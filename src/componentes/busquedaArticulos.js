@@ -34,11 +34,22 @@ export default function Articulos() {
     const [ModalSucursal, setModalSucursal] = useState(false);
     const [CambiarTipo, setCambiarTipo] = useState(false);
     const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
+    const [verArticuloSeleccionado, setVerArticuloSeleccionado] = useState(false);
     const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
     const [verTabla, setVerTabla] = useState(false);
     const [TextoCompleto, setTextoCompleto] = useState('');
     const [Sucursal, setSucursal] = useState(23);
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
+        Articulo: '',
+        Codigo: '',
+        Descripcion: '',
+        Precio: '',
+        Descuento: '',
+        PrecioConDescuento: '',
+        Existencia: '',
+        Gen_Pat: ''
+    })
+    const articuloLimpio = useState({
         Articulo: '',
         Codigo: '',
         Descripcion: '',
@@ -90,11 +101,13 @@ export default function Articulos() {
         if (caso !== "Seleccionar") {
             abrirCerrarModalArticulo();
         }
+        else{
+            setVerArticuloSeleccionado(true);
+        }
         if (caso === "Sugerir") {
             asignarSugerido(articulo.Articulo);
             setVerSugeridosSucursales(true);
         }
-        console.log(datosBusqueda, articulo);
     }
 
     const asignarSugerido = (textosugerido) => {
@@ -130,6 +143,8 @@ export default function Articulos() {
             setVerTabla(true);
             setTextoCompleto("");
             setVerSugeridosSucursales(false);
+            setarticuloSeleccionado(articuloLimpio);
+            setVerArticuloSeleccionado(false);
         }
     }
 
@@ -462,35 +477,37 @@ export default function Articulos() {
                                 alt="CAD13600" width="80%" className="img-fluid bordered" />
                         </div >
                         <p></p>
-                        <div className="col-sm-12 my-1 row" align="center">
-                            <Avatar
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                Precio:
-                            </Avatar>
-                            <Avatar
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                Ahorro:
-                            </Avatar>
-                        </div >
-                        <p></p>
-                        <div className="col-sm-12 my-1 row" align="center">
-                            <Avatar
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                {articuloSeleccionado && "$ " + articuloSeleccionado.Precio}
-                            </Avatar>
-                            <Avatar
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                {articuloSeleccionado && "$ " + articuloSeleccionado.PrecioConDescuento}
-                            </Avatar>
-                        </div >
+                        {verArticuloSeleccionado === true &&
+                            <div className="col-sm-12 my-1 row" align="center">
+                                <Avatar
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    Precio:
+                                </Avatar>
+                                <Avatar
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    Ahorro:
+                                </Avatar>
+                            </div >}
+                        {verArticuloSeleccionado === true &&
+                            <div className="col-sm-12 my-1 row" align="center">
+                                <Avatar
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    {articuloSeleccionado && "$ " + articuloSeleccionado.Precio}
+                                </Avatar>
+                                <Avatar
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    {articuloSeleccionado && "$ " + articuloSeleccionado.PrecioConDescuento}
+                                </Avatar>
+                            </div >
+                        }
                         <p></p>
                         {verSugeridosSucursales === true && (
                             <div isOpen={verSugeridosSucursales} className="border border-dark">
