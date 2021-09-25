@@ -33,7 +33,9 @@ export default function Articulos() {
     const [ModalArticulo, setModalArticulo] = useState(false);
     const [ModalSucursal, setModalSucursal] = useState(false);
     const [CambiarTipo, setCambiarTipo] = useState(false);
-    const [verAutoCompletar, setVerAutoCompletar] = useState(true);
+    const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
+    const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
+    const [verTabla, setVerTabla] = useState(false);
     const [TextoCompleto, setTextoCompleto] = useState('');
     const [Sucursal, setSucursal] = useState(23);
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
@@ -42,6 +44,7 @@ export default function Articulos() {
         Descripcion: '',
         Precio: '',
         Descuento: '',
+        PrecioConDescuento: '',
         Existencia: '',
         Gen_Pat: ''
     })
@@ -84,9 +87,12 @@ export default function Articulos() {
 
     const seleccionarArticulo = (articulo, caso) => {
         setarticuloSeleccionado(articulo);
-        abrirCerrarModalArticulo();
-        if(caso === "Sugerir"){
+        if (caso !== "Seleccionar") {
+            abrirCerrarModalArticulo();
+        }
+        if (caso === "Sugerir") {
             asignarSugerido(articulo.Articulo);
+            setVerSugeridosSucursales(true);
         }
         console.log(datosBusqueda, articulo);
     }
@@ -96,7 +102,7 @@ export default function Articulos() {
             ...datosBusqueda,
             "sugerido": textosugerido
         });
-
+        setVerSugeridosSucursales(true);
     }
 
     const OpcionesBusq = [
@@ -114,31 +120,47 @@ export default function Articulos() {
         }
     ];
 
-    const handleChange = e => {
-        const { name, value } = e.target;
-        console.log(name, value, datosBusqueda)
-        setDatosBusqueda({
-            ...datosBusqueda,
-            [name]: value
-        })
-        if (name === "tipo") {
-            setTextoCompleto("");
+    const handleKeyDown = e => {
+        if (e.key === "Enter") {
             setDatosBusqueda({
                 ...datosBusqueda,
-            ...datosBusqueda,
-            "textoabuscar": TextoCompleto
-            })
-            setVerAutoCompletar(true);
+                "textoabuscar": TextoCompleto
+            });
+            setOcultarAutoCompletar(true);
+            setVerTabla(true);
+            setTextoCompleto("");
+            setVerSugeridosSucursales(false);
+        }
+    }
+
+    const handleChange = e => {
+        setVerTabla(false);
+        const { name, value } = e.target;
+        if (name === "tipo") {
+            setDatosBusqueda({
+                ...datosBusqueda,
+                "tipo": value
+            });
+            setTextoCompleto("");
         }
         else {
+            setOcultarAutoCompletar(false);
             setTextoCompleto(value);
         }
     }
 
     const handleChangeSelect = e => {
-        setTextoCompleto(e.target.value);
+        setTextoCompleto(e.target.value)
+        setDatosBusqueda({
+            ...datosBusqueda,
+            "textoabuscar": e.target.value,
+            "sugerido": e.target.value
+        });
+        setOcultarAutoCompletar(true);
+        setVerTabla(true);
         setCambiarTipo(true);
-        setVerAutoCompletar(true);
+        setTextoCompleto("");
+        setVerSugeridosSucursales(true);
     }
 
     const [datosBusqueda, setDatosBusqueda] = useState({
@@ -154,22 +176,24 @@ export default function Articulos() {
             tipo = 3;
             setDatosBusqueda({
                 ...datosBusqueda,
-                "textoabuscar": TextoCompleto,
-                "sugerido" : TextoCompleto
+                "sugerido": TextoCompleto
             })
+            setVerSugeridosSucursales(true);
         }
-        await axios.get(baseUrl + "/" + datosBusqueda.sucursal +
+        var varLiga = baseUrl + "/" + datosBusqueda.sucursal +
             "/" + tipo +
-            "/" + datosBusqueda.textoabuscar)
+            "/" + datosBusqueda.textoabuscar;
+        console.log("Liga: " + varLiga)
+        await axios.get(varLiga)
             .then(response => {
                 setArticulos(response.data);
                 setPage(0);
                 if (tipo === 3) {
                     if (CambiarTipo) {
                         if (Object.keys(response.data).length === 1) {
-                            setTextoCompleto("");
                             setCambiarTipo(false);
-                            setVerAutoCompletar(true);
+                            setOcultarAutoCompletar(true);
+                            setVerTabla(true);
                         }
                     }
                 }
@@ -179,17 +203,18 @@ export default function Articulos() {
     }
 
     const peticionGetSugeridos = async (datosBusqueda) => {
-        console.log("peticionGetSugeridos antes: ", datosBusqueda);
-        await axios.get(baseUrl + "/Sugeridos" +
+        var varLiga = baseUrl + "/Sugeridos" +
             "/" + datosBusqueda.sucursal +
-            "/" + datosBusqueda.sugerido)
+            "/" + datosBusqueda.sugerido;
+        console.log("Liga: " + varLiga)
+        console.log("peticionGetSugeridos antes: ", datosBusqueda);
+        await axios.get(varLiga)
             .then(response => {
                 setSugeridos(response.data);
                 setPage2(0);
             }).catch(error => {
                 console.log(error);
             })
-        console.log("peticionGetSugeridos antes: ", datosBusqueda);
     }
 
     const peticionGetDisponibles = async (datosBusqueda) => {
@@ -204,35 +229,40 @@ export default function Articulos() {
 
     const peticionGetAutocompletar = async (datosBusqueda, TextoCompleto) => {
         await axios.get(baseUrl + "/" + datosBusqueda.tipo +
-            "/" + datosBusqueda.textoabuscar)
+            "/" + TextoCompleto)
             .then(response => {
                 setAutocompletar(response.data);
             }).catch(error => {
                 console.log(error);
             })
         if (TextoCompleto !== "") {
-            setVerAutoCompletar(false);
+            setOcultarAutoCompletar(false);
         }
         else {
-            setVerAutoCompletar(true);
+            setOcultarAutoCompletar(true);
         }
     }
 
     useEffect(() => {
         setSucursal(23);
-        if (datosBusqueda.textoabuscar.length > 2) {
-
-            peticionGetArticulo(datosBusqueda, CambiarTipo);
-            peticionGetAutocompletar(datosBusqueda);
-
-            (datosBusqueda.sugerido !== "") &&
-                peticionGetSugeridos(datosBusqueda);
-
-            (datosBusqueda.sugerido !== "") &&
-                peticionGetDisponibles(datosBusqueda);
+        if (TextoCompleto.length > 2) {
+            peticionGetAutocompletar(datosBusqueda, TextoCompleto);
         }
+
+        if (verTabla) {
+            peticionGetArticulo(datosBusqueda, CambiarTipo);
+        }
+        else {
+            setOcultarAutoCompletar(true);
+        }
+
+        if (datosBusqueda.sugerido !== "") {
+            peticionGetSugeridos(datosBusqueda);
+            peticionGetDisponibles(datosBusqueda);
+        }
+
         //eslint-disable-next-line
-    }, [datosBusqueda, CambiarTipo])
+    }, [datosBusqueda, TextoCompleto, CambiarTipo])
 
     return (
         <body className="cuerpo container-fluid">
@@ -266,17 +296,16 @@ export default function Articulos() {
                             <div className="col-sm-5 my-1 row">
 
                                 <input type="text" className="custom-drop" name="textoabuscar"
-                                    onChange={handleChange} value={TextoCompleto} />
+                                    onChange={handleChange} onKeyDown={handleKeyDown} value={TextoCompleto} />
                             </div>
-                            <div hidden={verAutoCompletar} className="col-sm-4 my-1 row">
+                            <div hidden={ocultarAutoCompletar} className="col-sm-4 my-1 row">
                                 {autocompletar.length !== 0 && (
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
-                                            <option
-                                                value={opcion.Articulo}
-                                                align="left"
-                                            >
-                                                {opcion.Articulo + ": " + opcion.Descripcion + "(" + opcion.SustanciaActiva + ")"}
+                                            <option value={(datosBusqueda.tipo === 2) ?
+                                                opcion.SustanciaActiva : opcion.Articulo} align="left">
+                                                {(datosBusqueda.tipo !== 2) ?
+                                                    opcion.SustanciaActiva : opcion.Articulo + ": " + opcion.Descripcion}
                                             </option>
                                         ))}
                                     </select>
@@ -306,12 +335,17 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Precio<br />Final</label></TableCell>
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
+                                        <TableCell><label className="custom-bg">Estatus</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => (
-                                        <TableRow key={i} value={row.Articulo}>
+                                        <TableRow
+                                            hover
+                                            key={i}
+                                            value={row.Articulo} selected={() => seleccionarArticulo(row, "Seleccionar")}
+                                        >
                                             <TableCell>
                                                 <Avatar
                                                     className="avatar-bg"
@@ -325,12 +359,13 @@ export default function Articulos() {
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
                                             </TableCell>
-                                            <TableCell>{row.Descripcion}</TableCell>
+                                            <TableCell>{row.Descripcion}<br />{"[Sustancia Activa]"}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + row.PrecioConDescuento}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
-                                            <TableCell>{row.Gen_Pat}</TableCell>
+                                            <TableCell align="center" >{row.Gen_Pat}</TableCell>
+                                            <TableCell align="center" >Estatus</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     className="avatar-bg"
@@ -353,9 +388,10 @@ export default function Articulos() {
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                             />
                         </TableFooter>
-
-                        <div className="custom-bg"><h4>Articulos Sugeridos</h4></div>
-
+                        {(verSugeridosSucursales === true) && (
+                            (sugeridos.length !== 0) &&
+                            <div className="custom-bg"><h4>Articulos Sugeridos</h4></div>
+                        )}
                         <TableContainer component={Paper} className="responsive">
                             <Table aria-label="simple table">
                                 <TableHead className="custom-invisible">
@@ -368,6 +404,7 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Precio<br />Final</label></TableCell>
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
+                                        <TableCell><label className="custom-bg">Estatus</label></TableCell>
                                         <TableCell><label className="custom-bg">Acciones</label></TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -388,11 +425,12 @@ export default function Articulos() {
                                                 {row.Codigo}
                                             </TableCell>
                                             <TableCell>{row.Descripcion}</TableCell>
-                                            <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
-                                            <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
-                                            <TableCell align="center" >{"$" + row.PrecioConDescuento}</TableCell>
-                                            <TableCell align="center" >{row.Existencia}</TableCell>
-                                            <TableCell>{row.Gen_Pat}</TableCell>
+                                            <TableCell align="center">{"$ " + financial(row.Precio)}</TableCell>
+                                            <TableCell align="center">{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
+                                            <TableCell align="center">{"$" + row.PrecioConDescuento}</TableCell>
+                                            <TableCell align="center">{row.Existencia}</TableCell>
+                                            <TableCell align="center">{row.Gen_Pat}</TableCell>
+                                            <TableCell align="center">Estatus</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     className="avatar-bg"
@@ -404,17 +442,19 @@ export default function Articulos() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <TableFooter>
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25]}
-                                component="div"
-                                count={sugeridos.length}
-                                rowsPerPage={rowsPerPage2}
-                                page={page2}
-                                onPageChange={handleChangePage2}
-                                onRowsPerPageChange={handleChangeRowsPerPage2}
-                            />
-                        </TableFooter>
+                        {(verSugeridosSucursales === true) && (
+                            (sugeridos.length !== 0) &&
+                            <TableFooter>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 25]}
+                                    component="div"
+                                    count={sugeridos.length}
+                                    rowsPerPage={rowsPerPage2}
+                                    page={page2}
+                                    onPageChange={handleChangePage2}
+                                    onRowsPerPageChange={handleChangeRowsPerPage2}
+                                />
+                            </TableFooter>)}
                     </div>
                     <div className="col-sm-3 my-1">
                         <div className="border border-dark">
@@ -422,41 +462,74 @@ export default function Articulos() {
                                 alt="CAD13600" width="80%" className="img-fluid bordered" />
                         </div >
                         <p></p>
-                        <div className="border border-dark">
-
-                            <div align="center" className="custom-bg row container-fluid">
-                                <label>Disponibles</label>
-                            </div>
-                            <TableContainer compontent={Paper} className="responsive" >
-                                <Table className="TablaDisponibles" aria-label="simple table">
-                                    <TableHead className="custom-bg">
-                                        <TableRow className="custom-bg">
-                                            <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
-                                            <TableCell className="custom-bg"><label>Existencia</label></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                </Table>
-                            </TableContainer>
-                            <TableContainer compontent={Paper} className="TablaContainer responsive" style={{maxHeight: 120}}>
-                                <Table className="TablaDisponibles" aria-label="simple table">
-                                    <TableBody class="bodyDisponibles">
-                                        {disponibles.slice(0, 10).map((row) => (
-                                            <TableRow class="rowDisponibles" key={row.Sucursal}>
-                                                <TableCell class="CellDisponibles" component="th" scope="row">
-                                                    {row.Sucursal}
-                                                </TableCell>
-                                                <TableCell class="CellDisponibles" component="th" scope="row">
-                                                    {row.Existencia}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <div align="right" className="custom-bg row container-fluid">
-                                <label onClick={() => abrirCerrarModalSucursal()}>ver mas</label>
-                            </div>
+                        <div className="col-sm-12 my-1 row" align="center">
+                            <Avatar
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                Precio:
+                            </Avatar>
+                            <Avatar
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                Ahorro:
+                            </Avatar>
                         </div >
+                        <p></p>
+                        <div className="col-sm-12 my-1 row" align="center">
+                            <Avatar
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                {articuloSeleccionado && "$ " + articuloSeleccionado.Precio}
+                            </Avatar>
+                            <Avatar
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                {articuloSeleccionado && "$ " + articuloSeleccionado.PrecioConDescuento}
+                            </Avatar>
+                        </div >
+                        <p></p>
+                        {verSugeridosSucursales === true && (
+                            <div isOpen={verSugeridosSucursales} className="border border-dark">
+
+                                <div align="center" className="custom-bg row container-fluid">
+                                    <label>Disponibles</label>
+                                </div>
+                                <TableContainer compontent={Paper} className="responsive" >
+                                    <Table className="TablaDisponibles" aria-label="simple table">
+                                        <TableHead className="custom-bg">
+                                            <TableRow className="custom-bg">
+                                                <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
+                                                <TableCell className="custom-bg"><label>Existencia</label></TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                    </Table>
+                                </TableContainer>
+                                <TableContainer compontent={Paper} className="TablaContainer responsive" style={{ maxHeight: 120 }}>
+                                    <Table className="TablaDisponibles" aria-label="simple table">
+                                        <TableBody class="bodyDisponibles">
+                                            {disponibles.slice(0, 10).map((row) => (
+                                                <TableRow class="rowDisponibles" key={row.Sucursal}>
+                                                    <TableCell class="CellDisponibles" component="th" scope="row">
+                                                        {row.Sucursal}
+                                                    </TableCell>
+                                                    <TableCell class="CellDisponibles" component="th" scope="row">
+                                                        {row.Existencia}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <div align="right" className="custom-bg row container-fluid">
+                                    <label onClick={() => abrirCerrarModalSucursal()}>ver mas</label>
+                                </div>
+                            </div >
+                        )}
+
                     </div>
                 </div>
                 <div className="custom-bg" align="left">
@@ -478,7 +551,7 @@ export default function Articulos() {
                             </TableHead>
                         </Table>
                     </TableContainer>
-                    <TableContainer component={Paper} className="TablaContainerModalSuc responsive" style={{maxHeight: 350}}>
+                    <TableContainer component={Paper} className="TablaContainerModalSuc responsive" style={{ maxHeight: 350 }}>
                         <Table aria-label="simple table">
                             <TableBody>
                                 {disponibles.map((row) => (

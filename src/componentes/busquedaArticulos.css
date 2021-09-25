@@ -58,6 +58,15 @@ div.custom-bg{
     cursor: pointer;
 }
 
+
+.avatarPrecio-bg{
+    color:#fbd134 !important;
+    background-color: #d11a2c !important;
+    cursor: pointer;
+    text-align: center !important;
+    width: 50% !important;
+}
+
 .allIcons {
     margin-top: 5%;
     height: 80%;
