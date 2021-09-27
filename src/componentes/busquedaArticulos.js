@@ -37,6 +37,7 @@ export default function Articulos() {
     const [verArticuloSeleccionado, setVerArticuloSeleccionado] = useState(false);
     const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
     const [verTabla, setVerTabla] = useState(false);
+    const [verSustanciaActiva, setVerSustanciaActiva] = useState(false);
     const [TextoCompleto, setTextoCompleto] = useState('');
     const [Sucursal, setSucursal] = useState(23);
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
@@ -59,6 +60,15 @@ export default function Articulos() {
         Existencia: '',
         Gen_Pat: ''
     })
+
+    function validaCaracteres(textoaValidar){
+        var vTexto = textoaValidar;
+
+        vTexto = vTexto.replaceAll("/", "%2f")
+        vTexto = vTexto.replaceAll(" ", "%20")
+
+        return vTexto;
+    }
 
     function financial(x) {
         return Number.parseFloat(x).toFixed(2);
@@ -101,13 +111,11 @@ export default function Articulos() {
         if (caso !== "Seleccionar") {
             abrirCerrarModalArticulo();
         }
-        else{
-            setVerArticuloSeleccionado(true);
-        }
-        if (caso === "Sugerir") {
+        if (caso !== "Ver") {
             asignarSugerido(articulo.Articulo);
             setVerSugeridosSucursales(true);
         }
+        setVerArticuloSeleccionado(true);
     }
 
     const asignarSugerido = (textosugerido) => {
@@ -156,12 +164,19 @@ export default function Articulos() {
                 ...datosBusqueda,
                 "tipo": value
             });
+            if (value === '2') {
+                console.log("ver sustancia activa on")
+                setVerSustanciaActiva(true);
+            } else {
+                setVerSustanciaActiva(false);
+            }
             setTextoCompleto("");
         }
         else {
             setOcultarAutoCompletar(false);
             setTextoCompleto(value);
         }
+        setVerSugeridosSucursales(false);
     }
 
     const handleChangeSelect = e => {
@@ -188,29 +203,34 @@ export default function Articulos() {
     const peticionGetArticulo = async (datosBusqueda, CambiarTipo) => {
         var tipo = datosBusqueda.tipo;
         if (CambiarTipo) {
-            tipo = 3;
-            setDatosBusqueda({
-                ...datosBusqueda,
-                "sugerido": TextoCompleto
-            })
-            setVerSugeridosSucursales(true);
+            if (!verSustanciaActiva) {
+                tipo = 3;
+                setDatosBusqueda({
+                    ...datosBusqueda,
+                    "sugerido": TextoCompleto
+                })
+                setVerSugeridosSucursales(true);
+            }
         }
         var varLiga = baseUrl + "/" + datosBusqueda.sucursal +
             "/" + tipo +
-            "/" + datosBusqueda.textoabuscar;
-        console.log("Liga: " + varLiga)
+            "/" + validaCaracteres(datosBusqueda.textoabuscar);
+        console.log("Liga Articulos: " + varLiga)
         await axios.get(varLiga)
             .then(response => {
                 setArticulos(response.data);
                 setPage(0);
-                if (tipo === 3) {
-                    if (CambiarTipo) {
+                if (CambiarTipo) {
+                    if (tipo === 3) {
                         if (Object.keys(response.data).length === 1) {
                             setCambiarTipo(false);
                             setOcultarAutoCompletar(true);
                             setVerTabla(true);
                         }
                     }
+                }
+                if (tipo === 2) {
+
                 }
             }).catch(error => {
                 console.log(error);
@@ -220,9 +240,8 @@ export default function Articulos() {
     const peticionGetSugeridos = async (datosBusqueda) => {
         var varLiga = baseUrl + "/Sugeridos" +
             "/" + datosBusqueda.sucursal +
-            "/" + datosBusqueda.sugerido;
-        console.log("Liga: " + varLiga)
-        console.log("peticionGetSugeridos antes: ", datosBusqueda);
+            "/" + validaCaracteres(datosBusqueda.sugerido);
+        console.log("Liga Sugeridos: " + varLiga)
         await axios.get(varLiga)
             .then(response => {
                 setSugeridos(response.data);
@@ -233,8 +252,10 @@ export default function Articulos() {
     }
 
     const peticionGetDisponibles = async (datosBusqueda) => {
-        await axios.get(baseUrl + "/Disponibles" +
-            "/" + datosBusqueda.sugerido)
+        var varLiga = baseUrl + "/Disponibles" +
+            "/" + validaCaracteres(datosBusqueda.sugerido);
+        console.log("Liga Disponibles: " + varLiga);
+        await axios.get(varLiga)
             .then(response => {
                 setDisponibles(response.data);
             }).catch(error => {
@@ -243,8 +264,10 @@ export default function Articulos() {
     }
 
     const peticionGetAutocompletar = async (datosBusqueda, TextoCompleto) => {
-        await axios.get(baseUrl + "/" + datosBusqueda.tipo +
-            "/" + TextoCompleto)
+        var varLiga = baseUrl + "/" + datosBusqueda.tipo +
+            "/" + validaCaracteres(TextoCompleto);
+        console.log("Liga Autocompletar: " + varLiga);
+        await axios.get(varLiga)
             .then(response => {
                 setAutocompletar(response.data);
             }).catch(error => {
@@ -271,7 +294,7 @@ export default function Articulos() {
             setOcultarAutoCompletar(true);
         }
 
-        if (datosBusqueda.sugerido !== "") {
+        if (verSugeridosSucursales && datosBusqueda.sugerido !== "") {
             peticionGetSugeridos(datosBusqueda);
             peticionGetDisponibles(datosBusqueda);
         }
@@ -314,14 +337,26 @@ export default function Articulos() {
                                     onChange={handleChange} onKeyDown={handleKeyDown} value={TextoCompleto} />
                             </div>
                             <div hidden={ocultarAutoCompletar} className="col-sm-4 my-1 row">
-                                {autocompletar.length !== 0 && (
+                                {TextoCompleto.length > 2 && (
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
-                                            <option value={(datosBusqueda.tipo === 2) ?
-                                                opcion.SustanciaActiva : opcion.Articulo} align="left">
-                                                {(datosBusqueda.tipo !== 2) ?
-                                                    opcion.SustanciaActiva : opcion.Articulo + ": " + opcion.Descripcion}
-                                            </option>
+
+                                            verSustanciaActiva ? 
+                                                <option
+                                                    align="left"
+                                                    value={opcion.SustanciaActiva}
+                                                >
+                                                    {opcion.SustanciaActiva}
+                                                </option>
+                                             : 
+                                                <option
+                                                    align="left"
+                                                    value={opcion.Articulo}
+                                                >
+                                                       {opcion.Articulo + ": " + opcion.Descripcion}
+                                                </option>
+
+                                            
                                         ))}
                                     </select>
                                 )}
@@ -351,7 +386,7 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Estatus</label></TableCell>
-                                        <TableCell><label className="custom-bg">Acciones</label></TableCell>
+                                        <TableCell><label className="custom-bg"></label></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -359,7 +394,11 @@ export default function Articulos() {
                                         <TableRow
                                             hover
                                             key={i}
-                                            value={row.Articulo} selected={() => seleccionarArticulo(row, "Seleccionar")}
+                                            value={row.Articulo}
+                                            onClick={() => seleccionarArticulo(row, "Seleccionar")}
+                                            selected={row.Articulo === articuloSeleccionado.Articulo ?
+                                                true : false
+                                            }
                                         >
                                             <TableCell>
                                                 <Avatar
@@ -377,7 +416,7 @@ export default function Articulos() {
                                             <TableCell>{row.Descripcion}<br />{"[Sustancia Activa]"}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
-                                            <TableCell align="center" >{"$" + row.PrecioConDescuento}</TableCell>
+                                            <TableCell align="center" >{"$" + financial(row.PrecioConDescuento)}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell align="center" >{row.Gen_Pat}</TableCell>
                                             <TableCell align="center" >Estatus</TableCell>
@@ -407,7 +446,7 @@ export default function Articulos() {
                             (sugeridos.length !== 0) &&
                             <div className="custom-bg"><h4>Articulos Sugeridos</h4></div>
                         )}
-                        <TableContainer component={Paper} className="responsive">
+                        <TableContainer hidden={!verSugeridosSucursales} component={Paper} className="responsive">
                             <Table aria-label="simple table">
                                 <TableHead className="custom-invisible">
                                     <TableRow className="custom-bg">
@@ -420,12 +459,20 @@ export default function Articulos() {
                                         <TableCell><label className="custom-bg">Exist</label></TableCell>
                                         <TableCell><label className="custom-bg">Tipo</label></TableCell>
                                         <TableCell><label className="custom-bg">Estatus</label></TableCell>
-                                        <TableCell><label className="custom-bg">Acciones</label></TableCell>
+                                        <TableCell><label className="custom-bg"></label></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {sugeridos.slice(page2 * rowsPerPage2, page2 * rowsPerPage2 + rowsPerPage2).map((row, i) => (
-                                        <TableRow key={i} value={row.Articulo}>
+                                        <TableRow
+                                            hover
+                                            key={i}
+                                            value={row.Articulo}
+                                            onClick={() => seleccionarArticulo(row, "Seleccionar")}
+                                            selected={row.Articulo === articuloSeleccionado.Articulo ?
+                                                true : false
+                                            }
+                                        >
                                             <TableCell>
                                                 <Avatar
                                                     className="avatar-bg"
@@ -439,13 +486,13 @@ export default function Articulos() {
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
                                             </TableCell>
-                                            <TableCell>{row.Descripcion}</TableCell>
-                                            <TableCell align="center">{"$ " + financial(row.Precio)}</TableCell>
-                                            <TableCell align="center">{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
-                                            <TableCell align="center">{"$" + row.PrecioConDescuento}</TableCell>
-                                            <TableCell align="center">{row.Existencia}</TableCell>
-                                            <TableCell align="center">{row.Gen_Pat}</TableCell>
-                                            <TableCell align="center">Estatus</TableCell>
+                                            <TableCell>{row.Descripcion}<br />{"[Sustancia Activa]"}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
+                                            <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
+                                            <TableCell align="center" >{"$" + financial(row.PrecioConDescuento)}</TableCell>
+                                            <TableCell align="center" >{row.Existencia}</TableCell>
+                                            <TableCell align="center" >{row.Gen_Pat}</TableCell>
+                                            <TableCell align="center" >Estatus</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     className="avatar-bg"
@@ -491,26 +538,27 @@ export default function Articulos() {
                                 >
                                     Ahorro:
                                 </Avatar>
-                            </div >}
+                            </div >
+                        }
                         {verArticuloSeleccionado === true &&
                             <div className="col-sm-12 my-1 row" align="center">
                                 <Avatar
                                     className="avatarPrecio-bg"
                                     src='.'
                                 >
-                                    {articuloSeleccionado && "$ " + articuloSeleccionado.Precio}
+                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
                                 </Avatar>
                                 <Avatar
                                     className="avatarPrecio-bg"
                                     src='.'
                                 >
-                                    {articuloSeleccionado && "$ " + articuloSeleccionado.PrecioConDescuento}
+                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.Precio - articuloSeleccionado.PrecioConDescuento)}
                                 </Avatar>
                             </div >
                         }
                         <p></p>
                         {verSugeridosSucursales === true && (
-                            <div isOpen={verSugeridosSucursales} className="border border-dark">
+                            <div className="col-sm-14 my-1 border border-dark">
 
                                 <div align="center" className="custom-bg row container-fluid">
                                     <label>Disponibles</label>
@@ -518,9 +566,9 @@ export default function Articulos() {
                                 <TableContainer compontent={Paper} className="responsive" >
                                     <Table className="TablaDisponibles" aria-label="simple table">
                                         <TableHead className="custom-bg">
-                                            <TableRow className="custom-bg">
-                                                <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
-                                                <TableCell className="custom-bg"><label>Existencia</label></TableCell>
+                                            <TableRow className="custom-bg" align="center">
+                                                <TableCell className="custom-bg" align="center"><label>Sucursal</label></TableCell>
+                                                <TableCell className="custom-bg" align="center"><label>Existencia</label></TableCell>
                                             </TableRow>
                                         </TableHead>
                                     </Table>
@@ -636,6 +684,6 @@ export default function Articulos() {
                     <button className="custom-bg" onClick={() => abrirCerrarModalArticulo()}>Cerrar</button>
                 </ModalFooter>
             </Modal>
-        </body>
+        </body >
     )
 }

@@ -92,5 +92,5 @@ div.custom-bg{
 
 .CellDisponibles.rowDisponibles{
     height:auto !important;
-    text-align: center;
+    text-align: center !important;
 }
