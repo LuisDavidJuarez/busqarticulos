@@ -67,6 +67,9 @@ export default function Articulos() {
         vTexto = vTexto.replaceAll("/", "%2f")
         vTexto = vTexto.replaceAll(" ", "%20")
         vTexto = vTexto.replaceAll(",", "%2c")
+        vTexto = vTexto.replaceAll("?", "%3f")
+        vTexto = vTexto.replaceAll("*", "")
+        vTexto = vTexto.replaceAll("=", "%3d")
 
         return vTexto;
     }
@@ -144,16 +147,18 @@ export default function Articulos() {
 
     const handleKeyDown = e => {
         if (e.key === "Enter") {
-            setDatosBusqueda({
-                ...datosBusqueda,
-                "textoabuscar": TextoCompleto
-            });
-            setOcultarAutoCompletar(true);
-            setVerTabla(true);
-            setTextoCompleto("");
-            setVerSugeridosSucursales(false);
-            setarticuloSeleccionado(articuloLimpio);
-            setVerArticuloSeleccionado(false);
+            if(TextoCompleto.length > 2){
+                setDatosBusqueda({
+                    ...datosBusqueda,
+                    "textoabuscar": TextoCompleto
+                });
+                setOcultarAutoCompletar(true);
+                setVerTabla(true);
+                setTextoCompleto("");
+                setVerSugeridosSucursales(false);
+                setarticuloSeleccionado(articuloLimpio);
+                setVerArticuloSeleccionado(false);
+            }
         }
     }
 
