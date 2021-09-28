@@ -1,6 +1,8 @@
 .cuerpo{
     font-family:Verdana, Geneva, Tahoma, sans-serif !important;
     font-size: small !important;
+    align-items: center !important;
+    text-align: center !important;
 }
 
 .custom-bg{
@@ -10,6 +12,50 @@
     background-color: #d11a2c !important;
     border-color:black !important;
     font-weight: bold !important;
+}
+
+.divTitulo{
+    align-items: center;
+    width: 98% !important;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
+    color:#fbd134 !important;
+    background-color: #d11a2c !important;
+    border-color:black !important;
+    font-weight: bold !important;
+}
+
+.divHeader{
+    width: 98% !important;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
+    border-color:black !important;
+    font-weight: bold !important;
+}
+
+.divBody{
+    width: 100% !important;
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
+    border-color:black !important;
+    font-weight: bold !important;
+    overflow: hidden;
+    overflow-y: auto !important;
+    max-height:490px !important;
+    min-height: 490px !important;
+}
+
+.divBody::-webkit-scrollbar{
+    display:none;
+}
+
+.divFooter{
+    font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+    font-size: small !important;
+    border-color:black !important;
+    font-weight: bold !important;
+    color:#fbd134 !important;
+    background-color: #d11a2c !important;
 }
 
 label.custom-bg{
@@ -83,6 +129,19 @@ div.custom-bg{
     height: 80%;
     width: 80%;
 
+}
+
+.TablaDisponiblesData{
+    overflow: hidden;
+    overflow-y: auto !important;
+    max-height:120px !important;
+    min-height: 120px !important;
+    text-align: center !important;
+    align-items: center;
+}
+
+.TablaDisponiblesData::-webkit-scrollbar{
+    display:none;
 }
 
 .rowDisponibles{

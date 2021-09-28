@@ -61,11 +61,12 @@ export default function Articulos() {
         Gen_Pat: ''
     })
 
-    function validaCaracteres(textoaValidar){
+    function validaCaracteres(textoaValidar) {
         var vTexto = textoaValidar;
 
         vTexto = vTexto.replaceAll("/", "%2f")
         vTexto = vTexto.replaceAll(" ", "%20")
+        vTexto = vTexto.replaceAll(",", "%2c")
 
         return vTexto;
     }
@@ -309,10 +310,10 @@ export default function Articulos() {
                 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
             </head>
             <div align="center">
-                <div className="custom-bg position:absolute" align="center">
+                <div className="divTitulo" align="center">
                     <h5>Pantalla Busqueda por Descripción</h5>
                 </div>
-                <div className="row container-fluid">
+                <div className="divHeader row">
                     <div className="col-sm-1 my-1 border border-dark container-fluid" align="center">
                         <ImIcons.ImMenu
                             responsive="true"
@@ -341,22 +342,22 @@ export default function Articulos() {
                                     <select name="Autocompletar" onChange={handleChangeSelect} className="custom-drop nonbordered">
                                         {autocompletar.map((opcion) => (
 
-                                            verSustanciaActiva ? 
+                                            verSustanciaActiva ?
                                                 <option
                                                     align="left"
                                                     value={opcion.SustanciaActiva}
                                                 >
                                                     {opcion.SustanciaActiva}
                                                 </option>
-                                             : 
+                                                :
                                                 <option
                                                     align="left"
                                                     value={opcion.Articulo}
                                                 >
-                                                       {opcion.Articulo + ": " + opcion.Descripcion}
+                                                    {opcion.Articulo + ": " + opcion.Descripcion}
                                                 </option>
 
-                                            
+
                                         ))}
                                     </select>
                                 )}
@@ -371,7 +372,7 @@ export default function Articulos() {
                     </div>
                 </div>
 
-                <div className="row container-fluid pt-0" align="top">
+                <div className="divBody row container-fluid pt-0" align="top">
                     <div className="col-sm-9 my-3 border border-dark">
                         <TableContainer component={Paper} className="responsive">
                             <Table aria-label="simple table">
@@ -563,7 +564,7 @@ export default function Articulos() {
                                 <div align="center" className="custom-bg row container-fluid">
                                     <label>Disponibles</label>
                                 </div>
-                                <TableContainer compontent={Paper} className="responsive" >
+                                <TableContainer compontent={Paper} className="TablaDisponiblesHeader" >
                                     <Table className="TablaDisponibles" aria-label="simple table">
                                         <TableHead className="custom-bg">
                                             <TableRow className="custom-bg" align="center">
@@ -573,16 +574,16 @@ export default function Articulos() {
                                         </TableHead>
                                     </Table>
                                 </TableContainer>
-                                <TableContainer compontent={Paper} className="TablaContainer responsive" style={{ maxHeight: 120 }}>
+                                <TableContainer compontent={Paper} className="TablaDisponiblesData">
                                     <Table className="TablaDisponibles" aria-label="simple table">
                                         <TableBody class="bodyDisponibles">
                                             {disponibles.slice(0, 10).map((row) => (
-                                                <TableRow class="rowDisponibles" key={row.Sucursal}>
-                                                    <TableCell class="CellDisponibles" component="th" scope="row">
-                                                        {row.Sucursal}
+                                                <TableRow class="rowDisponibles col-sm-6 my-1" key={row.Sucursal}>
+                                                    <TableCell class="CellDisponibles col-sm-6 my-1">
+                                                        <label>{row.Sucursal}</label>
                                                     </TableCell>
-                                                    <TableCell class="CellDisponibles" component="th" scope="row">
-                                                        {row.Existencia}
+                                                    <TableCell class="CellDisponibles col-sm-6 my-1">
+                                                        <label>{row.Existencia}</label>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -597,93 +598,92 @@ export default function Articulos() {
 
                     </div>
                 </div>
-                <div className="custom-bg" align="left">
+                <Modal isOpen={ModalSucursal}>
+                    <ModalBody>
+                        <TableContainer component={Paper} className="responsive">
+                            <Table aria-label="simple table">
+                                <TableHead className="custom-bg">
+                                    <TableRow className="custom-bg">
+                                        <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
+                                        <TableCell className="custom-bg"><label>Existencia</label></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                            </Table>
+                        </TableContainer>
+                        <TableContainer component={Paper} className="TablaContainerModalSuc responsive" style={{ maxHeight: 350 }}>
+                            <Table aria-label="simple table">
+                                <TableBody>
+                                    {disponibles.map((row) => (
+                                        <TableRow key={row.Sucursal}>
+                                            <TableCell component="th" scope="row">
+                                                {row.Sucursal}
+                                            </TableCell>
+                                            <TableCell >{row.Existencia}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </ModalBody>
+                    <ModalFooter>
+                        <button className="custom-bg" onClick={() => abrirCerrarModalSucursal()}>Cerrar</button>
+                    </ModalFooter>
+                </Modal>
+
+                <Modal isOpen={ModalArticulo}>
+                    <ModalBody>
+                        <div className="custom-bg border border-dark" align="center">
+                            <h4><p>Datos del Articulo</p></h4>
+                        </div>
+                        <div className="row" align="center">
+                            <div className="col-sm-6">
+                                <label>Articulo:</label><br />
+                                <input type="text" className="form-control" readOnly name="articulo" value={articuloSeleccionado && articuloSeleccionado.Articulo} /> <br />
+                            </div>
+                            <div className="col-sm-6">
+                                <label>Codigo:</label><br />
+                                <input type="text" className="form-control" readOnly name="codigo" value={articuloSeleccionado && articuloSeleccionado.Codigo} /> <br />
+                            </div>
+                        </div>
+                        <div className="row" align="center">
+                            <div className="col-sm-8 my-3">
+                                <label>Descripción:</label><br />
+                                <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion} /> <br />
+                            </div>
+                            <div className="col-sm-4 my-3 ">
+                                <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`}
+                                    alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%" />
+                            </div>
+                        </div>
+                        <div className="row" align="center">
+                            <div className="col-sm-3 my-3"> <br />
+                                <label>Precio:</label><br />
+                                <input type="text" className="form-control" readOnly name="precio" value={'$ ' + articuloSeleccionado && articuloSeleccionado.Precio} /> <br />
+                            </div>
+                            <div className="col-sm-3 my-3"> <br />
+                                <label>Descuento:</label><br />
+                                <input type="text" className="form-control" readOnly name="descuento" value={articuloSeleccionado && articuloSeleccionado.Descuento + " %"} /> <br />
+                            </div>
+                            <div className="col-sm-3 my-3">
+                                <label>Precio Con Descuento:</label><br />
+                                <input type="text" className="form-control" readOnly name="PrecioConDescuento" value={"$$ " + articuloSeleccionado && articuloSeleccionado.PrecioConDescuento} /> <br />
+                            </div>
+                            <div className="col-sm-3 my-3"> <br />
+                                <label>Existencia:</label><br />
+                                <input type="text" className="form-control" readOnly name="Existencia" value={articuloSeleccionado && articuloSeleccionado.Existencia} /> <br />
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <button className="custom-bg" onClick={() => abrirCerrarModalArticulo()}>Cerrar</button>
+                    </ModalFooter>
+                </Modal>
+                <div className="divFooter" align="left">
                     <label>
                         Dirección: {window.location.href} || Base de Datos: Local/Linea || Sucursal: {Sucursal}
                     </label>
                 </div>
             </div>
-
-            <Modal isOpen={ModalSucursal}>
-                <ModalBody>
-                    <TableContainer component={Paper} className="responsive">
-                        <Table aria-label="simple table">
-                            <TableHead className="custom-bg">
-                                <TableRow className="custom-bg">
-                                    <TableCell className="custom-bg"><label>Sucursal</label></TableCell>
-                                    <TableCell className="custom-bg"><label>Existencia</label></TableCell>
-                                </TableRow>
-                            </TableHead>
-                        </Table>
-                    </TableContainer>
-                    <TableContainer component={Paper} className="TablaContainerModalSuc responsive" style={{ maxHeight: 350 }}>
-                        <Table aria-label="simple table">
-                            <TableBody>
-                                {disponibles.map((row) => (
-                                    <TableRow key={row.Sucursal}>
-                                        <TableCell component="th" scope="row">
-                                            {row.Sucursal}
-                                        </TableCell>
-                                        <TableCell >{row.Existencia}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </ModalBody>
-                <ModalFooter>
-                    <button className="custom-bg" onClick={() => abrirCerrarModalSucursal()}>Cerrar</button>
-                </ModalFooter>
-            </Modal>
-
-            <Modal isOpen={ModalArticulo}>
-                <ModalBody>
-                    <div className="custom-bg border border-dark" align="center">
-                        <h4><p>Datos del Articulo</p></h4>
-                    </div>
-                    <div className="row" align="center">
-                        <div className="col-sm-6">
-                            <label>Articulo:</label><br />
-                            <input type="text" className="form-control" readOnly name="articulo" value={articuloSeleccionado && articuloSeleccionado.Articulo} /> <br />
-                        </div>
-                        <div className="col-sm-6">
-                            <label>Codigo:</label><br />
-                            <input type="text" className="form-control" readOnly name="codigo" value={articuloSeleccionado && articuloSeleccionado.Codigo} /> <br />
-                        </div>
-                    </div>
-                    <div className="row" align="center">
-                        <div className="col-sm-8 my-3">
-                            <label>Descripción:</label><br />
-                            <input type="text" className="form-control" readOnly name="descripcion" value={articuloSeleccionado && articuloSeleccionado.Descripcion} /> <br />
-                        </div>
-                        <div className="col-sm-4 my-3 ">
-                            <img src={`${process.env.PUBLIC_URL}/images/articulos/${articuloSeleccionado && articuloSeleccionado.Articulo}.png`}
-                                alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`} width="100%" />
-                        </div>
-                    </div>
-                    <div className="row" align="center">
-                        <div className="col-sm-3 my-3"> <br />
-                            <label>Precio:</label><br />
-                            <input type="text" className="form-control" readOnly name="precio" value={'$ ' + articuloSeleccionado && articuloSeleccionado.Precio} /> <br />
-                        </div>
-                        <div className="col-sm-3 my-3"> <br />
-                            <label>Descuento:</label><br />
-                            <input type="text" className="form-control" readOnly name="descuento" value={articuloSeleccionado && articuloSeleccionado.Descuento + " %"} /> <br />
-                        </div>
-                        <div className="col-sm-3 my-3">
-                            <label>Precio Con Descuento:</label><br />
-                            <input type="text" className="form-control" readOnly name="PrecioConDescuento" value={"$$ " + articuloSeleccionado && articuloSeleccionado.PrecioConDescuento} /> <br />
-                        </div>
-                        <div className="col-sm-3 my-3"> <br />
-                            <label>Existencia:</label><br />
-                            <input type="text" className="form-control" readOnly name="Existencia" value={articuloSeleccionado && articuloSeleccionado.Existencia} /> <br />
-                        </div>
-                    </div>
-                </ModalBody>
-                <ModalFooter>
-                    <button className="custom-bg" onClick={() => abrirCerrarModalArticulo()}>Cerrar</button>
-                </ModalFooter>
-            </Modal>
         </body >
     )
 }
