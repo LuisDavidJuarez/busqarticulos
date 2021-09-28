@@ -39,7 +39,8 @@ export default function Articulos() {
     const [verTabla, setVerTabla] = useState(false);
     const [verSustanciaActiva, setVerSustanciaActiva] = useState(false);
     const [TextoCompleto, setTextoCompleto] = useState('');
-    const [Sucursal, setSucursal] = useState(23);
+    const [Sucursal, setSucursal] = useState(0);
+    const [Getway, setGetway] = useState('');
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
         Articulo: '',
         Codigo: '',
@@ -148,6 +149,13 @@ export default function Articulos() {
             value: 3
         }
     ];
+
+    const IniciarValores = () =>{
+        
+        setGetway('192.168.1.1');
+        
+        setSucursal(23);
+    }
 
     const handleKeyDown = e => {
         if (e.key === "Enter") {
@@ -292,7 +300,7 @@ export default function Articulos() {
     }
 
     useEffect(() => {
-        setSucursal(23);
+
         if (TextoCompleto.length > 2) {
             peticionGetAutocompletar(datosBusqueda, TextoCompleto);
         }
@@ -313,7 +321,7 @@ export default function Articulos() {
     }, [datosBusqueda, TextoCompleto, CambiarTipo])
 
     return (
-        <body className="cuerpo container-fluid">
+        <body className="cuerpo container-fluid" onLoad={()=>IniciarValores()}>
             <head>
                 <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
@@ -689,7 +697,10 @@ export default function Articulos() {
                 </Modal>
                 <div className="divFooter" align="left">
                     <label>
-                        Dirección: {window.location.href} || Base de Datos: Local/Linea || Sucursal: {Sucursal}
+                        Dirección: {window.location.href}
+                        || Base de Datos: Local/Linea
+                        || Gateway: {Getway}
+                        || Sucursal: {Sucursal}
                     </label>
                 </div>
             </div>
