@@ -48,7 +48,9 @@ export default function Articulos() {
         Descuento: '',
         PrecioConDescuento: '',
         Existencia: '',
-        Gen_Pat: ''
+        Gen_Pat: '',
+        Estatus: '',
+        SustanciaActiva: ''
     })
     const articuloLimpio = useState({
         Articulo: '',
@@ -58,7 +60,9 @@ export default function Articulos() {
         Descuento: '',
         PrecioConDescuento: '',
         Existencia: '',
-        Gen_Pat: ''
+        Gen_Pat: '',
+        Estatus: '',
+        SustanciaActiva: ''
     })
 
     function validaCaracteres(textoaValidar) {
@@ -147,7 +151,7 @@ export default function Articulos() {
 
     const handleKeyDown = e => {
         if (e.key === "Enter") {
-            if(TextoCompleto.length > 2){
+            if (TextoCompleto.length > 2) {
                 setDatosBusqueda({
                     ...datosBusqueda,
                     "textoabuscar": TextoCompleto
@@ -419,13 +423,13 @@ export default function Articulos() {
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
                                             </TableCell>
-                                            <TableCell>{row.Descripcion}<br />{"[Sustancia Activa]"}</TableCell>
+                                            <TableCell>{row.Descripcion}<br />{"[" + row.SustanciaActiva + "]"}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + financial(row.PrecioConDescuento)}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell align="center" >{row.Gen_Pat}</TableCell>
-                                            <TableCell align="center" >Estatus</TableCell>
+                                            <TableCell align="center" >{row.Estatus}</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     className="avatar-bg"
@@ -492,13 +496,13 @@ export default function Articulos() {
                                                 <text className="tipoOpe">{row.Articulo}</text><br />
                                                 {row.Codigo}
                                             </TableCell>
-                                            <TableCell>{row.Descripcion}<br />{"[Sustancia Activa]"}</TableCell>
+                                            <TableCell>{row.Descripcion}<br />{"[" + row.SustanciaActiva + "]"}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
                                             <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + financial(row.PrecioConDescuento)}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell align="center" >{row.Gen_Pat}</TableCell>
-                                            <TableCell align="center" >Estatus</TableCell>
+                                            <TableCell align="center" >{row.Estatus}</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     className="avatar-bg"
