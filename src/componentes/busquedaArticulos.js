@@ -575,6 +575,7 @@ export default function Articulos() {
                                 alt="CAD13600" width="80%" className="img-fluid bordered" />
                         </div >
                         <p></p>
+                        {verSugeridosSucursales === true &&
                             <div className="col-sm-12 my-1 row" align="center">
                                 <Avatar
                                     align="left"
@@ -594,26 +595,25 @@ export default function Articulos() {
                                     Ahorro:
                                 </Avatar>
                             </div >
-                        {verSugeridosSucursales === true && ""
                         }
-                        {verSugeridosSucursales === true && ""
+                        {verSugeridosSucursales === true &&
+                            <div className="col-sm-12 my-1 row" align="center">
+                                <Avatar
+                                    variant="rounded"
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
+                                </Avatar>
+                                <Avatar
+                                    variant="rounded"
+                                    className="avatarPrecio-bg"
+                                    src='.'
+                                >
+                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.Precio - articuloSeleccionado.PrecioConDescuento)}
+                                </Avatar>
+                            </div >
                         }
-                        <div className="col-sm-12 my-1 row" align="center">
-                            <Avatar
-                                variant="rounded"
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                {articuloSeleccionado && "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
-                            </Avatar>
-                            <Avatar
-                                variant="rounded"
-                                className="avatarPrecio-bg"
-                                src='.'
-                            >
-                                {articuloSeleccionado && "$ " + financial(articuloSeleccionado.Precio - articuloSeleccionado.PrecioConDescuento)}
-                            </Avatar>
-                        </div >
                         <p></p>
                         {disponibles.length !== 0 && (
                             <div className="col-sm-14 my-1 border border-dark">
