@@ -41,6 +41,7 @@ export default function Articulos() {
     const [TextoCompleto, setTextoCompleto] = useState('');
     const [Sucursal, setSucursal] = useState(0);
     const [Getway, setGetway] = useState('');
+    const [Conexion, setConexion] = useState('');
     const [articuloSeleccionado, setarticuloSeleccionado] = useState({
         Articulo: '',
         Codigo: '',
@@ -152,6 +153,7 @@ export default function Articulos() {
     const IniciarValores = () => {
         var vSucursal = '';
         var vGateway = '';
+        var vConexion = '';
         peticionGetGatewayData();
 
         console.log("GatewayData: ", GatewayData);
@@ -163,8 +165,12 @@ export default function Articulos() {
             GatewayData.map((data) => (
                 vGateway = data.Gateway
             ))
+            GatewayData.map((data) => (
+                vConexion = data.Conexion
+            ))
             setSucursal(vSucursal);
             setGetway(vGateway);
+            setConexion(vConexion);
         }
     }
 
@@ -181,6 +187,7 @@ export default function Articulos() {
                 setVerSugeridosSucursales(false);
                 setarticuloSeleccionado(articuloLimpio);
             }
+            e.target.blur();
         }
     }
 
@@ -213,7 +220,7 @@ export default function Articulos() {
             ...datosBusqueda,
             "textoabuscar": e.target.value
         });
-        if(datosBusqueda.tipo !=='2'){
+        if (datosBusqueda.tipo !== '2') {
             asignarSugerido(e.target.value);
         }
         setVerTabla(true);
@@ -241,7 +248,7 @@ export default function Articulos() {
                 setVerSugeridosSucursales(true);
             }
         }
-        var varLiga = baseUrl + "/" + Sucursal +
+        var varLiga = baseUrl + "/23" +
             "/" + tipo +
             "/" + validaCaracteres(datosBusqueda.textoabuscar);
         console.log("Liga Articulos: " + varLiga)
@@ -268,7 +275,7 @@ export default function Articulos() {
 
     const peticionGetSugeridos = async (datosBusqueda) => {
         var varLiga = baseUrl + "/Sugeridos" +
-            "/" + Sucursal +
+            "/23" +
             "/" + datosBusqueda.sugerido;
         console.log("Liga Sugeridos: " + varLiga)
         await axios.get(varLiga)
@@ -322,7 +329,7 @@ export default function Articulos() {
     }
 
     useEffect(() => {
-        if (Getway === '') {
+        if (Conexion === '' || Conexion === 'Local') {
             IniciarValores();
         }
 
@@ -416,10 +423,10 @@ export default function Articulos() {
 
                 <div className="divBody row container-fluid pt-0" align="top">
                     <div className="col-sm-9 my-3 border border-dark">
-                        <TableContainer component={Paper} className="responsive">
+                        <TableContainer id="TablaPrincipal" component={Paper} className="responsive">
                             <Table aria-label="simple table">
                                 <TableHead className="custom-bg">
-                                    <TableRow className="custom-bg">
+                                    <TableRow className="TablaRowHead">
                                         <TableCell><label className="custom-bg">#</label></TableCell>
                                         <TableCell><label className="custom-bg">Articulo<br />Código</label></TableCell>
                                         <TableCell><label className="custom-bg">Descripción</label></TableCell>
@@ -435,7 +442,7 @@ export default function Articulos() {
                                 <TableBody>
                                     {articulos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => (
                                         <TableRow
-                                        className="CustomRows"
+                                            className="CustomRows"
                                             hover
                                             key={i}
                                             value={row.Articulo}
@@ -458,8 +465,8 @@ export default function Articulos() {
                                                 {row.Codigo}
                                             </TableCell>
                                             <TableCell>{row.Descripcion}<br />{"[" + row.SustanciaActiva + "]"}</TableCell>
-                                            <TableCell align="center" >{"$ " + financial(row.Precio)}</TableCell>
-                                            <TableCell align="center" >{"$ " + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
+                                            <TableCell align="center" >{"$" + financial(row.Precio)}</TableCell>
+                                            <TableCell align="center" >{"$" + financial(row.Precio - row.PrecioConDescuento)}<br />{"(" + row.Descuento + " %)"}</TableCell>
                                             <TableCell align="center" >{"$" + financial(row.PrecioConDescuento)}</TableCell>
                                             <TableCell align="center" >{row.Existencia}</TableCell>
                                             <TableCell align="center" >{row.Gen_Pat}</TableCell>
@@ -568,38 +575,45 @@ export default function Articulos() {
                                 alt="CAD13600" width="80%" className="img-fluid bordered" />
                         </div >
                         <p></p>
-                        {verSugeridosSucursales === true &&
                             <div className="col-sm-12 my-1 row" align="center">
                                 <Avatar
+                                    align="left"
+                                    width="10%"
+                                    variant="rounded"
                                     className="avatarPrecio-bg"
                                     src='.'
                                 >
                                     Precio:
                                 </Avatar>
                                 <Avatar
+                                    align="right"
+                                    variant="rounded"
                                     className="avatarPrecio-bg"
                                     src='.'
                                 >
                                     Ahorro:
                                 </Avatar>
                             </div >
+                        {verSugeridosSucursales === true && ""
                         }
-                        {verSugeridosSucursales === true &&
-                            <div className="col-sm-12 my-1 row" align="center">
-                                <Avatar
-                                    className="avatarPrecio-bg"
-                                    src='.'
-                                >
-                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
-                                </Avatar>
-                                <Avatar
-                                    className="avatarPrecio-bg"
-                                    src='.'
-                                >
-                                    {articuloSeleccionado && "$ " + financial(articuloSeleccionado.Precio - articuloSeleccionado.PrecioConDescuento)}
-                                </Avatar>
-                            </div >
+                        {verSugeridosSucursales === true && ""
                         }
+                        <div className="col-sm-12 my-1 row" align="center">
+                            <Avatar
+                                variant="rounded"
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                {articuloSeleccionado && "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
+                            </Avatar>
+                            <Avatar
+                                variant="rounded"
+                                className="avatarPrecio-bg"
+                                src='.'
+                            >
+                                {articuloSeleccionado && "$ " + financial(articuloSeleccionado.Precio - articuloSeleccionado.PrecioConDescuento)}
+                            </Avatar>
+                        </div >
                         <p></p>
                         {disponibles.length !== 0 && (
                             <div className="col-sm-14 my-1 border border-dark">
@@ -724,7 +738,7 @@ export default function Articulos() {
                 <div className="divFooter" align="left">
                     <label>
                         Dirección: {window.location.href}
-                        || Base de Datos: Local/Linea
+                        || Base de Datos: {Conexion}
                         || Gateway: {Getway}
                         || Sucursal: {Sucursal}
                     </label>
