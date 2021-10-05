@@ -51,8 +51,8 @@
     font-weight: bold !important;
     overflow: hidden;
     overflow-y: auto !important;
-    max-height:490px !important;
-    min-height: 490px !important;
+    max-height:550px !important;
+    min-height: 550px !important;
 }
 
 .divBody::-webkit-scrollbar{
