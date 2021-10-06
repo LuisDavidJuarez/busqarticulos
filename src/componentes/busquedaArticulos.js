@@ -159,7 +159,7 @@ export default function Articulos() {
 
     if (GatewayData.length !== 0) {
       GatewayData.map((data) => (vSucursal = data.Sucursal));
-      GatewayData.map((data) => (vGateway = data.Gateway));
+      GatewayData.map((data) => (vGateway = data.IP));
       GatewayData.map((data) => (vConexion = data.Conexion));
       setSucursal(vSucursal);
       setGetway(vGateway);
@@ -349,7 +349,9 @@ export default function Articulos() {
 
     if (verSugeridosSucursales && TextoSugerido !== "") {
       peticionGetSugeridos();
-      peticionGetDisponibles();
+      if(Conexion === 'Linea'){
+        peticionGetDisponibles();
+      }
     }
 
     //eslint-disable-next-line
