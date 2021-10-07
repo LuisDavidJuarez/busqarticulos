@@ -745,7 +745,7 @@ export default function Articulos() {
               </div>
             )}
             <p></p>
-            {verSugeridosSucursales && (
+            {verSugeridosSucursales && Conexion === 'Linea' && (
               <div className="col-sm-14 my-1 border border-dark">
                 <div align="center" className="custom-bg row container-fluid">
                   <label>Disponibles</label>
