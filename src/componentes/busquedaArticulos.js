@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./busquedaArticulos.css";
 import axios from "axios";
+//import LogoImg from '@file://192.168.13.30/Imagenes/Articulos/default.png';
 import { Modal, ModalBody, ModalFooter } from "reactstrap";
 import {
   Table,
@@ -531,7 +532,9 @@ export default function Articulos() {
                         <TableCell>
                           {row.Descripcion}
                           <br />
-                          {"[" + row.SustanciaActiva + "]"}
+                          {(row.SustanciaActiva !== null) && (
+                            "[" + row.SustanciaActiva + "]"
+                            )}
                         </TableCell>
                         <TableCell align="center">
                           {"$" + financial(row.Precio)}
@@ -656,7 +659,9 @@ export default function Articulos() {
                         <TableCell>
                           {row.Descripcion}
                           <br />
-                          {"[" + row.SustanciaActiva + "]"}
+                          {(row.SustanciaActiva !== null) && (
+                            "[" + row.SustanciaActiva + "]"
+                            )}
                         </TableCell>
                         <TableCell align="center">
                           {"$ " + financial(row.Precio)}
@@ -700,8 +705,9 @@ export default function Articulos() {
           <div className="col-sm-3 my-1">
             <div className="border border-dark">
               <img
-                src={`${process.env.PUBLIC_URL}/images/articulos/CAD13600.png`}
-                alt="CAD13600"
+                /*src={`${process.env.PUBLIC_URL}/images/page/default.png`}*/
+                src={`${process.env.PUBLIC_URL}/images/ArticulosSC/default.png`}
+                alt="default"
                 width="80%"
                 className="img-fluid bordered"
               />
