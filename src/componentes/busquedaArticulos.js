@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./busquedaArticulos.css";
 import axios from "axios";
@@ -19,8 +19,16 @@ import {
 import * as ImIcons from "react-icons/im";
 import * as TiIcons from "react-icons/ti";
 
+/* Todo para el Carrito de compras */
+import {
+  shoppingReducer,
+  shoppinInitialState,
+} from "./reducers/shoppingReducer";
+import { TYPES } from "./actions/shoppingActions";
+/* Todo para el Carrito de compras */
+
 export default function Articulos() {
-  const baseUrl = "https://localhost:44371/api/BusquedaArticulos";
+  const baseUrl = "https://" + adquirirUrl() + ":443/api/BusquedaArticulos";
 
   const [articulos, setArticulos] = useState([]);
   const [sugeridos, setSugeridos] = useState([]);
@@ -29,9 +37,12 @@ export default function Articulos() {
   const [GatewayData, setGatewayData] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
+  const [mostrarTabla, setMostrarTabla] = useState(false);
+  const [mostrarProgress, setMostrarProgress] = useState(false);
   const [CambiarTipo, setCambiarTipo] = useState(false);
   const [ModalArticulo, setModalArticulo] = useState(false);
   const [ModalSucursal, setModalSucursal] = useState(false);
+  const [ModalCarrito, setModalCarrito] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
   const [verPrecios, SetVerPrecios] = useState(false);
@@ -40,6 +51,9 @@ export default function Articulos() {
   const [Sucursal, setSucursal] = useState(0);
   const [TipoBusqueda, setTipoBusqueda] = useState(1);
 
+  const [Imagen, setImagen] = useState(
+    `${process.env.PUBLIC_URL}/images/page/default.png`
+  );
   const [TextoCompleto, setTextoCompleto] = useState("");
   const [TextoABuscar, setTextoABuscar] = useState("");
   const [TextoSugerido, setTextoSugerido] = useState("");
@@ -57,6 +71,22 @@ export default function Articulos() {
     Estatus: "",
     SustanciaActiva: "",
   });
+
+  /* Todo para el Carrito de compras */
+  const [state, dispatch] = useReducer(shoppingReducer, shoppinInitialState);
+
+  const { car } = state;
+
+  const addToCar = (articulo) => {
+    dispatch({ type: TYPES.ADD_TO_CAR, payload: articulo });
+    console.log(articulo);
+  };
+
+  const delFromCar = () => {};
+
+  const clearCar = () => {};
+
+  /* Todo para el Carrito de compras */
   const articuloLimpio = useState({
     Articulo: "",
     Codigo: "",
@@ -81,6 +111,36 @@ export default function Articulos() {
     vTexto = vTexto.replaceAll("=", "%3d");
 
     return vTexto;
+  }
+
+  function adquirirUrl() {
+    var vUrl = window.location.href;
+    vUrl = vUrl.replaceAll("http:", "");
+    vUrl = vUrl.replaceAll("/", "");
+    vUrl = vUrl.replaceAll(":3000", "");
+
+    return vUrl;
+  }
+
+  const getImage = () => {
+    var vUrlImage = "";
+
+    if (Conexion === "Local") {
+      vUrlImage = "/images/page/default.png";
+    } else {
+      var img = articuloSeleccionado.Articulo;
+
+      if (!verSugeridosSucursales) {
+        vUrlImage = "/images/page/default.png";
+      } else {
+        vUrlImage = "http://192.168.13.30:82/Articulos/" + img + ".png";
+      }
+    }
+    setImagen(vUrlImage);
+  };
+
+  function addDefaultSrc(ev) {
+    ev.target.src = "/images/page/default.png";
   }
 
   function financial(x) {
@@ -119,6 +179,10 @@ export default function Articulos() {
     setModalSucursal(!ModalSucursal);
   };
 
+  const abrirCerrarModalCarrito = () => {
+    setModalCarrito(!ModalCarrito);
+  };
+
   const seleccionarArticulo = (articulo, caso) => {
     setarticuloSeleccionado(articulo);
     SetVerPrecios(true);
@@ -151,20 +215,17 @@ export default function Articulos() {
   ];
 
   const IniciarValores = () => {
-    var vSucursal = "";
-    var vGateway = "";
-    var vConexion = "";
     peticionGetGatewayData();
 
-    console.log("GatewayData: ", GatewayData);
+    //console.log("GatewayData: ", GatewayData);
+    GuardarGateway();
+  };
 
+  const GuardarGateway = () => {
     if (GatewayData.length !== 0) {
-      GatewayData.map((data) => (vSucursal = data.Sucursal));
-      GatewayData.map((data) => (vGateway = data.IP));
-      GatewayData.map((data) => (vConexion = data.Conexion));
-      setSucursal(vSucursal);
-      setGetway(vGateway);
-      setConexion(vConexion);
+      GatewayData.map((data) => setSucursal(data.Sucursal));
+      GatewayData.map((data) => setGetway(data.IP));
+      GatewayData.map((data) => setConexion(data.Conexion));
     }
   };
 
@@ -178,18 +239,21 @@ export default function Articulos() {
         setVerSugeridosSucursales(false);
         setarticuloSeleccionado(articuloLimpio);
         SetVerPrecios(false);
+        setMostrarTabla(false);
+        setMostrarProgress(true);
+        setImagen("/images/page/default.png");
       }
       e.target.blur();
     }
   };
 
   const handleChange = (e) => {
-    setVerTabla(false);
+    //setVerTabla(false);
     const { name, value } = e.target;
     if (name === "tipo") {
       setTipoBusqueda(value);
       if (value === "2") {
-        console.log("ver sustancia activa on");
+        //console.log("ver sustancia activa on");
         setVerSustanciaActiva(true);
       } else {
         setVerSustanciaActiva(false);
@@ -199,7 +263,7 @@ export default function Articulos() {
       setOcultarAutoCompletar(false);
       setVerSugeridosSucursales(false);
       setTextoCompleto(value);
-      console.log("value", value);
+      //console.log("value", value);
     }
     setVerSugeridosSucursales(false);
     if (CambiarTipo) setCambiarTipo(false);
@@ -216,6 +280,9 @@ export default function Articulos() {
       setVerSugeridosSucursales(true);
       SetVerPrecios(false);
       setCambiarTipo(true);
+      setMostrarTabla(false);
+      setMostrarProgress(true);
+      setImagen("/images/page/default.png");
       if (TipoBusqueda === 1) {
         setCambiarTipo(true);
       }
@@ -266,6 +333,8 @@ export default function Articulos() {
       .catch((error) => {
         console.log(error);
       });
+    setMostrarTabla(true);
+    setMostrarProgress(false);
   };
 
   const peticionGetSugeridos = async () => {
@@ -280,6 +349,7 @@ export default function Articulos() {
       .catch((error) => {
         console.log(error);
       });
+    getImage();
   };
 
   const peticionGetDisponibles = async () => {
@@ -327,7 +397,8 @@ export default function Articulos() {
   };
 
   useEffect(() => {
-    IniciarValores();
+    //IniciarValores();
+    GuardarGateway();
 
     if (TextoCompleto.length > 2) {
       //console.log("Mayor a 2");
@@ -350,7 +421,7 @@ export default function Articulos() {
 
     if (verSugeridosSucursales && TextoSugerido !== "") {
       peticionGetSugeridos();
-      if(Conexion === 'Linea'){
+      if (Conexion === "Linea") {
         peticionGetDisponibles();
       }
     }
@@ -438,7 +509,10 @@ export default function Articulos() {
             </div>
           </div>
           <div className="col-sm-1 my-1 border border-dark">
-            <TiIcons.TiShoppingCart className="allIcons" />
+            <TiIcons.TiShoppingCart
+              className="allIcons"
+              onClick={abrirCerrarModalCarrito}
+            />
           </div>
           <div className="col-sm-1 my-1 border border-dark">
             <img
@@ -499,65 +573,78 @@ export default function Articulos() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  {articulos
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, i) => (
-                      <TableRow
-                        className="CustomRows"
-                        hover
-                        key={i}
-                        value={row.Articulo}
-                        onClick={() => seleccionarArticulo(row, "Seleccionar")}
-                        selected={
-                          row.Articulo === articuloSeleccionado.Articulo
-                            ? true
-                            : false
-                        }
-                      >
-                        <TableCell>
-                          <Avatar
-                            className="avatar-bg"
-                            src="."
-                            onClick={() => seleccionarArticulo(row, "Sugerir")}
-                          >
-                            {page * rowsPerPage + (i + 1)}
-                          </Avatar>
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          <text className="tipoOpe">{row.Articulo}</text>
-                          <br />
-                          {row.Codigo}
-                        </TableCell>
-                        <TableCell>
-                          {row.Descripcion}
-                          <br />
-                          {(row.SustanciaActiva !== null) && (
-                            "[" + row.SustanciaActiva + "]"
-                            )}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.Precio)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.Precio - row.PrecioConDescuento)}
-                          <br />
-                          {"(" + row.Descuento + " %)"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.PrecioConDescuento)}
-                        </TableCell>
-                        <TableCell align="center">{row.Existencia}</TableCell>
-                        <TableCell align="center">{row.Gen_Pat}</TableCell>
-                        <TableCell align="center">{row.Estatus}</TableCell>
-                        <TableCell align="center">
-                          <Avatar className="avatar-bg" src=".">
-                            +
-                          </Avatar>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
+                {mostrarTabla && (
+                  <TableBody>
+                    {articulos
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row, i) => (
+                        <TableRow
+                          className="CustomRows"
+                          hover
+                          key={i}
+                          value={row.Articulo}
+                          onClick={() =>
+                            seleccionarArticulo(row, "Seleccionar")
+                          }
+                          selected={
+                            row.Articulo === articuloSeleccionado.Articulo
+                              ? true
+                              : false
+                          }
+                        >
+                          <TableCell>
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() =>
+                                seleccionarArticulo(row, "Sugerir")
+                              }
+                            >
+                              {page * rowsPerPage + (i + 1)}
+                            </Avatar>
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            <text className="tipoOpe">{row.Articulo}</text>
+                            <br />
+                            {row.Codigo}
+                          </TableCell>
+                          <TableCell>
+                            {row.Descripcion}
+                            <br />
+                            {row.SustanciaActiva !== null &&
+                              "[" + row.SustanciaActiva + "]"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" + financial(row.Precio)}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" +
+                              financial(row.Precio - row.PrecioConDescuento)}
+                            <br />
+                            {"(" + row.Descuento + " %)"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" + financial(row.PrecioConDescuento)}
+                          </TableCell>
+                          <TableCell align="center">{row.Existencia}</TableCell>
+                          <TableCell align="center">{row.Gen_Pat}</TableCell>
+                          <TableCell align="center">{row.Estatus}</TableCell>
+                          <TableCell align="center">
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() => addToCar(row)}
+                            >
+                              +
+                            </Avatar>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
             <TableFooter>
@@ -571,6 +658,7 @@ export default function Articulos() {
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
             </TableFooter>
+            {mostrarProgress && ""}
             {verSugeridosSucursales === true && sugeridos.length !== 0 && (
               <div className="custom-bg">
                 <h4>Articulos Sugeridos</h4>
@@ -659,9 +747,8 @@ export default function Articulos() {
                         <TableCell>
                           {row.Descripcion}
                           <br />
-                          {(row.SustanciaActiva !== null) && (
-                            "[" + row.SustanciaActiva + "]"
-                            )}
+                          {row.SustanciaActiva !== null &&
+                            "[" + row.SustanciaActiva + "]"}
                         </TableCell>
                         <TableCell align="center">
                           {"$ " + financial(row.Precio)}
@@ -706,7 +793,10 @@ export default function Articulos() {
             <div className="border border-dark">
               <img
                 /*src={`${process.env.PUBLIC_URL}/images/page/default.png`}*/
-                src={`${process.env.PUBLIC_URL}/images/ArticulosSC/default.png`}
+                /*src="https://www.farmaciaslamasbarata.com/wp-content/uploads/2017/11/2logoweb.png"*/
+                /*src="http://192.168.13.30:82/Articulos/OPE0022555.png"*/
+                src={Imagen}
+                onError={addDefaultSrc}
                 alt="default"
                 width="80%"
                 className="img-fluid bordered"
@@ -751,7 +841,7 @@ export default function Articulos() {
               </div>
             )}
             <p></p>
-            {verSugeridosSucursales && Conexion === 'Linea' && (
+            {verSugeridosSucursales && Conexion === "Linea" && (
               <div className="col-sm-14 my-1 border border-dark">
                 <div align="center" className="custom-bg row container-fluid">
                   <label>Disponibles</label>
@@ -980,6 +1070,149 @@ export default function Articulos() {
             <button
               className="custom-bg"
               onClick={() => abrirCerrarModalArticulo()}
+            >
+              Cerrar
+            </button>
+          </ModalFooter>
+        </Modal>
+        <Modal className="Progress" isOpen={mostrarProgress}>
+          <ModalBody>
+            <div align="center">
+              <img src="/images/pages/loader6.gif" alt="load1" height="8%" />
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal className="Carrito modal-xl" isOpen={ModalCarrito}>
+          <ModalBody>
+            <div align="center">
+              <div className="row">
+                <div className="col-sm-12 my-1">
+                  <TableContainer component={Paper} className="responsive">
+                    <Table aria-label="simple table">
+                      <TableHead className="custom-bg">
+                        <TableRow className="TablaRowHead">
+                          <TableCell>
+                            <label className="custom-bg">#</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">
+                              Articulo
+                              <br />
+                              Código
+                            </label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">Descripción</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">Precio</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">Ahorro</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">
+                              Precio
+                              <br />
+                              Final
+                            </label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">Cant</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg">Monto</label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg"></label>
+                          </TableCell>
+                          <TableCell>
+                            <label className="custom-bg"></label>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {car.map((row, i) => (
+                          <TableRow
+                            className="CustomRows"
+                            hover
+                            key={i}
+                            value={row.Articulo}
+                          >
+                            <TableCell>
+                              <Avatar className="avatar-bg" src=".">
+                                {i + 1}
+                              </Avatar>
+                            </TableCell>
+                            <TableCell component="th" scope="row">
+                              <text className="tipoOpe">{row.Articulo}</text>
+                              <br />
+                              {row.Codigo}
+                            </TableCell>
+                            <TableCell>
+                              {row.Descripcion}
+                              <br />
+                              {row.SustanciaActiva !== null &&
+                                "[" + row.SustanciaActiva + "]"}
+                            </TableCell>
+                            <TableCell align="center">
+                              {"$" + financial(row.Precio)}
+                            </TableCell>
+                            <TableCell align="center">
+                              {"$" +
+                                financial(row.Precio - row.PrecioConDescuento)}
+                              <br />
+                              {"(" + row.Descuento + " %)"}
+                            </TableCell>
+                            <TableCell align="center">
+                              {"$" + financial(row.PrecioConDescuento)}
+                            </TableCell>
+                            <TableCell align="center">{"Cantidad"}</TableCell>
+                            <TableCell align="center">{"Monto"}</TableCell>
+                            <TableCell align="center">
+                              <Avatar
+                                className="avatar-bg"
+                                src="."
+                                onClick={() => addToCar(row)}
+                              >
+                                +
+                              </Avatar>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Avatar
+                                className="avatar-bg"
+                                src="."
+                                onClick={() => delFromCar(row)}
+                              >
+                                -
+                              </Avatar>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TableContainer
+                    component={Paper}
+                    className="TablaContainerModalSuc responsive"
+                    style={{ maxHeight: 350 }}
+                  >
+                    <Table aria-label="simple table">
+                      <TableBody></TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              </div>
+                <div className="col-sm-1dss2 my-1" align="right">Montos</div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <button className="custom-bg" onClick={() => clearCar()}>
+              Limpiar Carrito
+            </button>
+            <button
+              className="custom-bg"
+              onClick={() => abrirCerrarModalCarrito()}
             >
               Cerrar
             </button>

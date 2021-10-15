@@ -170,3 +170,15 @@ div.custom-bg{
     height:auto !important;
     text-align: center !important;
 }
+
+.Progress{
+    position: absolute !important;
+    left: 40% !important;
+    top: 30% !important;
+    /*top: 45% !important;*/
+    justify-content: center !important;
+    
+    width: 0% !important;
+    height: 0% !important;
+    transform: translate(-50%, -50%);
+}
