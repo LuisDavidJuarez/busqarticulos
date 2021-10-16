@@ -18,6 +18,7 @@ import {
 } from "@material-ui/core";
 import * as ImIcons from "react-icons/im";
 import * as TiIcons from "react-icons/ti";
+import * as FaIcons from "react-icons/fa";
 
 /* Todo para el Carrito de compras */
 import {
@@ -73,18 +74,70 @@ export default function Articulos() {
   });
 
   /* Todo para el Carrito de compras */
+  const [Monto, setMonto] = useState(0);
+  const [Ahorro, setAhorro] = useState(0);
+  const [QtyItems, setQtyItems] = useState(0);
   const [state, dispatch] = useReducer(shoppingReducer, shoppinInitialState);
-
   const { car } = state;
+
+  const calcularMontos = () => {
+    var monto = 0;
+    var ahorro = 0;
+
+    car.map(
+      (item) => (monto = monto + item.PrecioConDescuento * item.quantity)
+    );
+    car.map(
+      (item) =>
+        (ahorro =
+          ahorro + (item.Precio - item.PrecioConDescuento) * item.quantity)
+    );
+
+    setMonto(monto);
+    setAhorro(ahorro);
+  };
 
   const addToCar = (articulo) => {
     dispatch({ type: TYPES.ADD_TO_CAR, payload: articulo });
-    console.log(articulo);
+    setMonto(Monto + articulo.PrecioConDescuento);
+    setAhorro(Ahorro + (articulo.Precio - articulo.PrecioConDescuento));
+    setQtyItems(QtyItems + 1);
   };
 
-  const delFromCar = () => {};
+  const delFromCar = (Articulo, all = false) => {
+    let articuloInCar = car.find((item) => item.Articulo === Articulo);
 
-  const clearCar = () => {};
+    if (all) {
+      if (car.length === 1) {
+        setModalCarrito();
+      }
+      dispatch({ type: TYPES.REMOVE_ALL_FROM_CAR, payload: Articulo });
+      setMonto(
+        Monto - articuloInCar.quantity * articuloInCar.PrecioConDescuento
+      );
+      setAhorro(
+        Ahorro -
+          (articuloInCar.Precio - articuloInCar.PrecioConDescuento) *
+            articuloInCar.quantity
+      );
+      setQtyItems(QtyItems - articuloInCar.quantity);
+    } else {
+      dispatch({ type: TYPES.REMOVE_ONE_FROM_CAR, payload: Articulo });
+      setMonto(Monto - articuloInCar.PrecioConDescuento);
+      setAhorro(
+        Ahorro - (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
+      );
+      setQtyItems(QtyItems - 1);
+    }
+  };
+
+  const clearCar = () => {
+    dispatch({ type: TYPES.CLEAR_CAR });
+    setModalCarrito();
+    setMonto(0);
+    setAhorro(0);
+    setQtyItems(0);
+  };
 
   /* Todo para el Carrito de compras */
   const articuloLimpio = useState({
@@ -180,6 +233,7 @@ export default function Articulos() {
   };
 
   const abrirCerrarModalCarrito = () => {
+    calcularMontos();
     setModalCarrito(!ModalCarrito);
   };
 
@@ -509,10 +563,16 @@ export default function Articulos() {
             </div>
           </div>
           <div className="col-sm-1 my-1 border border-dark">
-            <TiIcons.TiShoppingCart
-              className="allIcons"
-              onClick={abrirCerrarModalCarrito}
-            />
+            <span>
+              <TiIcons.TiShoppingCart
+                className="allIcons"
+                onClick={abrirCerrarModalCarrito}
+              />
+              {QtyItems > 0 && 
+                <Avatar className="avatar2-bg" src=".">
+                  {QtyItems}
+                </Avatar>}
+            </span>
           </div>
           <div className="col-sm-1 my-1 border border-dark">
             <img
@@ -638,7 +698,7 @@ export default function Articulos() {
                               src="."
                               onClick={() => addToCar(row)}
                             >
-                              +
+                              <FaIcons.FaPlus />
                             </Avatar>
                           </TableCell>
                         </TableRow>
@@ -766,7 +826,11 @@ export default function Articulos() {
                         <TableCell align="center">{row.Gen_Pat}</TableCell>
                         <TableCell align="center">{row.Estatus}</TableCell>
                         <TableCell align="center">
-                          <Avatar className="avatar-bg" src=".">
+                          <Avatar
+                            className="avatar-bg"
+                            src="."
+                            onClick={() => addToCar(row)}
+                          >
                             +
                           </Avatar>
                         </TableCell>
@@ -1087,6 +1151,9 @@ export default function Articulos() {
             <div align="center">
               <div className="row">
                 <div className="col-sm-12 my-1">
+                  <h4>
+                    <strong>Carrito de Compras</strong>
+                  </h4>
                   <TableContainer component={Paper} className="responsive">
                     <Table aria-label="simple table">
                       <TableHead className="custom-bg">
@@ -1129,8 +1196,19 @@ export default function Articulos() {
                           <TableCell>
                             <label className="custom-bg"></label>
                           </TableCell>
+                          <TableCell>
+                            <label className="custom-bg"></label>
+                          </TableCell>
                         </TableRow>
                       </TableHead>
+                    </Table>
+                  </TableContainer>
+                  <TableContainer
+                    component={Paper}
+                    className="TablaContainerCarrito responsive"
+                    style={{ maxHeight: 350 }}
+                  >
+                    <Table aria-label="simple table">
                       <TableBody>
                         {car.map((row, i) => (
                           <TableRow
@@ -1167,24 +1245,39 @@ export default function Articulos() {
                             <TableCell align="center">
                               {"$" + financial(row.PrecioConDescuento)}
                             </TableCell>
-                            <TableCell align="center">{"Cantidad"}</TableCell>
-                            <TableCell align="center">{"Monto"}</TableCell>
+                            <TableCell align="center">{row.quantity}</TableCell>
+                            <TableCell align="center">
+                              {" "}
+                              {"$" +
+                                financial(
+                                  row.PrecioConDescuento * row.quantity
+                                )}
+                            </TableCell>
                             <TableCell align="center">
                               <Avatar
                                 className="avatar-bg"
                                 src="."
                                 onClick={() => addToCar(row)}
                               >
-                                +
+                                <FaIcons.FaPlus />
                               </Avatar>
                             </TableCell>
                             <TableCell align="center">
                               <Avatar
                                 className="avatar-bg"
                                 src="."
-                                onClick={() => delFromCar(row)}
+                                onClick={() => delFromCar(row.Articulo)}
                               >
-                                -
+                                <FaIcons.FaMinus />
+                              </Avatar>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Avatar
+                                className="avatar-bg"
+                                src="."
+                                onClick={() => delFromCar(row.Articulo, true)}
+                              >
+                                <FaIcons.FaTrashAlt />
                               </Avatar>
                             </TableCell>
                           </TableRow>
@@ -1203,19 +1296,67 @@ export default function Articulos() {
                   </TableContainer>
                 </div>
               </div>
-                <div className="col-sm-1dss2 my-1" align="right">Montos</div>
+            </div>
+            <div className="col-sm-12 my-1 row" align="right">
+              <div className="col-sm-4 my-1" align="right"></div>
+              <div className="col-sm-4 my-1 row" align="center">
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio-bg"
+                  src="."
+                >
+                  Ahorro Total:
+                </Avatar>
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio2-bg"
+                  src="."
+                >
+                  <h5>{"$" + financial(Ahorro)}</h5>
+                </Avatar>
+              </div>
+              <div className="col-sm-4 my-1 row" align="center">
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio-bg"
+                  src="."
+                >
+                  Monto Total:
+                </Avatar>
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio2-bg"
+                  src="."
+                >
+                  <h5>{"$" + financial(Monto)}</h5>
+                </Avatar>
+              </div>
             </div>
           </ModalBody>
           <ModalFooter>
-            <button className="custom-bg" onClick={() => clearCar()}>
-              Limpiar Carrito
-            </button>
-            <button
-              className="custom-bg"
-              onClick={() => abrirCerrarModalCarrito()}
-            >
-              Cerrar
-            </button>
+            <div className="col-sm-8 my-1 " align="center">
+              <button
+                type="button"
+                className="custom-bg btn-lg"
+                onClick={() => clearCar()}
+              >
+                <h6>Limpiar Carrito</h6>
+              </button>
+              <button type="button" className="custom-bg btn-lg">
+                <h6>Guardar</h6>
+              </button>
+              <button
+                type="button"
+                className="custom-bg btn-lg"
+                onClick={() => abrirCerrarModalCarrito()}
+              >
+                <h6>Cerrar</h6>
+              </button>
+            </div>
           </ModalFooter>
         </Modal>
         <div className="divFooter" align="left">
