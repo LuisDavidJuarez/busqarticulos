@@ -1,13 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import Articulos from './componentes/busquedaArticulos';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import Articulos from "./componentes/busquedaArticulos";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "mdb-react-ui-kit/dist/css/mdb.min.css";
 
-ReactDOM.render(
-    <Articulos />
-, document.getElementById('root'));
+ReactDOM.render(<Articulos />, document.getElementById("root"));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

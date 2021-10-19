@@ -17,9 +17,8 @@ import {
   Avatar,
 } from "@material-ui/core";
 import * as ImIcons from "react-icons/im";
-import * as TiIcons from "react-icons/ti";
 import * as FaIcons from "react-icons/fa";
-
+import * as RiIcons from "react-icons/ri";
 /* Todo para el Carrito de compras */
 import {
   shoppingReducer,
@@ -500,20 +499,17 @@ export default function Articulos() {
           <h5>Pantalla Busqueda por Descripción</h5>
         </div>
         <div className="divHeader row">
-          <div
-            className="col-sm-1 my-1 border border-dark container-fluid"
-            align="center"
-          >
+          <div className="ContainerHeaders col-sm-1 my-1" align="center">
             <ImIcons.ImMenu responsive="true" alt="Menu" className="allIcons" />
           </div>
-          <div className="col-sm-1 my-1 border border-dark">
+          <div className="ContainerHeaders col-sm-1 my-1">
             <img
               src="/images/pages/logoweb.png"
               alt="Logo"
               className="allImg"
             />
           </div>
-          <div className="col-sm-8 my-1 border border-dark">
+          <div className="ContainerHeaders col-sm-8 my-1">
             <div className="col-sm-12 my-1 row">
               <div className="col-sm-3 my-1 row">
                 <select
@@ -562,19 +558,23 @@ export default function Articulos() {
               </div>
             </div>
           </div>
-          <div className="col-sm-1 my-1 border border-dark">
-            <span>
-              <TiIcons.TiShoppingCart
-                className="allIcons"
-                onClick={abrirCerrarModalCarrito}
-              />
-              {QtyItems > 0 && 
-                <Avatar className="avatar2-bg" src=".">
-                  {QtyItems}
-                </Avatar>}
-            </span>
+          <div
+            className="QtyItemsCar col-sm-1 my-1"
+            onClick={abrirCerrarModalCarrito}
+          >
+            <RiIcons.RiShoppingCartLine
+              responsive="true"
+              alt="Menu"
+              className="CarIcon"
+              onClick={abrirCerrarModalCarrito}
+            />
+            {QtyItems > 0 && (
+              <Avatar className="avatar2-bg" src=".">
+                <h7>{QtyItems}</h7>
+              </Avatar>
+            )}
           </div>
-          <div className="col-sm-1 my-1 border border-dark">
+          <div className="ContainerHeaders col-sm-1 my-1">
             <img
               src="/images/pages/descuento.png"
               alt="Desc"
@@ -584,7 +584,7 @@ export default function Articulos() {
         </div>
 
         <div className="divBody row container-fluid pt-0" align="top">
-          <div className="col-sm-9 my-3 border border-dark">
+          <div className="ContainerHeaders col-sm-9 my-3">
             <TableContainer
               id="TablaPrincipal"
               component={Paper}
@@ -854,7 +854,7 @@ export default function Articulos() {
             )}
           </div>
           <div className="col-sm-3 my-1">
-            <div className="border border-dark">
+            <div className="ContainerHeaders">
               <img
                 /*src={`${process.env.PUBLIC_URL}/images/page/default.png`}*/
                 /*src="https://www.farmaciaslamasbarata.com/wp-content/uploads/2017/11/2logoweb.png"*/
@@ -890,11 +890,11 @@ export default function Articulos() {
             )}
             {verPrecios && (
               <div className="col-sm-12 my-1 row" align="center">
-                <Avatar variant="rounded" className="avatarPrecio-bg" src=".">
+                <Avatar variant="rounded" className="avatarPrecio2-bg" src=".">
                   {articuloSeleccionado &&
                     "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
                 </Avatar>
-                <Avatar variant="rounded" className="avatarPrecio-bg" src=".">
+                <Avatar variant="rounded" className="avatarPrecio2-bg" src=".">
                   {articuloSeleccionado &&
                     "$ " +
                       financial(
@@ -1314,7 +1314,7 @@ export default function Articulos() {
                   className="avatarPrecio2-bg"
                   src="."
                 >
-                  <h5>{"$" + financial(Ahorro)}</h5>
+                  {"$" + financial(Ahorro)}
                 </Avatar>
               </div>
               <div className="col-sm-4 my-1 row" align="center">
@@ -1332,7 +1332,7 @@ export default function Articulos() {
                   className="avatarPrecio2-bg"
                   src="."
                 >
-                  <h5>{"$" + financial(Monto)}</h5>
+                  {"$" + financial(Monto)}
                 </Avatar>
               </div>
             </div>
