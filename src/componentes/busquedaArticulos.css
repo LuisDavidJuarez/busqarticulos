@@ -123,14 +123,14 @@ div.custom-bg {
 .avatar2-bg {
   color: #d11a2c !important;
   background-color: white !important;
-  width: fit-content !important;
-  height: fit-content !important;
+  width: 30% !important;
+  height: 30% !important;
   cursor: pointer;
 
   position: absolute !important;
   top: 45% !important;
   left: 55% !important;
-  transform: translate(-50%, -50%) !important;
+  transform: translate(-45%, -50%) !important;
 }
 
 .avatarPrecio-bg {
@@ -232,5 +232,11 @@ div.custom-bg {
   color: #d11a2c !important;
 }
 
-.centrado {
+.qtyItems {
+  font-family: cursive !important;
+}
+
+.TablaContainerCarrito {
+  overflow-y: auto !important;
+  max-height: 350px !important;
 }

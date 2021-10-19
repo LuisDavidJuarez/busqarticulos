@@ -570,7 +570,7 @@ export default function Articulos() {
             />
             {QtyItems > 0 && (
               <Avatar className="avatar2-bg" src=".">
-                <h7>{QtyItems}</h7>
+                <h7 className="qtyItems">{QtyItems}</h7>
               </Avatar>
             )}
           </div>
@@ -1154,7 +1154,11 @@ export default function Articulos() {
                   <h4>
                     <strong>Carrito de Compras</strong>
                   </h4>
-                  <TableContainer component={Paper} className="responsive">
+                  <TableContainer
+                    component={Paper}
+                    className="responsive"
+                    style={{ maxHeight: 400 }}
+                  >
                     <Table aria-label="simple table">
                       <TableHead className="custom-bg">
                         <TableRow className="TablaRowHead">
@@ -1190,26 +1194,12 @@ export default function Articulos() {
                           <TableCell>
                             <label className="custom-bg">Monto</label>
                           </TableCell>
-                          <TableCell>
-                            <label className="custom-bg"></label>
-                          </TableCell>
-                          <TableCell>
-                            <label className="custom-bg"></label>
-                          </TableCell>
-                          <TableCell>
-                            <label className="custom-bg"></label>
-                          </TableCell>
+                          <TableCell align="center"></TableCell>
+                          <TableCell align="center"></TableCell>
+                          <TableCell align="center"></TableCell>
                         </TableRow>
                       </TableHead>
-                    </Table>
-                  </TableContainer>
-                  <TableContainer
-                    component={Paper}
-                    className="TablaContainerCarrito responsive"
-                    style={{ maxHeight: 350 }}
-                  >
-                    <Table aria-label="simple table">
-                      <TableBody>
+                      <TableBody className="TablaContainerCarrito">
                         {car.map((row, i) => (
                           <TableRow
                             className="CustomRows"
