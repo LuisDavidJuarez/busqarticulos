@@ -16,8 +16,7 @@ export function shoppingReducer(state, action) {
             ...state,
             car: state.car.map((item) =>
               item.Articulo === newItem.Articulo
-                ? { ...item, quantity: item.quantity + 1,
-                }
+                ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
           }
@@ -27,26 +26,28 @@ export function shoppingReducer(state, action) {
           };
     }
     case TYPES.REMOVE_ONE_FROM_CAR: {
-      let itemToDelete = state.car.find(item => item.Articulo===action.payload);
+      let itemToDelete = state.car.find(
+        (item) => item.Articulo === action.payload
+      );
 
-      return itemToDelete.quantity > 1 
-      ? { 
-        ...state,
-        car: state.car.map(item => 
-          item.Articulo === action.payload 
-          ? { ...item, quantity: item.quantity - 1} 
-          : item
-          ),
-      } 
-      : {
-        ...state,
-        car: state.car.filter(item => item.Articulo !== action.payload),
-      };      
+      return itemToDelete.quantity > 1
+        ? {
+            ...state,
+            car: state.car.map((item) =>
+              item.Articulo === action.payload
+                ? { ...item, quantity: item.quantity - 1 }
+                : item
+            ),
+          }
+        : {
+            ...state,
+            car: state.car.filter((item) => item.Articulo !== action.payload),
+          };
     }
     case TYPES.REMOVE_ALL_FROM_CAR: {
       return {
         ...state,
-        car: state.car.filter(item => item.Articulo !== action.payload),
+        car: state.car.filter((item) => item.Articulo !== action.payload),
       };
     }
 

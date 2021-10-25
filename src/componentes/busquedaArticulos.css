@@ -1,14 +1,4 @@
-.cuerpo {
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
-  align-items: center !important;
-  text-align: center !important;
-  flex-direction: column !important;
-}
-
 .custom-bg {
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
   color: #fbd134 !important;
   background-color: #d11a2c !important;
   border-color: black !important;
@@ -25,50 +15,260 @@
   font-weight: bold !important;
 }
 
-.divTitulo {
-  align-items: center;
-  width: 98% !important;
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
+.secHeader {
+  height: 4vh;
+  background-color: #d11a2c;
+  color: #fbd134;
+}
+
+.secFooter {
+  height: 4vh;
+  background-color: #d11a2c;
+  color: #fbd134;
+}
+
+.secNavBar {
+  margin-top: 1vh;
+  height: 14vh;
+  color: #d11a2c !important;
+}
+
+.ContainerMenuIcon {
+  color: #d11a2c !important;
+  border-left: solid !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-width: medium !important;
+  border-top-left-radius: 10% !important;
+  border-bottom-left-radius: 10% !important;
+}
+
+.MenuIcon {
+  height: 8vh;
+  width: 8vw;
+}
+
+.ContainerLogoIcon {
+  color: #d11a2c !important;
+  border-left: solid !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-width: medium !important;
+}
+
+.LogoIcon {
+  height: 12vh;
+  width: 8vw;
+}
+
+.ContainerSearch {
+  color: #d11a2c !important;
+  border: solid !important;
+  border-width: medium !important;
+}
+
+.custom-drop {
+  color: #d11a2c !important;
+  background-color: white !important;
+  border-color: #d11a2c !important;
+  border-width: medium !important;
+}
+
+.custom-input {
+  color: #d11a2c !important;
+  background-color: white !important;
+  border-color: #d11a2c !important;
+  border-width: medium !important;
+}
+
+.QtyItemsCar {
+  position: relative !important;
+  display: inline-block !important;
+  text-align: center !important;
+
+  color: #d11a2c !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-right: solid !important;
+  border-width: medium !important;
+}
+
+.divCar-bg {
+  color: #d11a2c !important;
+  background-color: white !important;
+  border: none;
+  width: fit-content !important;
+  height: fit-content !important;
+  cursor: pointer;
+
+  position: absolute !important;
+  top: 45% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.qtyItemsH7 {
+  font-family: cursive !important;
+  font-style: italic !important;
+  font-size: 2vh;
+}
+
+.CarIcon {
+  height: 12vh;
+  width: 8vw;
+}
+
+.DiscountDiv {
+  position: relative !important;
+  display: inline-block !important;
+  text-align: center !important;
+
+  color: #d11a2c !important;
+  border-right: solid !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-width: medium !important;
+  border-top-right-radius: 10% !important;
+  border-bottom-right-radius: 10% !important;
+
+  display: flex;
+  flex-direction: ;
+  align-content: flex-start !important;
+}
+
+.avatar2d-bg {
   color: #fbd134 !important;
-  background-color: #d11a2c !important;
-  border-color: black !important;
-  font-weight: bold !important;
+  background-color: none !important;
+  border: none;
+  cursor: pointer;
+
+  position: absolute !important;
+  top: 55% !important;
+  left: 55% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
-.divHeader {
-  flex-direction: row !important;
-  width: 98% !important;
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
-  border-color: black !important;
-  font-weight: bold !important;
+.DiscIcon {
+  height: 11vh;
+  width: 8vw;
 }
 
-.divBody {
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
-  border-color: black !important;
-  font-weight: bold !important;
-  overflow: hidden;
-  overflow-y: auto !important;
-  max-height: 77vh !important;
-  min-height: 77vh !important;
-  flex-grow: 1 !important;
+.secMain {
+  margin-top: 1vh;
+  max-height: 75vh;
+  min-height: 75vh;
+  margin-bottom: 1vh;
+  overflow-y: auto;
 }
 
-.divBody::-webkit-scrollbar {
+.secMain::-webkit-scrollbar {
   display: none;
 }
 
-.divFooter {
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  font-size: small !important;
-  border-color: rgb(248, 13, 13) !important;
-  font-weight: bold !important;
+.divContenido {
+  border: solid;
+  border-color: #d11a2c;
+  border-width: medium;
+  border-radius: 2vh;
+  height: fit-content !important;
+}
+
+.divSideBar {
+  margin-left: 1vw;
+}
+
+.divImagen {
+  border: solid;
+  border-width: medium;
+  border-color: #d11a2c;
+  border-radius: 2vh;
+}
+
+.avatarPrecio-bg {
+  font-variant: rounded !important;
+  color: #fbd134 !important;
+  border-style: solid !important;
+  background-color: #d11a2c !important;
+  width: 24vh !important;
+  border-radius: 1vh !important;
+}
+
+.avatarPrecio2-bg {
+  font-variant: rounded !important;
+  color: #000000 !important;
+  border-style: solid !important;
+  background-color: white !important;
+  width: 24vh !important;
+  border-radius: 1vh !important;
+}
+
+.divDisponibles {
+  font-variant: rounded !important;
+  color: #000000 !important;
+  border: solid !important;
+  border-width: medium !important;
+  border-radius: 2vh;
+  background-color: white !important;
+}
+
+.divDisponibleHeader {
+  height: 4vh;
+  margin-top: 0% !important;
   color: #fbd134 !important;
   background-color: #d11a2c !important;
+  font-weight: bold !important;
+  border-top-left-radius: 2vh !important;
+  border-top-right-radius: 2vh !important;
 }
+
+.divDisponibleHeader2 {
+  height: 7vh;
+  margin-top: 0% !important;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  font-weight: bold !important;
+  border-top-left-radius: 2vh !important;
+  border-top-right-radius: 2vh !important;
+}
+
+.divDisponiblesContainer {
+  max-height: 22vh;
+  overflow-y: auto !important;
+}
+
+.divDisponiblesContainer2 {
+  max-height: 60vh;
+  overflow-y: auto !important;
+}
+
+.btnCerrarModal {
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  border-color: black !important;
+  font-weight: bold !important;
+  border-radius: 1vh;
+}
+
+.artHeaderDisponibles {
+  height: 4vh;
+  margin-top: 0% !important;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  font-weight: bold !important;
+  border-top: solid !important;
+  border-width: medium;
+}
+
+.divDisponibleFooter {
+  height: 4vh;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  font-weight: bold !important;
+  border-bottom-left-radius: 2vh !important;
+  border-bottom-right-radius: 2vh !important;
+}
+
+/********************************************************/
 
 .CustomRows {
   font-size: smaller !important;
@@ -88,14 +288,6 @@ div.custom-bg {
 
 .custom-invisible {
   visibility: collapse !important;
-}
-
-.custom-drop {
-  color: #d11a2c !important;
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  background-color: white !important;
-  border-color: #d11a2c !important;
-  border-radius: 5%;
 }
 
 .custom-data {
@@ -123,48 +315,21 @@ div.custom-bg {
 .avatar2-bg {
   color: #d11a2c !important;
   background-color: white !important;
-  width: 30% !important;
-  height: 30% !important;
+  border: none;
+  width: fit-content !important;
+  height: fit-content !important;
   cursor: pointer;
 
   position: absolute !important;
   top: 45% !important;
-  left: 55% !important;
-  transform: translate(-45%, -50%) !important;
-}
-
-.avatarPrecio-bg {
-  border-style: solid !important;
-  width: fit-content !important;
-  font-variant: rounded !important;
-  color: #fbd134 !important;
-  background-color: #d11a2c !important;
-  cursor: pointer;
-  text-align: center !important;
-  width: 23vh !important;
-}
-
-.avatarPrecio2-bg {
-  border-style: solid !important;
-  width: fit-content !important;
-  font-variant: rounded !important;
-  color: #000000 !important;
-  background-color: white !important;
-  cursor: pointer;
-  text-align: center !important;
-  width: 23vh !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 .allIcons {
   margin-top: 5%;
   height: 80%;
   width: 80%;
-}
-
-.CarIcon {
-  left: -7vh;
-  height: 13vh !important;
-  width: 13vh !important;
 }
 
 .IconX {
@@ -220,20 +385,6 @@ div.custom-bg {
   border-radius: 10px !important;
   border: solid !important;
   color: #d11a2c !important;
-}
-
-.QtyItemsCar {
-  position: relative !important;
-  display: inline-block !important;
-  text-align: center !important;
-
-  border-radius: 10px !important;
-  border: solid !important;
-  color: #d11a2c !important;
-}
-
-.qtyItems {
-  font-family: cursive !important;
 }
 
 .TablaContainerCarrito {
