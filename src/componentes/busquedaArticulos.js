@@ -46,6 +46,7 @@ export default function Articulos() {
   const [ModalArticulo, setModalArticulo] = useState(false);
   const [ModalSucursal, setModalSucursal] = useState(false);
   const [ModalCarrito, setModalCarrito] = useState(false);
+  const [ModalImprimir, setModalImprimir] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
   const [verPrecios, SetVerPrecios] = useState(false);
@@ -282,6 +283,15 @@ export default function Articulos() {
   const abrirCerrarModalCarrito = () => {
     calcularMontos();
     setModalCarrito(!ModalCarrito);
+  };
+
+  const abrirCerrarModalImprimir = () => {
+    setModalImprimir(!ModalImprimir);
+  };
+
+  const enviarAImprimir = () => {
+    abrirCerrarModalCarrito();
+    abrirCerrarModalImprimir();
   };
 
   const seleccionarArticulo = (articulo, caso) => {
@@ -978,6 +988,7 @@ export default function Articulos() {
             )}
         </section>
       </section>
+
       <Modal isOpen={ModalSucursal}>
         <ModalBody>
           <div align="center" className="divDisponibleHeader2 p-2">
@@ -1387,6 +1398,13 @@ export default function Articulos() {
             <button
               type="button"
               className="custom-bg btn-lg"
+              onClick={() => enviarAImprimir()}
+            >
+              <h6>Imprimir</h6>
+            </button>
+            <button
+              type="button"
+              className="custom-bg btn-lg"
               onClick={() => clearCar()}
             >
               <h6>Limpiar Carrito</h6>
@@ -1409,6 +1427,65 @@ export default function Articulos() {
             </button>
           </div>
         </ModalFooter>
+      </Modal>
+
+      <Modal
+        className="Imprimir d-flex modal-sm"
+        isOpen={ModalImprimir}
+        media="print"
+      >
+        <section
+          className="secHeaderImprimir d-flex flex-column"
+          align="center"
+        >
+          <small>{" * * FARMACIA LA MAS BARATA * * "}</small>
+          <small>{"Sucursal " + Sucursal}</small>
+        </section>
+        <section className="secHeaderImprimir d-flex flex-row" align="center">
+          <article className="TitularesTicket col-3">
+            <small>{"COD"}</small>
+          </article>
+          <article className="TitularesTicket flex-grow-1">
+            <small>{"DESCRIPCION"}</small>
+          </article>
+          <article className="TitularesTicket col-2">
+            <small>{"CANT"}</small>
+          </article>
+          <article className="TitularesTicket col-2">
+            <small>{"PRECIO"}</small>
+          </article>
+        </section>
+        {car.map((row, i) => (
+          <section className="secBodyImprimir d-flex flex-row" align="center">
+            <article className="artDetalleTicket col-3">
+              <small>{row.Articulo}</small>
+            </article>
+            <article className="artDetalleTicket flex-grow-1" align="left">
+              <small>{row.Descripcion}</small>
+            </article>
+            <article className="artDetalleTicket col-2">
+              <small>{row.quantity}</small>
+            </article>
+            <article className="artDetalleTicket col-2">
+              <small>{"$" + financial(row.PrecioConDescuento)}</small>
+            </article>
+          </section>
+        ))}
+        <section className="secTotalesTicket d-flex flex-column" align="right">
+          <article className="artPreciosTicket">
+            {"Total Pesos: $" + financial(Monto)}
+          </article>
+          <article className="artPreciosTicket">
+            {"Total Dlls: $" + financial(Monto / TipoCambio)}
+          </article>
+          <article className="artPreciosTicket" align="center">
+            {"Usted Ahorro: $" + financial(Ahorro)}
+          </article>
+        </section>
+        <section className="secAtendio d-flex flex-column" align="center">
+          <article className="">Le atendio: LUIS</article>
+        </section>
+        <br />
       </Modal>
 
       <section className="secFooter d-flex p-1">

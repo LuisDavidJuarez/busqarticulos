@@ -171,6 +171,7 @@
   border-width: medium;
   border-radius: 2vh;
   height: fit-content !important;
+  min-height: 75vh !important;
 }
 
 .divSideBar {
@@ -390,4 +391,67 @@ div.custom-bg {
 .TablaContainerCarrito {
   overflow-y: auto !important;
   max-height: 350px !important;
+}
+
+.secHeaderImprimir {
+  margin-left: 5% !important;
+  width: 90% !important;
+}
+
+.secBodyImprimir {
+  margin-left: 5% !important;
+  width: 90% !important;
+}
+
+.TitularesTicket {
+  border-style: dashed !important;
+  border-top: dashed !important;
+  border-bottom: dashed !important;
+  border-left: none !important;
+  border-right: none !important;
+  font-size: x-small !important;
+}
+
+.artDetalleTicket {
+  font-size: xx-small !important;
+}
+
+.secTotalesTicket {
+  border-style: dashed !important;
+  border-top: dashed !important;
+  border-bottom: dashed !important;
+  border-left: none !important;
+  border-right: none !important;
+  margin-left: 5% !important;
+  width: 90% !important;
+}
+
+.artPreciosTicket {
+  font-size: small !important;
+}
+
+.secAtendio {
+  border-style: dashed !important;
+  border-top: none !important;
+  border-bottom: dashed !important;
+  border-left: none !important;
+  border-right: none !important;
+  margin-left: 5% !important;
+  width: 90% !important;
+  font-size: small !important;
+}
+
+@media print {
+  #secHeader {
+    display: none !important;
+  }
+  #secNavBar {
+    display: none !important;
+  }
+  #secMain {
+    display: none !important;
+  }
+  #secFooter {
+    display: none !important;
+  }
 }
