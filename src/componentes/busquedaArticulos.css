@@ -269,104 +269,6 @@
   border-bottom-right-radius: 2vh !important;
 }
 
-/********************************************************/
-
-.CustomRows {
-  font-size: smaller !important;
-}
-
-label.custom-bg {
-  color: #fbd134 !important;
-}
-
-button.custom-bg {
-  border-radius: 10%;
-}
-
-div.custom-bg {
-  border-radius: 2%;
-}
-
-.custom-invisible {
-  visibility: collapse !important;
-}
-
-.custom-data {
-  text-size-adjust: small I !important;
-}
-
-.tipoOpe {
-  font-weight: bold !important;
-}
-
-.listaAutocompletar {
-  color: #d11a2c !important;
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  background-color: white !important;
-  border-color: #d11a2c !important;
-  border-radius: 5%;
-}
-
-.avatar-bg {
-  color: #fbd134 !important;
-  background-color: #d11a2c !important;
-  cursor: pointer;
-}
-
-.avatar2-bg {
-  color: #d11a2c !important;
-  background-color: white !important;
-  border: none;
-  width: fit-content !important;
-  height: fit-content !important;
-  cursor: pointer;
-
-  position: absolute !important;
-  top: 45% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-}
-
-.allIcons {
-  margin-top: 5%;
-  height: 80%;
-  width: 80%;
-}
-
-.IconX {
-  height: max-content;
-  width: max-content;
-}
-
-.allImg {
-  margin-top: 5%;
-  height: 80%;
-  width: 80%;
-}
-
-.TablaDisponiblesData {
-  overflow: hidden;
-  overflow-y: auto !important;
-  max-height: 120px !important;
-  min-height: 120px !important;
-  text-align: center !important;
-  align-items: center;
-}
-
-.TablaDisponiblesData::-webkit-scrollbar {
-  display: none;
-}
-
-.rowDisponibles {
-  height: 10px !important;
-  text-align: center;
-}
-
-.CellDisponibles.rowDisponibles {
-  height: auto !important;
-  text-align: center !important;
-}
-
 .Progress {
   position: absolute !important;
   left: 40% !important;
@@ -393,6 +295,15 @@ div.custom-bg {
   max-height: 350px !important;
 }
 
+.Imprimir {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif !important;
+}
+
+.titularTicket {
+  font-weight: normal !important;
+  font-size: small !important;
+}
+
 .secHeaderImprimir {
   margin-left: 5% !important;
   width: 90% !important;
@@ -404,9 +315,10 @@ div.custom-bg {
 }
 
 .TitularesTicket {
-  border-style: dashed !important;
-  border-top: dashed !important;
-  border-bottom: dashed !important;
+  border-style: solid !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-width: thin !important;
   border-left: none !important;
   border-right: none !important;
   font-size: x-small !important;
@@ -417,9 +329,10 @@ div.custom-bg {
 }
 
 .secTotalesTicket {
-  border-style: dashed !important;
-  border-top: dashed !important;
-  border-bottom: dashed !important;
+  border-style: solid !important;
+  border-top: solid !important;
+  border-bottom: solid !important;
+  border-width: thin !important;
   border-left: none !important;
   border-right: none !important;
   margin-left: 5% !important;
@@ -431,27 +344,82 @@ div.custom-bg {
 }
 
 .secAtendio {
-  border-style: dashed !important;
+  border-style: solid !important;
   border-top: none !important;
-  border-bottom: dashed !important;
+  border-bottom: solid !important;
   border-left: none !important;
   border-right: none !important;
+  border-width: thin !important;
   margin-left: 5% !important;
   width: 90% !important;
   font-size: small !important;
 }
 
+.CustomRows {
+  font-size: smaller !important;
+}
+
+.custom-invisible {
+  visibility: collapse !important;
+}
+
+.tipoOpe {
+  font-weight: bold !important;
+}
+
+.avatar-bg {
+  color: #fbd134 !important;
+  font-weight: bold !important;
+  background-color: #d11a2c !important;
+  cursor: pointer;
+}
+
+.divDatosArt {
+  margin-top: 2vh !important;
+}
+
+.divDatos1 {
+  margin-left: 1% !important;
+}
+
+.imgModal {
+  width: 95% !important;
+  margin-left: 5% !important;
+}
+
+textarea {
+  resize: none !important;
+}
+
+.txtAPricing {
+  text-align: center !important;
+}
+
 @media print {
-  #secHeader {
-    display: none !important;
+  .Imprimir {
+    visibility: visible;
+    height: auto !important;
   }
-  #secNavBar {
+
+  .secHeader {
     display: none !important;
+    visibility: hidden;
   }
-  #secMain {
+
+  .secNavBar {
     display: none !important;
+    visibility: hidden;
   }
-  #secFooter {
+
+  .secMain {
     display: none !important;
+    visibility: hidden;
+  }
+
+  .secFooter {
+    display: none !important;
+    visibility: hidden;
   }
 }
+
+/********************************************************/

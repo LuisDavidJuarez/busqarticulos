@@ -46,6 +46,7 @@ export default function Articulos() {
   const [ModalArticulo, setModalArticulo] = useState(false);
   const [ModalSucursal, setModalSucursal] = useState(false);
   const [ModalCarrito, setModalCarrito] = useState(false);
+  const [ModalCheckOut, setModalCheckOut] = useState(false);
   const [ModalImprimir, setModalImprimir] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
@@ -109,38 +110,49 @@ export default function Articulos() {
   const handleChangeCar = (e) => {
     const { name, value } = e.target;
 
-    let itemCar = name.replaceAll(" ", "");
-    let articuloInCar = car.find((item) => item.Articulo === itemCar);
+    console.log(name, value);
+    if (value !== null && value !== "") {
+      let itemCar = name.replaceAll(" ", "");
+      let articuloInCar = car.find((item) => item.Articulo === itemCar);
 
-    var qtyAnt = articuloInCar.quantity;
-    var qtyNew = parseInt(value);
-    var times = 0;
+      var qtyAnt = articuloInCar.quantity;
+      var qtyNew = parseInt(value);
+      var Exist = articuloInCar.Existencia;
+      var times = 0;
 
-    if (qtyAnt < qtyNew) {
-      times = qtyNew - qtyAnt;
-      for (var i = 0; i < times; i++) {
-        dispatch({ type: TYPES.ADD_TO_CAR, payload: articuloInCar });
+      if (qtyAnt < qtyNew) {
+        if (qtyNew > Exist) {
+          times = Exist - qtyAnt;
+        } else {
+          times = qtyNew - qtyAnt;
+        }
+        for (var i = 0; i < times; i++) {
+          dispatch({ type: TYPES.ADD_TO_CAR, payload: articuloInCar });
+        }
+        setMonto(Monto + times * articuloInCar.PrecioConDescuento);
+        setAhorro(
+          Ahorro +
+            times * (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
+        );
+        setQtyItems(QtyItems + times);
+      } else {
+        if (qtyNew < 1) {
+          qtyNew = 1;
+        }
+        times = qtyAnt - qtyNew;
+        for (var indx = 0; indx < times; indx++) {
+          dispatch({
+            type: TYPES.REMOVE_ONE_FROM_CAR,
+            payload: articuloInCar.Articulo,
+          });
+        }
+        setMonto(Monto - times * articuloInCar.PrecioConDescuento);
+        setAhorro(
+          Ahorro -
+            times * (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
+        );
+        setQtyItems(QtyItems - times);
       }
-      setMonto(Monto + times * articuloInCar.PrecioConDescuento);
-      setAhorro(
-        Ahorro +
-          times * (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
-      );
-      setQtyItems(QtyItems + times);
-    } else {
-      times = qtyAnt - qtyNew;
-      for (var indx = 0; indx < times; indx++) {
-        dispatch({
-          type: TYPES.REMOVE_ONE_FROM_CAR,
-          payload: articuloInCar.Articulo,
-        });
-      }
-      setMonto(Monto - times * articuloInCar.PrecioConDescuento);
-      setAhorro(
-        Ahorro -
-          times * (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
-      );
-      setQtyItems(QtyItems - times);
     }
   };
 
@@ -149,6 +161,7 @@ export default function Articulos() {
     setMonto(Monto + articulo.PrecioConDescuento);
     setAhorro(Ahorro + (articulo.Precio - articulo.PrecioConDescuento));
     setQtyItems(QtyItems + 1);
+    console.log("carrito: ", car);
   };
 
   const delFromCar = (Articulo, all = false) => {
@@ -289,9 +302,23 @@ export default function Articulos() {
     setModalImprimir(!ModalImprimir);
   };
 
+  const abrirCerrarModalCheckOut = () => {
+    setModalCheckOut(!ModalCheckOut);
+  };
+
+  const imprimirTicket = () => {
+    window.print();
+    enviarAImprimir();
+  };
+
   const enviarAImprimir = () => {
     abrirCerrarModalCarrito();
     abrirCerrarModalImprimir();
+  };
+
+  const enviarcheckout = () => {
+    abrirCerrarModalCheckOut();
+    abrirCerrarModalCarrito();
   };
 
   const seleccionarArticulo = (articulo, caso) => {
@@ -546,6 +573,7 @@ export default function Articulos() {
       <section className="secHeader" align="center">
         <h5>Pantalla Busqueda por Descripción</h5>
       </section>
+
       <section className="secNavBar">
         <div className="d-flex flex-row">
           <div className="ContainerMenuIcon p-1">
@@ -622,7 +650,7 @@ export default function Articulos() {
         </div>
       </section>
 
-      <section className="secMain d-flex flex-row justify-content-start">
+      <section className="secMain d-flex flex-row">
         <section className="divContenido flex-grow-1">
           <TableContainer
             id="TablaPrincipal"
@@ -632,7 +660,7 @@ export default function Articulos() {
             <Table aria-label="simple table">
               <TableHead className="custom-bg">
                 <TableRow className="TablaRowHead">
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">#</label>
                   </TableCell>
                   <TableCell>
@@ -645,28 +673,31 @@ export default function Articulos() {
                   <TableCell>
                     <label className="custom-bg">Descripción</label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">Precio</label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">Ahorro</label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">
                       Precio
                       <br />
                       Final
                     </label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">Exist</label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">Tipo</label>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <label className="custom-bg">Estatus</label>
                   </TableCell>
+                  {/* <TableCell align="center">
+                    <label className="custom-bg">Cantidad</label>
+                  </TableCell> */}
                   <TableCell>
                     <label className="custom-bg"></label>
                   </TableCell>
@@ -723,6 +754,17 @@ export default function Articulos() {
                         <TableCell align="center">{row.Existencia}</TableCell>
                         <TableCell align="center">{row.Gen_Pat}</TableCell>
                         <TableCell align="center">{row.Estatus}</TableCell>
+                        {/* <TableCell align="center">
+                          <TextField
+                            inputProps={{
+                              style: { textAlign: "center" },
+                            }}
+                            name={row.Articulo}
+                            onChange={handleChangeCar}
+                            value={row.quantity}
+                            readOnly={false}
+                          ></TextField>
+                        </TableCell> */}
                         <TableCell align="center">
                           <Avatar
                             className="avatar-bg"
@@ -738,20 +780,24 @@ export default function Articulos() {
               )}
             </Table>
           </TableContainer>
-          <TableFooter>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={articulos.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableFooter>
+          {articulos.length !== 0 && (
+            <TableFooter className="FooterArticulos d-flex justify-content-center">
+              <TablePagination
+                className=""
+                rowsPerPageOptions={[5, 10, 25]}
+                labelRowsPerPage="Lineas por Pagina"
+                count={articulos.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableFooter>
+          )}
+
           {verSugeridosSucursales === true && sugeridos.length !== 0 && (
-            <div className="custom-bg">
-              <h4>Articulos Sugeridos</h4>
+            <div className="secHeader" align="center">
+              <h5>Articulos Sugeridos</h5>
             </div>
           )}
           {verSugeridosSucursales === true && sugeridos.length > 0 && (
@@ -764,42 +810,42 @@ export default function Articulos() {
                 <TableHead className="custom-invisible">
                   <TableRow className="custom-bg">
                     <TableCell>
-                      <label className="custom-bg">#</label>
+                      <label>#</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">
+                      <label>
                         Articulo
                         <br />
                         Código
                       </label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Descripción</label>
+                      <label>Descripción</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Precio</label>
+                      <label>Precio</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Ahorro</label>
+                      <label>Ahorro</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">
+                      <label>
                         Precio
                         <br />
                         Final
                       </label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Exist</label>
+                      <label>Exist</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Tipo</label>
+                      <label>Tipo</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg">Estatus</label>
+                      <label>Estatus</label>
                     </TableCell>
                     <TableCell>
-                      <label className="custom-bg"></label>
+                      <label></label>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -809,10 +855,11 @@ export default function Articulos() {
                       page2 * rowsPerPage2,
                       page2 * rowsPerPage2 + rowsPerPage2
                     )
-                    .map((row, i) => (
+                    .map((row, x) => (
                       <TableRow
+                        align="center"
                         hover
-                        key={i}
+                        key={x}
                         value={row.Articulo}
                         onClick={() => seleccionarArticulo(row, "Seleccionar")}
                         selected={
@@ -827,7 +874,7 @@ export default function Articulos() {
                             src="."
                             onClick={() => seleccionarArticulo(row, "Ver")}
                           >
-                            {page * rowsPerPage + (i + 1)}
+                            {page2 * rowsPerPage2 + (x + 1)}
                           </Avatar>
                         </TableCell>
                         <TableCell component="th" scope="row">
@@ -841,9 +888,7 @@ export default function Articulos() {
                           {row.SustanciaActiva !== null &&
                             "[" + row.SustanciaActiva + "]"}
                         </TableCell>
-                        <TableCell align="center">
-                          {"$ " + financial(row.Precio)}
-                        </TableCell>
+                        <TableCell>{"$ " + financial(row.Precio)}</TableCell>
                         <TableCell align="center">
                           {"$ " +
                             financial(row.Precio - row.PrecioConDescuento)}
@@ -862,7 +907,7 @@ export default function Articulos() {
                             src="."
                             onClick={() => addToCar(row)}
                           >
-                            +
+                            <FaIcons.FaPlus />
                           </Avatar>
                         </TableCell>
                       </TableRow>
@@ -872,19 +917,21 @@ export default function Articulos() {
             </TableContainer>
           )}
           {verSugeridosSucursales === true && sugeridos.length > 0 && (
-            <TableFooter>
+            <TableFooter className="FooterArticulos d-flex justify-content-center">
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
-                component="div"
+                labelRowsPerPage="Lineas por Pagina"
                 count={sugeridos.length}
                 rowsPerPage={rowsPerPage2}
                 page={page2}
                 onPageChange={handleChangePage2}
                 onRowsPerPageChange={handleChangeRowsPerPage2}
+                className="FooterArticulos"
               />
             </TableFooter>
           )}
         </section>
+
         <section className="divSideBar col-3">
           <div className="divImagen d-flex justify-content-center">
             <img
@@ -1034,132 +1081,153 @@ export default function Articulos() {
         </ModalFooter>
       </Modal>
 
-      <Modal isOpen={ModalArticulo}>
+      <Modal className="ModalArticulo modal-lg" isOpen={ModalArticulo}>
         <ModalBody>
-          <div className="custom-bg border border-dark" align="center">
-            <h4>
-              <p>Datos del Articulo</p>
-            </h4>
-          </div>
-          <div className="row" align="center">
-            <div className="col-sm-6">
-              <label>Articulo:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="articulo"
-                value={articuloSeleccionado && articuloSeleccionado.Articulo}
-              />{" "}
-              <br />
-            </div>
-            <div className="col-sm-6">
-              <label>Codigo:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="codigo"
-                value={articuloSeleccionado && articuloSeleccionado.Codigo}
-              />{" "}
-              <br />
-            </div>
-          </div>
-          <div className="row" align="center">
-            <div className="col-sm-8 my-3">
-              <label>Descripción:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="descripcion"
-                value={articuloSeleccionado && articuloSeleccionado.Descripcion}
-              />{" "}
-              <br />
-            </div>
-            <div className="col-sm-4 my-3 ">
-              <img
-                src={`${process.env.PUBLIC_URL}/images/articulos/${
-                  articuloSeleccionado && articuloSeleccionado.Articulo
-                }.png`}
-                alt={`${articuloSeleccionado && articuloSeleccionado.Articulo}`}
-                width="100%"
-              />
-            </div>
-          </div>
-          <div className="row" align="center">
-            <div className="col-sm-3 my-3">
-              {" "}
-              <br />
-              <label>Precio:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="precio"
-                value={
-                  "$ " + articuloSeleccionado && articuloSeleccionado.Precio
-                }
-              />{" "}
-              <br />
-            </div>
-            <div className="col-sm-3 my-3">
-              {" "}
-              <br />
-              <label>Descuento:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="descuento"
-                value={
-                  articuloSeleccionado && articuloSeleccionado.Descuento + " %"
-                }
-              />{" "}
-              <br />
-            </div>
-            <div className="col-sm-3 my-3">
-              <label>Precio Con Descuento:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="PrecioConDescuento"
-                value={
-                  "$ " + articuloSeleccionado &&
-                  articuloSeleccionado.PrecioConDescuento
-                }
-              />{" "}
-              <br />
-            </div>
-            <div className="col-sm-3 my-3">
-              {" "}
-              <br />
-              <label>Existencia:</label>
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                readOnly
-                name="Existencia"
-                value={articuloSeleccionado && articuloSeleccionado.Existencia}
-              />{" "}
-              <br />
-            </div>
+          <section className="secHeader" align="center">
+            <article>
+              <h4>Datos del Articulo</h4>
+            </article>
+          </section>
+          <div className="divDatosArt d-flex">
+            <section className="divDatos1 flex-row flex-grow-1">
+              <div>
+                <section className="d-flex flex-row">
+                  <article className="col-4">
+                    <h5 className="tipoOpe">Articulo / Codigo</h5>
+                  </article>
+                  <article className="flex-grow-1">
+                    <h5 className="tipoOpe">Descripción / Sustancia Activa</h5>
+                  </article>
+                </section>
+                <section className="d-flex flex-row">
+                  <article className="col-4">
+                    <textarea
+                      type="text"
+                      className="form-control"
+                      readOnly
+                      rows="2"
+                      name="articulo"
+                      value={
+                        articuloSeleccionado &&
+                        articuloSeleccionado.Articulo +
+                          "\n" +
+                          articuloSeleccionado.Codigo
+                      }
+                    />{" "}
+                  </article>
+                  <article className="flex-grow-1">
+                    <textarea
+                      type="text"
+                      rows="2"
+                      className="form-control"
+                      readOnly
+                      name="descripcion"
+                      value={
+                        articuloSeleccionado &&
+                        articuloSeleccionado.Descripcion +
+                          "\n [" +
+                          articuloSeleccionado.SustanciaActiva +
+                          "]"
+                      }
+                    />
+                  </article>
+                </section>
+                <br />
+                <section className="d-flex flex-row">
+                  <article className="col-3" align="center">
+                    <h5 className="tipoOpe">Precio</h5>
+                  </article>
+                  <article className="col-3" align="center">
+                    <h5 className="tipoOpe">Descuento</h5>
+                  </article>
+                  <article className="col-3" align="center">
+                    <h5 className="tipoOpe">Ahorro</h5>
+                  </article>
+                  <article className="col-3" align="center">
+                    <h5 className="tipoOpe">Precio Final</h5>
+                  </article>
+                </section>
+                <section className="d-flex flex-row">
+                  <article className="col-3" align="center">
+                    <textarea
+                      type="text"
+                      className="txtAPricing form-control"
+                      readOnly
+                      rows={1}
+                      name="Precio"
+                      value={
+                        articuloSeleccionado &&
+                        "$" + financial(articuloSeleccionado.Precio)
+                      }
+                    />
+                  </article>
+                  <article className="col-3">
+                    <textarea
+                      type="text"
+                      className="txtAPricing form-control"
+                      align="center"
+                      readOnly
+                      rows={1}
+                      name="Ahorro"
+                      value={
+                        articuloSeleccionado &&
+                        articuloSeleccionado.Descuento + "%"
+                      }
+                    />
+                  </article>
+                  <article className="col-3">
+                    <textarea
+                      type="text"
+                      className="txtAPricing form-control"
+                      align="center"
+                      readOnly
+                      rows={1}
+                      name="Ahorro"
+                      value={
+                        articuloSeleccionado &&
+                        "$ " +
+                          financial(
+                            articuloSeleccionado.Precio -
+                              articuloSeleccionado.PrecioConDescuento
+                          )
+                      }
+                    />
+                  </article>
+                  <article className="col-3">
+                    <textarea
+                      type="text"
+                      className="txtAPricing form-control"
+                      readOnly
+                      rows={1}
+                      name="PrecioFinal"
+                      value={
+                        articuloSeleccionado &&
+                        "$" + financial(articuloSeleccionado.PrecioConDescuento)
+                      }
+                    />
+                  </article>
+                </section>
+              </div>
+            </section>
+            <section className="col-4">
+              <article>
+                <img
+                  className="imgModal"
+                  src={Imagen}
+                  onError={addDefaultSrc}
+                  alt="default"
+                />
+              </article>
+            </section>
           </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="d-flex flex-row">
           <button
-            className="custom-bg"
+            type="button"
+            className="btnCerrarModal btn-lg"
             onClick={() => abrirCerrarModalArticulo()}
           >
-            Cerrar
+            <h6>Cerrar</h6>
           </button>
         </ModalFooter>
       </Modal>
@@ -1167,7 +1235,7 @@ export default function Articulos() {
       <Modal className="Progress" isOpen={mostrarProgress}>
         <ModalBody>
           <div align="center">
-            <img src="/images/pages/loader6.gif" alt="load1" height="8%" />
+            <img src="/images/page/loader6.gif" alt="load1" height="8%" />
           </div>
         </ModalBody>
       </Modal>
@@ -1188,36 +1256,36 @@ export default function Articulos() {
                   <Table aria-label="simple table">
                     <TableHead className="custom-bg">
                       <TableRow className="TablaRowHead">
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">#</label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">
                             Articulo
                             <br />
                             Código
                           </label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">Descripción</label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">Precio</label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">Ahorro</label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">
                             Precio
                             <br />
                             Final
                           </label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">Cant</label>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center">
                           <label className="custom-bg">Total</label>
                         </TableCell>
                         <TableCell align="center"></TableCell>
@@ -1233,7 +1301,7 @@ export default function Articulos() {
                           key={i}
                           value={row.Articulo}
                         >
-                          <TableCell>
+                          <TableCell align="center">
                             <Avatar className="avatar-bg" src=".">
                               {i + 1}
                             </Avatar>
@@ -1263,6 +1331,9 @@ export default function Articulos() {
                           </TableCell>
                           <TableCell align="center">
                             <TextField
+                              inputProps={{
+                                style: { textAlign: "center" },
+                              }}
                               name={row.Articulo}
                               onChange={handleChangeCar}
                               value={row.quantity}
@@ -1274,24 +1345,28 @@ export default function Articulos() {
                             {"$" +
                               financial(row.PrecioConDescuento * row.quantity)}
                           </TableCell>
-                          <TableCell align="center">
-                            <Avatar
-                              className="avatar-bg"
-                              src="."
-                              onClick={() => addToCar(row)}
-                            >
-                              <FaIcons.FaPlus />
-                            </Avatar>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Avatar
-                              className="avatar-bg"
-                              src="."
-                              onClick={() => delFromCar(row.Articulo)}
-                            >
-                              <FaIcons.FaMinus />
-                            </Avatar>
-                          </TableCell>
+                          {row.quantity !== row.Existencia && (
+                            <TableCell align="center">
+                              <Avatar
+                                className="avatar-bg"
+                                src="."
+                                onClick={() => addToCar(row)}
+                              >
+                                <FaIcons.FaPlus />
+                              </Avatar>
+                            </TableCell>
+                          )}
+                          {row.quantity > 1 && (
+                            <TableCell align="center">
+                              <Avatar
+                                className="avatar-bg"
+                                src="."
+                                onClick={() => delFromCar(row.Articulo)}
+                              >
+                                <FaIcons.FaMinus />
+                              </Avatar>
+                            </TableCell>
+                          )}
                           <TableCell align="center">
                             <Avatar
                               className="avatar-bg"
@@ -1319,6 +1394,26 @@ export default function Articulos() {
             </div>
           </div>
           <div className="d-flex flex-row-reverse ">
+            {Conexion === "Linea" && (
+              <div className="" align="center">
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio-bg"
+                  src="."
+                >
+                  Total DLLS:
+                </Avatar>
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio2-bg"
+                  src="."
+                >
+                  {"$" + financial(Monto / TipoCambio)}
+                </Avatar>
+              </div>
+            )}
             <div className="" align="center">
               <Avatar
                 align="right"
@@ -1337,24 +1432,27 @@ export default function Articulos() {
                 {"$" + financial(Monto)}
               </Avatar>
             </div>
-            <div className="" align="center">
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio-bg"
-                src="."
-              >
-                Total DLLS:
-              </Avatar>
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio2-bg"
-                src="."
-              >
-                {"$" + financial(Monto / TipoCambio)}
-              </Avatar>
-            </div>
+
+            {Conexion === "Linea" && (
+              <div className="" align="center">
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio-bg"
+                  src="."
+                >
+                  T.C.
+                </Avatar>
+                <Avatar
+                  align="right"
+                  variant="rounded"
+                  className="avatarPrecio2-bg"
+                  src="."
+                >
+                  {"$" + financial(TipoCambio)}
+                </Avatar>
+              </div>
+            )}
             <div className="" align="center">
               <Avatar
                 align="right"
@@ -1412,7 +1510,7 @@ export default function Articulos() {
             {Conexion === "Linea" && (
               <button
                 type="button"
-                onClick={console.log("its ok")}
+                onClick={() => enviarcheckout()}
                 className="custom-bg btn-lg"
               >
                 <h6>Guardar</h6>
@@ -1429,17 +1527,20 @@ export default function Articulos() {
         </ModalFooter>
       </Modal>
 
-      <Modal
+      <Modal /*** MODAL IMPRIMIR **/
         className="Imprimir d-flex modal-sm"
         isOpen={ModalImprimir}
+        onOpened={() => imprimirTicket()}
         media="print"
       >
         <section
           className="secHeaderImprimir d-flex flex-column"
           align="center"
         >
-          <small>{" * * FARMACIA LA MAS BARATA * * "}</small>
-          <small>{"Sucursal " + Sucursal}</small>
+          <small className="titularTicket">
+            {" * * FARMACIA LA MAS BARATA * * "}
+          </small>
+          <small className="titularTicket">{"Sucursal " + Sucursal}</small>
         </section>
         <section className="secHeaderImprimir d-flex flex-row" align="center">
           <article className="TitularesTicket col-3">
@@ -1483,19 +1584,70 @@ export default function Articulos() {
           </article>
         </section>
         <section className="secAtendio d-flex flex-column" align="center">
+          <br />
           <article className="">Le atendio: LUIS</article>
         </section>
         <br />
+        <section
+          className="secHeaderImprimir d-flex flex-column"
+          align="center"
+        >
+          <small className="titularTicket">
+            {" * * GRACIAS POR SU PREFERENCIA * * "}
+          </small>
+          <br />
+        </section>
+      </Modal>
+
+      <Modal /*** MODAL CHECKOUT **/
+        className="CheckOut d-flex modal-lg"
+        isOpen={ModalCheckOut}
+      >
+        <section>
+          <h5>CheckOut</h5>
+        </section>
+        <ModalBody></ModalBody>
+        <ModalFooter>
+          <div className="d-flex justify-content-center ">
+            <button
+              type="button"
+              className="custom-bg btn-lg"
+              onClick={() => enviarAImprimir()}
+            >
+              <h6>Imprimir</h6>
+            </button>
+            <button
+              type="button"
+              className="custom-bg btn-lg"
+              onClick={() => enviarcheckout()}
+            >
+              <h6>regresar</h6>
+            </button>
+            <button
+              type="button"
+              onClick={console.log("its ok")}
+              className="custom-bg btn-lg"
+            >
+              <h6>Guardar</h6>
+            </button>
+            <button
+              type="button"
+              className="custom-bg btn-lg"
+              onClick={() => abrirCerrarModalCheckOut()}
+            >
+              <h6>Cerrar</h6>
+            </button>
+          </div>
+        </ModalFooter>
       </Modal>
 
       <section className="secFooter d-flex p-1">
-        <h6>
+        <h6 className="tipoOpe">
           Dirección: {window.location.href + "  "}
           || Base de Datos: {Conexion + "  "}
           || Gateway: {Getway + "  "}
           || Sucursal: {Sucursal + "  "}
-          || TipoCambio:
-          {TipoCambio === null || TipoCambio === "undefined" ? 0 : TipoCambio}
+          {Conexion === "Linea" && "|| TipoCambio: $" + TipoCambio}
         </h6>
       </section>
     </div>
