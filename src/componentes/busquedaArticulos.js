@@ -32,8 +32,8 @@ import { TYPES } from "./actions/shoppingActions";
 /* Todo para el Carrito de compras */
 
 export default function Articulos() {
-  const baseUrl = "https://" + adquirirUrl() + ":443/api/BusquedaArticulos";
-  const baseUrlCotizador = "https://" + adquirirUrl() + ":443/api/Cotizador";
+  const baseUrl = "http://" + adquirirUrl() + ":81/api/BusquedaArticulos";
+  const baseUrlCotizador = "http://" + adquirirUrl() + ":81/api/Cotizador";
 
   const [articulos, setArticulos] = useState([]);
   const [sugeridos, setSugeridos] = useState([]);
