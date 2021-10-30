@@ -395,6 +395,50 @@ textarea {
   text-align: center !important;
 }
 
+.secHeaderCheckout {
+  margin-top: 2vh !important;
+  margin-bottom: 3vh !important;
+  background-color: #d11a2c !important;
+  color: #fbd134 !important;
+  text-align: center !important;
+  border-top-left-radius: 1vh;
+  border-top-right-radius: 1vh;
+  height: 4vh;
+}
+
+.secHeaderCheckout2 {
+  margin-top: 3vh;
+  margin-bottom: 3vh !important;
+  background-color: #d11a2c !important;
+  color: #fbd134 !important;
+  text-align: center !important;
+  height: 4vh;
+}
+
+.InputsAgentes {
+  margin-left: 1% !important;
+}
+
+.InputsClientes {
+  margin-left: 1% !important;
+}
+
+.LupaIcon {
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  height: 5.4vh;
+  width: 4vw;
+  margin-left: -1vh;
+  border-top-right-radius: 1vh !important;
+  border-bottom-right-radius: 1vh !important;
+}
+
+.tablaAgentes {
+  margin-top: 2vh !important;
+}
+
+/*************** LUGAR DE IMPRESION **************************/
+
 @media print {
   .Imprimir {
     visibility: visible;

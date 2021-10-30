@@ -21,6 +21,7 @@ import {
 import * as ImIcons from "react-icons/im";
 import * as FaIcons from "react-icons/fa";
 import * as RiIcons from "react-icons/ri";
+import * as BiIcons from "react-icons/bi";
 
 /* Todo para el Carrito de compras */
 import {
@@ -32,12 +33,18 @@ import { TYPES } from "./actions/shoppingActions";
 
 export default function Articulos() {
   const baseUrl = "https://" + adquirirUrl() + ":443/api/BusquedaArticulos";
+  const baseUrlCotizador = "https://" + adquirirUrl() + ":443/api/Cotizador";
 
   const [articulos, setArticulos] = useState([]);
   const [sugeridos, setSugeridos] = useState([]);
   const [disponibles, setDisponibles] = useState([]);
   const [autocompletar, setAutocompletar] = useState([]);
   const [GatewayData, setGatewayData] = useState([]);
+  const [AgentesData, setAgentesData] = useState([]);
+  const [AgentesData2, setAgentesData2] = useState([]);
+  const [ClientesData, setClientesData] = useState([]);
+  const [ClientesData2, setClientesData2] = useState([]);
+  //const [AgenteSeleccionado, setAgenteSeleccionado] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
@@ -47,8 +54,11 @@ export default function Articulos() {
   const [ModalSucursal, setModalSucursal] = useState(false);
   const [ModalCarrito, setModalCarrito] = useState(false);
   const [ModalCheckOut, setModalCheckOut] = useState(false);
+  const [ModalDatosClienteAgente, setModalDatosClienteAgente] = useState(false);
   const [ModalImprimir, setModalImprimir] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
+  const [ocultarAutoComplAgente, setocultarAutoComplAgente] = useState(true);
+  const [ocultarAutoComplCliente, setocultarAutoComplCliente] = useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
   const [verPrecios, SetVerPrecios] = useState(false);
   const [verSustanciaActiva, setVerSustanciaActiva] = useState(false);
@@ -62,9 +72,15 @@ export default function Articulos() {
   );
   const [TextoCompleto, setTextoCompleto] = useState("");
   const [TextoABuscar, setTextoABuscar] = useState("");
+  const [AgenteABuscar, setAgenteABuscar] = useState("");
+  const [NumAgente, setNumAgente] = useState("");
+  const [NumCliente, setNumCliente] = useState("");
+  const [ClienteABuscar, setClienteABuscar] = useState("");
   const [TextoSugerido, setTextoSugerido] = useState("");
   const [Getway, setGetway] = useState("");
   const [Conexion, setConexion] = useState("");
+  const [TipoBusquedaAgenteCliente, setTipoBusquedaAgenteCliente] =
+    useState("");
   const [articuloSeleccionado, setarticuloSeleccionado] = useState({
     Articulo: "",
     Codigo: "",
@@ -110,7 +126,7 @@ export default function Articulos() {
   const handleChangeCar = (e) => {
     const { name, value } = e.target;
 
-    console.log(name, value);
+    //console.log(name, value);
     if (value !== null && value !== "") {
       let itemCar = name.replaceAll(" ", "");
       let articuloInCar = car.find((item) => item.Articulo === itemCar);
@@ -197,6 +213,117 @@ export default function Articulos() {
     setMonto(0);
     setAhorro(0);
     setQtyItems(0);
+  };
+
+  const hancleChangeAgente = (e) => {
+    setAgenteABuscar(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetAgentes(1, e.target.value);
+      peticionGetAgentes(2, e.target.value);
+      setocultarAutoComplAgente(false);
+    } else {
+      setocultarAutoComplAgente(true);
+      setNumAgente("");
+    }
+  };
+
+  const asignarAgente = (numAg, nombAg) => {
+    setNumAgente(numAg);
+    setAgenteABuscar(nombAg);
+    abrirCerrarModalAgenteCliente();
+    setocultarAutoComplAgente(true);
+  };
+
+  const asignarCliente = (numClie, nombClie) => {
+    setNumCliente(numClie);
+    setClienteABuscar(nombClie);
+    abrirCerrarModalAgenteCliente();
+    setocultarAutoComplCliente(true);
+  };
+
+  const hancleChangeAgente2 = (e) => {
+    setAgenteABuscar(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetAgentes(2, e.target.value);
+      peticionGetAgentes(1, e.target.value);
+    } else {
+      //no mostrar
+    }
+  };
+
+  const hancleChangeCliente = (e) => {
+    setClienteABuscar(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetClientes(1, e.target.value);
+      peticionGetClientes(2, e.target.value);
+      setocultarAutoComplCliente(false);
+    } else {
+      setocultarAutoComplCliente(true);
+      setNumCliente("");
+    }
+  };
+
+  const hancleChangeCliente2 = (e) => {
+    setClienteABuscar(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetClientes(2, e.target.value);
+      peticionGetClientes(1, e.target.value);
+    } else {
+      //no mostrar
+    }
+  };
+
+  const peticionGetAgentes = async (iTipo, agenteAbusc) => {
+    var varLiga = baseUrlCotizador + "/Agentes/" + iTipo + "/" + agenteAbusc;
+    console.log("Liga Agentes: " + varLiga);
+    await axios
+      .get(varLiga)
+      .then((response) => {
+        iTipo === 1
+          ? setAgentesData(response.data)
+          : setAgentesData2(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const peticionGetClientes = async (iTipo, clienteAbusc) => {
+    var varLiga = baseUrlCotizador + "/Clientes/" + iTipo + "/" + clienteAbusc;
+    console.log("Liga Clientes: " + varLiga);
+    await axios
+      .get(varLiga)
+      .then((response) => {
+        iTipo === 1
+          ? setClientesData(response.data)
+          : setClientesData2(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const seleccionarAgente = (e) => {
+    setNumAgente(e.target.value);
+
+    if (e.target.value !== "#") setocultarAutoComplAgente(true);
+
+    AgentesData.map(
+      (agente) =>
+        agente.Agente === e.target.value && setAgenteABuscar(agente.Nombre)
+    );
+  };
+
+  const seleccionarCliente = (e) => {
+    setNumCliente(e.target.value);
+
+    if (e.target.value !== "#") setocultarAutoComplCliente(true);
+
+    ClientesData.map(
+      (cliente) =>
+        cliente.Cliente === e.target.value && setClienteABuscar(cliente.Nombre)
+    );
+    console.log(e.target.value, " - ", ClienteABuscar);
   };
 
   /**************************** Todo para el Carrito de compras *****************************/
@@ -296,6 +423,24 @@ export default function Articulos() {
   const abrirCerrarModalCarrito = () => {
     calcularMontos();
     setModalCarrito(!ModalCarrito);
+  };
+
+  const clickBusquedaCliente = () => {
+    if (ClienteABuscar.length > 3) {
+      setTipoBusquedaAgenteCliente("Cliente");
+      abrirCerrarModalAgenteCliente();
+    }
+  };
+
+  const clickBusquedaAgente = () => {
+    if (AgenteABuscar.length > 3) {
+      setTipoBusquedaAgenteCliente("Agente");
+      abrirCerrarModalAgenteCliente();
+    }
+  };
+
+  const abrirCerrarModalAgenteCliente = () => {
+    setModalDatosClienteAgente(!ModalDatosClienteAgente);
   };
 
   const abrirCerrarModalImprimir = () => {
@@ -1603,12 +1748,102 @@ export default function Articulos() {
         className="CheckOut d-flex modal-lg"
         isOpen={ModalCheckOut}
       >
-        <section>
-          <h5>CheckOut</h5>
-        </section>
-        <ModalBody></ModalBody>
+        <ModalBody>
+          <section className="secHeaderCheckout d-flex flex-column">
+            <h4>Agente</h4>
+          </section>
+          <section className="SecDatosAgente d-flex flex-row" align="center">
+            <article className="InputsAgentes col-2">
+              <input
+                type="text"
+                class="form-control custom-input"
+                placeholder="#"
+                value={NumAgente}
+                readOnly
+              ></input>
+            </article>
+            <article className="InputsAgentes flex-grow-1">
+              <input
+                type="text"
+                class="form-control custom-input"
+                value={AgenteABuscar}
+                onChange={hancleChangeAgente}
+                placeholder="Nombre"
+              ></input>
+            </article>
+            <article className="col-1 d-flex align-items-end" align="left">
+              <BiIcons.BiSearchAlt
+                className="LupaIcon"
+                onClick={() => clickBusquedaAgente()}
+              />
+            </article>
+            <article className="col-3 d-flex align-items-end">
+              {AgentesData.length > 0 && (
+                <select
+                  hidden={ocultarAutoComplAgente}
+                  name="AutoAgente"
+                  className="form-control custom-drop"
+                  onChange={seleccionarAgente}
+                >
+                  <option header value="#">
+                    Seleccione
+                  </option>
+                  {AgentesData.map((opcion) => (
+                    <option value={opcion.Agente}>{opcion.Nombre}</option>
+                  ))}
+                </select>
+              )}
+            </article>
+          </section>
+          <section className="secHeaderCheckout2 d-flex flex-column">
+            <h4>Cliente</h4>
+          </section>
+          <section className="SecDatosCliente d-flex flex-row" align="center">
+            <article className="InputsCliente col-2">
+              <input
+                type="text"
+                class="form-control custom-input"
+                placeholder="#"
+                value={NumCliente}
+                readOnly
+              ></input>
+            </article>
+            <article className="InputsClientes flex-grow-1">
+              <input
+                type="text"
+                class="form-control custom-input"
+                value={ClienteABuscar}
+                onChange={hancleChangeCliente}
+                placeholder="Nombre"
+              ></input>
+            </article>
+            <article className="col-1 d-flex align-items-end" align="left">
+              <BiIcons.BiSearchAlt
+                className="LupaIcon"
+                onClick={() => clickBusquedaCliente()}
+              />
+            </article>
+            <article className="col-3 d-flex align-items-end">
+              {ClientesData.length > 0 && (
+                <select
+                  hidden={ocultarAutoComplCliente}
+                  name="AutoAgente"
+                  className="form-control custom-drop"
+                  onChange={seleccionarCliente}
+                >
+                  <option header value="#">
+                    Seleccione
+                  </option>
+                  {ClientesData.map((opcion) => (
+                    <option value={opcion.Cliente}>{opcion.Nombre}</option>
+                  ))}
+                </select>
+              )}
+            </article>
+          </section>
+        </ModalBody>
         <ModalFooter>
-          <div className="d-flex justify-content-center ">
+          <div className="d-flex">
             <button
               type="button"
               className="custom-bg btn-lg"
@@ -1623,11 +1858,7 @@ export default function Articulos() {
             >
               <h6>regresar</h6>
             </button>
-            <button
-              type="button"
-              onClick={console.log("its ok")}
-              className="custom-bg btn-lg"
-            >
+            <button type="button" className="custom-bg btn-lg">
               <h6>Guardar</h6>
             </button>
             <button
@@ -1636,6 +1867,146 @@ export default function Articulos() {
               onClick={() => abrirCerrarModalCheckOut()}
             >
               <h6>Cerrar</h6>
+            </button>
+          </div>
+        </ModalFooter>
+      </Modal>
+
+      <Modal className="d-flex modal-lg" isOpen={ModalDatosClienteAgente}>
+        <ModalBody>
+          <section className="secHeaderCheckout d-flex flex-column">
+            <h4>{"Datos del " + TipoBusquedaAgenteCliente}</h4>
+          </section>
+          {TipoBusquedaAgenteCliente === "Cliente" && (
+            <section className=" d-flex flex-column">
+              <section className=" d-flex flex-row">
+                <input
+                  type="text"
+                  class="form-control custom-input flex-grow-1"
+                  value={ClienteABuscar}
+                  onChange={hancleChangeCliente2}
+                  placeholder="Nombre"
+                ></input>
+                <article className="col-5"></article>
+              </section>
+              <TableContainer component={Paper} className="tablaAgentes">
+                <Table aria-label="simple table">
+                  <TableHead className="custom-bg">
+                    <TableRow className="TablaRowHead d-flex flex-row">
+                      <TableCell className="col-2" align="center">
+                        <label className="custom-bg">#</label>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="center">
+                        <label className="custom-bg">Nombre</label>
+                      </TableCell>
+                      <TableCell className="col-3" align="left">
+                        <label className="custom-bg">Telefono</label>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              {AgenteABuscar.length > 3 && (
+                <TableContainer
+                  component={Paper}
+                  className="tablaAgentes2"
+                  style={{ maxHeight: 350 }}
+                >
+                  <Table aria-label="simple table">
+                    <TableBody>
+                      {ClientesData2.map((cliente) => (
+                        <TableRow
+                          className="d-flex flex-row"
+                          onClick={() =>
+                            asignarCliente(cliente.Cliente, cliente.Nombre)
+                          }
+                        >
+                          <TableCell className="col-2" align="center">
+                            <label>{cliente.Cliente}</label>
+                          </TableCell>
+                          <TableCell className="flex-grow-1" align="center">
+                            <label>{cliente.Nombre}</label>
+                          </TableCell>
+                          <TableCell className="col-3" align="left">
+                            <label>{cliente.Telefonos}</label>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </section>
+          )}
+          {TipoBusquedaAgenteCliente === "Agente" && (
+            <section className=" d-flex flex-column">
+              <section className=" d-flex flex-row">
+                <input
+                  type="text"
+                  class="form-control custom-input flex-grow-1"
+                  value={AgenteABuscar}
+                  onChange={hancleChangeAgente2}
+                  placeholder="Nombre"
+                ></input>
+                <article className="col-5"></article>
+              </section>
+              <TableContainer component={Paper} className="tablaAgentes">
+                <Table aria-label="simple table">
+                  <TableHead className="custom-bg">
+                    <TableRow className="TablaRowHead">
+                      <TableCell className="col-2" align="center">
+                        <label className="custom-bg">Agente</label>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="center">
+                        <label className="custom-bg">Nombre</label>
+                      </TableCell>
+                      <TableCell className="col-3" align="center">
+                        <label className="custom-bg">Tipo</label>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              {AgenteABuscar.length > 3 && (
+                <TableContainer
+                  component={Paper}
+                  className="tablaAgentes2"
+                  style={{ maxHeight: 350 }}
+                >
+                  <Table aria-label="simple table">
+                    <TableBody>
+                      {AgentesData2.map((agente) => (
+                        <TableRow
+                          onClick={() =>
+                            asignarAgente(agente.Agente, agente.Nombre)
+                          }
+                        >
+                          <TableCell className="col-2" align="center">
+                            <label>{agente.Agente}</label>
+                          </TableCell>
+                          <TableCell className="flex-grow-1" align="center">
+                            <label>{agente.Nombre}</label>
+                          </TableCell>
+                          <TableCell className="col-3" align="center">
+                            <label>{agente.Tipo}</label>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </section>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <div className="d-flex">
+            <button
+              type="button"
+              className="custom-bg btn-lg"
+              onClick={abrirCerrarModalAgenteCliente}
+            >
+              <h6>Regresar</h6>
             </button>
           </div>
         </ModalFooter>
