@@ -67,6 +67,10 @@
   border-width: medium !important;
 }
 
+.divSearchItem {
+  margin-left: 0.5vw;
+}
+
 .custom-drop {
   color: #d11a2c !important;
   background-color: white !important;
@@ -165,7 +169,28 @@
   display: none;
 }
 
+.secMainHistorial {
+  margin-top: 1vh;
+  max-height: 75vh;
+  min-height: 75vh;
+  margin-bottom: 1vh;
+  overflow-y: auto;
+}
+
+.secMainHistorial::-webkit-scrollbar {
+  display: none;
+}
+
 .divContenido {
+  border: solid;
+  border-color: #d11a2c;
+  border-width: medium;
+  border-radius: 2vh;
+  height: fit-content !important;
+  min-height: 75vh !important;
+}
+
+.divContenidoHistorial {
   border: solid;
   border-color: #d11a2c;
   border-width: medium;
@@ -176,6 +201,14 @@
 
 .divSideBar {
   margin-left: 1vw;
+}
+
+.divSideBarHistorial {
+  margin-left: 1vw;
+  border: solid;
+  border-color: #d11a2c;
+  border-width: medium;
+  border-radius: 2vh;
 }
 
 .divImagen {
@@ -190,7 +223,8 @@
   color: #fbd134 !important;
   border-style: solid !important;
   background-color: #d11a2c !important;
-  width: 24vh !important;
+  /* width: 24vw !important; */
+  width: 100% !important;
   border-radius: 1vh !important;
 }
 
@@ -199,7 +233,8 @@
   color: #000000 !important;
   border-style: solid !important;
   background-color: white !important;
-  width: 24vh !important;
+  /* width: 24vw !important; */
+  width: 100% !important;
   border-radius: 1vh !important;
 }
 
@@ -230,6 +265,7 @@
   font-weight: bold !important;
   border-top-left-radius: 2vh !important;
   border-top-right-radius: 2vh !important;
+  border-bottom: solid !important;
 }
 
 .divDisponiblesContainer {
@@ -406,6 +442,16 @@ textarea {
   height: 4vh;
 }
 
+.secHeaderDatosBusqueda {
+  margin-bottom: 3vh !important;
+  background-color: #d11a2c !important;
+  color: #fbd134 !important;
+  text-align: center !important;
+  border-top-left-radius: 1vh;
+  border-top-right-radius: 1vh;
+  height: 4vh;
+}
+
 .secHeaderCheckout2 {
   margin-top: 3vh;
   margin-bottom: 3vh !important;
@@ -435,6 +481,45 @@ textarea {
 
 .tablaAgentes {
   margin-top: 2vh !important;
+}
+
+.divModalfooter {
+  border-color: blue !important;
+  border-width: solid !important;
+}
+
+.secModalCarritoFooter {
+  margin-left: 1vw !important;
+  margin-right: 1vw !important;
+  margin-top: 2vh !important;
+  margin-bottom: 4vh !important;
+}
+
+.secModalAgClieFooter {
+  border-top: solid !important;
+  border-width: thin !important;
+  margin-left: 1vw !important;
+  margin-right: 1vw !important;
+  margin-top: 2vh !important;
+  margin-bottom: 4vh !important;
+}
+
+.artFooterCarrito {
+  width: 18% !important;
+}
+
+.artFooterAgeClient {
+  width: 25% !important;
+}
+
+.btnCarrito {
+  margin-left: 2%;
+  width: 96% !important;
+  height: 6vh !important;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  border-color: black !important;
+  font-weight: bold !important;
 }
 
 /*************** LUGAR DE IMPRESION **************************/

@@ -22,6 +22,7 @@ import * as ImIcons from "react-icons/im";
 import * as FaIcons from "react-icons/fa";
 import * as RiIcons from "react-icons/ri";
 import * as BiIcons from "react-icons/bi";
+import * as AiIcons from "react-icons/ai";
 
 /* Todo para el Carrito de compras */
 import {
@@ -44,10 +45,12 @@ export default function Articulos() {
   const [AgentesData2, setAgentesData2] = useState([]);
   const [ClientesData, setClientesData] = useState([]);
   const [ClientesData2, setClientesData2] = useState([]);
-  //const [AgenteSeleccionado, setAgenteSeleccionado] = useState([]);
+  const [Cotizacion, setCotizacion] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
+  const [mostrarMain, setMostrarMain] = useState(true);
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const [mostrarProgress, setMostrarProgress] = useState(false);
   const [CambiarTipo, setCambiarTipo] = useState(false);
   const [ModalArticulo, setModalArticulo] = useState(false);
@@ -107,16 +110,16 @@ export default function Articulos() {
     var qty = 0;
 
     car.map(
-      (item) => (monto = monto + item.PrecioConDescuento * item.quantity)
+      (item) => (monto = monto + item.PrecioConDescuento * item.Cantidad)
     );
 
     car.map(
       (item) =>
         (ahorro =
-          ahorro + (item.Precio - item.PrecioConDescuento) * item.quantity)
+          ahorro + (item.Precio - item.PrecioConDescuento) * item.Cantidad)
     );
 
-    car.map((item) => (qty = qty + item.quantity));
+    car.map((item) => (qty = qty + item.Cantidad));
 
     setMonto(monto);
     setAhorro(ahorro);
@@ -131,7 +134,7 @@ export default function Articulos() {
       let itemCar = name.replaceAll(" ", "");
       let articuloInCar = car.find((item) => item.Articulo === itemCar);
 
-      var qtyAnt = articuloInCar.quantity;
+      var qtyAnt = articuloInCar.Cantidad;
       var qtyNew = parseInt(value);
       var Exist = articuloInCar.Existencia;
       var times = 0;
@@ -173,11 +176,36 @@ export default function Articulos() {
   };
 
   const addToCar = (articulo) => {
-    dispatch({ type: TYPES.ADD_TO_CAR, payload: articulo });
-    setMonto(Monto + articulo.PrecioConDescuento);
-    setAhorro(Ahorro + (articulo.Precio - articulo.PrecioConDescuento));
-    setQtyItems(QtyItems + 1);
-    console.log("carrito: ", car);
+    var agregar = false;
+    let itemInCar = null;
+    let existe = false;
+    if (car.length > 0) {
+      itemInCar = car.find((items) =>
+        items.Articulo === articulo.Articulo ? true : undefined
+      );
+    }
+    if (itemInCar !== null && itemInCar !== undefined) {
+      existe = true;
+    } else {
+      existe = false;
+    }
+
+    if (existe) {
+      if (itemInCar.Existencia > itemInCar.Cantidad) {
+        agregar = true;
+      }
+    } else {
+      if (articulo.Existencia > 0) {
+        agregar = true;
+      }
+    }
+    if (agregar === true) {
+      dispatch({ type: TYPES.ADD_TO_CAR, payload: articulo });
+      setMonto(Monto + articulo.PrecioConDescuento);
+      setAhorro(Ahorro + (articulo.Precio - articulo.PrecioConDescuento));
+      setQtyItems(QtyItems + 1);
+      agregar = false;
+    }
   };
 
   const delFromCar = (Articulo, all = false) => {
@@ -189,14 +217,14 @@ export default function Articulos() {
       }
       dispatch({ type: TYPES.REMOVE_ALL_FROM_CAR, payload: Articulo });
       setMonto(
-        Monto - articuloInCar.quantity * articuloInCar.PrecioConDescuento
+        Monto - articuloInCar.Cantidad * articuloInCar.PrecioConDescuento
       );
       setAhorro(
         Ahorro -
           (articuloInCar.Precio - articuloInCar.PrecioConDescuento) *
-            articuloInCar.quantity
+            articuloInCar.Cantidad
       );
-      setQtyItems(QtyItems - articuloInCar.quantity);
+      setQtyItems(QtyItems - articuloInCar.Cantidad);
     } else {
       dispatch({ type: TYPES.REMOVE_ONE_FROM_CAR, payload: Articulo });
       setMonto(Monto - articuloInCar.PrecioConDescuento);
@@ -232,6 +260,11 @@ export default function Articulos() {
     setAgenteABuscar(nombAg);
     abrirCerrarModalAgenteCliente();
     setocultarAutoComplAgente(true);
+    setCotizacion({
+      ...Cotizacion,
+      Agente: numAg,
+    });
+    console.log("Cotizacion: ", Cotizacion);
   };
 
   const asignarCliente = (numClie, nombClie) => {
@@ -239,6 +272,11 @@ export default function Articulos() {
     setClienteABuscar(nombClie);
     abrirCerrarModalAgenteCliente();
     setocultarAutoComplCliente(true);
+    setCotizacion({
+      ...Cotizacion,
+      Cliente: numClie,
+    });
+    console.log("Cotizacion: ", Cotizacion);
   };
 
   const hancleChangeAgente2 = (e) => {
@@ -312,6 +350,12 @@ export default function Articulos() {
       (agente) =>
         agente.Agente === e.target.value && setAgenteABuscar(agente.Nombre)
     );
+
+    setCotizacion({
+      ...Cotizacion,
+      Agente: e.target.value,
+    });
+    console.log("Cotizacion: ", Cotizacion);
   };
 
   const seleccionarCliente = (e) => {
@@ -323,7 +367,65 @@ export default function Articulos() {
       (cliente) =>
         cliente.Cliente === e.target.value && setClienteABuscar(cliente.Nombre)
     );
-    console.log(e.target.value, " - ", ClienteABuscar);
+
+    setCotizacion({
+      ...Cotizacion,
+      Cliente: e.target.value,
+    });
+    console.log("Cotizacion: ", Cotizacion);
+  };
+
+  const GenerarCotizacion = () => {
+    setCotizacion({
+      ...Cotizacion,
+      TipoCambio: TipoCambio,
+      Sucursal: parseInt(Sucursal),
+      CarritoD: car,
+    });
+
+    console.log("Cotizacion: ", Cotizacion);
+    /* peticionGuardarCotizacion();
+    console.log("Cotizacion Guardada...!!!"); */
+  };
+
+  const peticionGuardarCotizacion = async () => {
+    console.log("Cotizacion: ", Cotizacion);
+    var varLiga = baseUrlCotizador;
+    console.log("Liga Guardar: " + varLiga);
+    await axios
+      .post(varLiga, Cotizacion)
+      .then((response) => {
+        //setData(data.concat(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    ImprimirCotizacionGuardada();
+    limpiarCotizacion();
+  };
+
+  const ImprimirCotizacionGuardada = () => {
+    abrirCerrarModalCheckOut();
+    abrirCerrarModalImprimir();
+    window.print();
+    abrirCerrarModalImprimir();
+  };
+
+  const limpiarCotizacion = () => {
+    setNumAgente("");
+    setNumCliente("");
+    setAgenteABuscar("");
+    setClienteABuscar("");
+    clearCar();
+    setCotizacion({
+      ...Cotizacion,
+      Agente: "",
+      Cliente: "",
+      TipoCambio: "",
+      Sucursal: "",
+      CarritoD: car,
+    });
+    abrirCerrarModalCarrito();
   };
 
   /**************************** Todo para el Carrito de compras *****************************/
@@ -425,6 +527,11 @@ export default function Articulos() {
     setModalCarrito(!ModalCarrito);
   };
 
+  const abrirCerrarHistorial = () => {
+    setMostrarMain(!mostrarMain);
+    setMostrarHistorial(!mostrarHistorial);
+  };
+
   const clickBusquedaCliente = () => {
     if (ClienteABuscar.length > 3) {
       setTipoBusquedaAgenteCliente("Cliente");
@@ -464,6 +571,7 @@ export default function Articulos() {
   const enviarcheckout = () => {
     abrirCerrarModalCheckOut();
     abrirCerrarModalCarrito();
+    GenerarCotizacion();
   };
 
   const seleccionarArticulo = (articulo, caso) => {
@@ -526,6 +634,7 @@ export default function Articulos() {
         setMostrarTabla(false);
         setMostrarProgress(true);
         setImagen("/images/page/default.png");
+        abrirCerrarHistorial();
       }
       e.target.blur();
     }
@@ -557,10 +666,9 @@ export default function Articulos() {
   const handleChangeSelect = (e) => {
     setTextoCompleto("");
     setTextoABuscar(e.target.value);
-    //console.log(datosBusqueda);
+    abrirCerrarHistorial();
     if (TipoBusqueda !== 2) {
       setTextoSugerido(e.target.value);
-      //console.log(datosBusqueda);
       setVerSugeridosSucursales(true);
       SetVerPrecios(false);
       setCambiarTipo(true);
@@ -733,7 +841,7 @@ export default function Articulos() {
           </div>
           <div className="ContainerSearch flex-grow-1 p-4">
             <div className="d-flex flex-row justify-content-start">
-              <div className="col-3">
+              <div className="col-3 flex-shrink-1">
                 <select
                   name="tipo"
                   onChange={handleChange}
@@ -746,7 +854,7 @@ export default function Articulos() {
                   ))}
                 </select>
               </div>
-              <div className="col-5">
+              <div className="divSearchItem flex-grow-1 flex-shrink-1">
                 <input
                   type="text"
                   className="form-control custom-input"
@@ -756,7 +864,10 @@ export default function Articulos() {
                   value={TextoCompleto}
                 />
               </div>
-              <div hidden={ocultarAutoCompletar} className="col-4">
+              <div
+                hidden={ocultarAutoCompletar}
+                className="divSearchItem col-4 flex-shrink-1"
+              >
                 {TextoCompleto.length > 2 && (
                   <select
                     name="Autocompletar"
@@ -780,9 +891,18 @@ export default function Articulos() {
               </div>
             </div>
           </div>
-          <div className="QtyItemsCar" onClick={abrirCerrarModalCarrito}>
+          <div /** div Carrito*/
+            className="QtyItemsCar"
+            onClick={
+              QtyItems > 0 ? abrirCerrarModalCarrito : abrirCerrarHistorial
+            }
+          >
             <div className="divCar-bg" src=".">
-              {QtyItems > 0 && <h7 className="qtyItemsH7">{QtyItems}</h7>}
+              {QtyItems > 0 ? (
+                <h7 className="qtyItemsH7">{QtyItems}</h7>
+              ) : (
+                <FaIcons.FaHistory className="qtyItemsH7" />
+              )}
             </div>
             <RiIcons.RiShoppingCartLine className="CarIcon" />
           </div>
@@ -795,433 +915,535 @@ export default function Articulos() {
         </div>
       </section>
 
-      <section className="secMain d-flex flex-row">
-        <section className="divContenido flex-grow-1">
-          <TableContainer
-            id="TablaPrincipal"
-            component={Paper}
-            className="responsive"
-          >
-            <Table aria-label="simple table">
-              <TableHead className="custom-bg">
-                <TableRow className="TablaRowHead">
-                  <TableCell align="center">
-                    <label className="custom-bg">#</label>
-                  </TableCell>
-                  <TableCell>
-                    <label className="custom-bg">
-                      Articulo
-                      <br />
-                      Código
-                    </label>
-                  </TableCell>
-                  <TableCell>
-                    <label className="custom-bg">Descripción</label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">Precio</label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">Ahorro</label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">
-                      Precio
-                      <br />
-                      Final
-                    </label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">Exist</label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">Tipo</label>
-                  </TableCell>
-                  <TableCell align="center">
-                    <label className="custom-bg">Estatus</label>
-                  </TableCell>
-                  {/* <TableCell align="center">
-                    <label className="custom-bg">Cantidad</label>
-                  </TableCell> */}
-                  <TableCell>
-                    <label className="custom-bg"></label>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              {mostrarTabla && (
-                <TableBody>
-                  {articulos
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, i) => (
-                      <TableRow
-                        className="CustomRows"
-                        hover
-                        key={i}
-                        value={row.Articulo}
-                        onClick={() => seleccionarArticulo(row, "Seleccionar")}
-                        selected={
-                          row.Articulo === articuloSeleccionado.Articulo
-                            ? true
-                            : false
-                        }
-                      >
-                        <TableCell>
-                          <Avatar
-                            className="avatar-bg"
-                            src="."
-                            onClick={() => seleccionarArticulo(row, "Sugerir")}
-                          >
-                            {page * rowsPerPage + (i + 1)}
-                          </Avatar>
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          <text className="tipoOpe">{row.Articulo}</text>
-                          <br />
-                          {row.Codigo}
-                        </TableCell>
-                        <TableCell>
-                          {row.Descripcion}
-                          <br />
-                          {row.SustanciaActiva !== null &&
-                            "[" + row.SustanciaActiva + "]"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.Precio)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.Precio - row.PrecioConDescuento)}
-                          <br />
-                          {"(" + row.Descuento + " %)"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.PrecioConDescuento)}
-                        </TableCell>
-                        <TableCell align="center">{row.Existencia}</TableCell>
-                        <TableCell align="center">{row.Gen_Pat}</TableCell>
-                        <TableCell align="center">{row.Estatus}</TableCell>
-                        {/* <TableCell align="center">
-                          <TextField
-                            inputProps={{
-                              style: { textAlign: "center" },
-                            }}
-                            name={row.Articulo}
-                            onChange={handleChangeCar}
-                            value={row.quantity}
-                            readOnly={false}
-                          ></TextField>
-                        </TableCell> */}
-                        <TableCell align="center">
-                          <Avatar
-                            className="avatar-bg"
-                            src="."
-                            onClick={() => addToCar(row)}
-                          >
-                            <FaIcons.FaPlus />
-                          </Avatar>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              )}
-            </Table>
-          </TableContainer>
-          {articulos.length !== 0 && (
-            <TableFooter className="FooterArticulos d-flex justify-content-center">
-              <TablePagination
-                className=""
-                rowsPerPageOptions={[5, 10, 25]}
-                labelRowsPerPage="Lineas por Pagina"
-                count={articulos.length}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </TableFooter>
-          )}
-
-          {verSugeridosSucursales === true && sugeridos.length !== 0 && (
-            <div className="secHeader" align="center">
-              <h5>Articulos Sugeridos</h5>
-            </div>
-          )}
-          {verSugeridosSucursales === true && sugeridos.length > 0 && (
+      {mostrarMain && (
+        <section className="secMain d-flex flex-row">
+          <section className="divContenido flex-grow-1">
             <TableContainer
-              hidden={!verSugeridosSucursales}
+              id="TablaPrincipal"
               component={Paper}
               className="responsive"
             >
               <Table aria-label="simple table">
-                <TableHead className="custom-invisible">
-                  <TableRow className="custom-bg">
-                    <TableCell>
-                      <label>#</label>
+                <TableHead className="custom-bg">
+                  <TableRow className="TablaRowHead">
+                    <TableCell align="center">
+                      <label className="custom-bg">#</label>
                     </TableCell>
                     <TableCell>
-                      <label>
+                      <label className="custom-bg">
                         Articulo
                         <br />
                         Código
                       </label>
                     </TableCell>
                     <TableCell>
-                      <label>Descripción</label>
+                      <label className="custom-bg">Descripción</label>
                     </TableCell>
-                    <TableCell>
-                      <label>Precio</label>
+                    <TableCell align="center">
+                      <label className="custom-bg">Precio</label>
                     </TableCell>
-                    <TableCell>
-                      <label>Ahorro</label>
+                    <TableCell align="center">
+                      <label className="custom-bg">Ahorro</label>
                     </TableCell>
-                    <TableCell>
-                      <label>
+                    <TableCell align="center">
+                      <label className="custom-bg">
                         Precio
                         <br />
                         Final
                       </label>
                     </TableCell>
-                    <TableCell>
-                      <label>Exist</label>
+                    <TableCell align="center">
+                      <label className="custom-bg">Exist</label>
                     </TableCell>
-                    <TableCell>
-                      <label>Tipo</label>
+                    <TableCell align="center">
+                      <label className="custom-bg">Tipo</label>
                     </TableCell>
-                    <TableCell>
-                      <label>Estatus</label>
+                    <TableCell align="center">
+                      <label className="custom-bg">Estatus</label>
                     </TableCell>
+                    {/* <TableCell align="center">
+                    <label className="custom-bg">Cantidad</label>
+                  </TableCell> */}
                     <TableCell>
-                      <label></label>
+                      <label className="custom-bg"></label>
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  {sugeridos
-                    .slice(
-                      page2 * rowsPerPage2,
-                      page2 * rowsPerPage2 + rowsPerPage2
-                    )
-                    .map((row, x) => (
-                      <TableRow
-                        align="center"
-                        hover
-                        key={x}
-                        value={row.Articulo}
-                        onClick={() => seleccionarArticulo(row, "Seleccionar")}
-                        selected={
-                          row.Articulo === articuloSeleccionado.Articulo
-                            ? true
-                            : false
-                        }
-                      >
-                        <TableCell>
-                          <Avatar
-                            className="avatar-bg"
-                            src="."
-                            onClick={() => seleccionarArticulo(row, "Ver")}
-                          >
-                            {page2 * rowsPerPage2 + (x + 1)}
-                          </Avatar>
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          <text className="tipoOpe">{row.Articulo}</text>
-                          <br />
-                          {row.Codigo}
-                        </TableCell>
-                        <TableCell>
-                          {row.Descripcion}
-                          <br />
-                          {row.SustanciaActiva !== null &&
-                            "[" + row.SustanciaActiva + "]"}
-                        </TableCell>
-                        <TableCell>{"$ " + financial(row.Precio)}</TableCell>
-                        <TableCell align="center">
-                          {"$ " +
-                            financial(row.Precio - row.PrecioConDescuento)}
-                          <br />
-                          {"(" + row.Descuento + " %)"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"$" + financial(row.PrecioConDescuento)}
-                        </TableCell>
-                        <TableCell align="center">{row.Existencia}</TableCell>
-                        <TableCell align="center">{row.Gen_Pat}</TableCell>
-                        <TableCell align="center">{row.Estatus}</TableCell>
-                        <TableCell align="center">
-                          <Avatar
-                            className="avatar-bg"
-                            src="."
-                            onClick={() => addToCar(row)}
-                          >
-                            <FaIcons.FaPlus />
-                          </Avatar>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
+                {mostrarTabla && (
+                  <TableBody>
+                    {articulos
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row, i) => (
+                        <TableRow
+                          className="CustomRows"
+                          hover
+                          key={i}
+                          value={row.Articulo}
+                          onClick={() =>
+                            seleccionarArticulo(row, "Seleccionar")
+                          }
+                          selected={
+                            row.Articulo === articuloSeleccionado.Articulo
+                              ? true
+                              : false
+                          }
+                        >
+                          <TableCell>
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() =>
+                                seleccionarArticulo(row, "Sugerir")
+                              }
+                            >
+                              {page * rowsPerPage + (i + 1)}
+                            </Avatar>
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            <text className="tipoOpe">{row.Articulo}</text>
+                            <br />
+                            {row.Codigo}
+                          </TableCell>
+                          <TableCell>
+                            {row.Descripcion}
+                            <br />
+                            {row.SustanciaActiva !== null &&
+                              "[" + row.SustanciaActiva + "]"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" + financial(row.Precio)}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" +
+                              financial(row.Precio - row.PrecioConDescuento)}
+                            <br />
+                            {"(" + row.Descuento + " %)"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" + financial(row.PrecioConDescuento)}
+                          </TableCell>
+                          <TableCell align="center">{row.Existencia}</TableCell>
+                          <TableCell align="center">{row.Gen_Pat}</TableCell>
+                          <TableCell align="center">{row.Estatus}</TableCell>
+                          {/* <TableCell align="center">
+                          <TextField
+                            inputProps={{
+                              style: { textAlign: "center" },
+                            }}
+                            name={row.Articulo}
+                            onChange={handleChangeCar}
+                            value={row.Cantidad}
+                            readOnly={false}
+                          ></TextField>
+                        </TableCell> */}
+                          <TableCell align="center">
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() => addToCar(row)}
+                            >
+                              <FaIcons.FaPlus />
+                            </Avatar>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                )}
               </Table>
+              {articulos.length !== 0 && (
+                <TableFooter className="FooterArticulos d-flex justify-content-center">
+                  <TablePagination
+                    className=""
+                    rowsPerPageOptions={[5, 10, 25]}
+                    labelRowsPerPage="Lineas por Pagina"
+                    count={articulos.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </TableFooter>
+              )}
             </TableContainer>
-          )}
-          {verSugeridosSucursales === true && sugeridos.length > 0 && (
-            <TableFooter className="FooterArticulos d-flex justify-content-center">
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                labelRowsPerPage="Lineas por Pagina"
-                count={sugeridos.length}
-                rowsPerPage={rowsPerPage2}
-                page={page2}
-                onPageChange={handleChangePage2}
-                onRowsPerPageChange={handleChangeRowsPerPage2}
-                className="FooterArticulos"
-              />
-            </TableFooter>
-          )}
-        </section>
 
-        <section className="divSideBar col-3">
-          <div className="divImagen d-flex justify-content-center">
-            <img
-              src={Imagen}
-              onError={addDefaultSrc}
-              alt="default"
-              width="90%"
-            />
-          </div>
-          <p></p>
-          <div className="d-flex flex-row nowrap" align="center">
-            <div className="flex-grow-1" align="center">
-              {verPrecios && (
-                <div className="" align="center">
-                  <Avatar
-                    align="right"
-                    variant="rounded"
-                    className="avatarPrecio-bg"
-                    src="."
-                  >
-                    Ahorro:
-                  </Avatar>
-                  <Avatar
-                    variant="rounded"
-                    className="avatarPrecio2-bg"
-                    src="."
-                  >
-                    {articuloSeleccionado &&
-                      "$ " +
-                        financial(
-                          articuloSeleccionado.Precio -
-                            articuloSeleccionado.PrecioConDescuento
-                        )}
-                  </Avatar>
-                </div>
-              )}
+            {verSugeridosSucursales === true && sugeridos.length !== 0 && (
+              <div className="secHeader" align="center">
+                <h5>Articulos Sugeridos</h5>
+              </div>
+            )}
+            {verSugeridosSucursales === true && sugeridos.length > 0 && (
+              <TableContainer
+                hidden={!verSugeridosSucursales}
+                component={Paper}
+                className="responsive"
+              >
+                <Table aria-label="simple table">
+                  <TableHead className="custom-invisible">
+                    <TableRow className="custom-bg">
+                      <TableCell>
+                        <label>#</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>
+                          Articulo
+                          <br />
+                          Código
+                        </label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Descripción</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Precio</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Ahorro</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>
+                          Precio
+                          <br />
+                          Final
+                        </label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Exist</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Tipo</label>
+                      </TableCell>
+                      <TableCell>
+                        <label>Estatus</label>
+                      </TableCell>
+                      <TableCell>
+                        <label></label>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sugeridos
+                      .slice(
+                        page2 * rowsPerPage2,
+                        page2 * rowsPerPage2 + rowsPerPage2
+                      )
+                      .map((row, x) => (
+                        <TableRow
+                          align="center"
+                          hover
+                          key={x}
+                          value={row.Articulo}
+                          onClick={() =>
+                            seleccionarArticulo(row, "Seleccionar")
+                          }
+                          selected={
+                            row.Articulo === articuloSeleccionado.Articulo
+                              ? true
+                              : false
+                          }
+                        >
+                          <TableCell>
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() => seleccionarArticulo(row, "Ver")}
+                            >
+                              {page2 * rowsPerPage2 + (x + 1)}
+                            </Avatar>
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            <text className="tipoOpe">{row.Articulo}</text>
+                            <br />
+                            {row.Codigo}
+                          </TableCell>
+                          <TableCell>
+                            {row.Descripcion}
+                            <br />
+                            {row.SustanciaActiva !== null &&
+                              "[" + row.SustanciaActiva + "]"}
+                          </TableCell>
+                          <TableCell>{"$ " + financial(row.Precio)}</TableCell>
+                          <TableCell align="center">
+                            {"$ " +
+                              financial(row.Precio - row.PrecioConDescuento)}
+                            <br />
+                            {"(" + row.Descuento + " %)"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"$" + financial(row.PrecioConDescuento)}
+                          </TableCell>
+                          <TableCell align="center">{row.Existencia}</TableCell>
+                          <TableCell align="center">{row.Gen_Pat}</TableCell>
+                          <TableCell align="center">{row.Estatus}</TableCell>
+                          <TableCell align="center">
+                            <Avatar
+                              className="avatar-bg"
+                              src="."
+                              onClick={() => addToCar(row)}
+                            >
+                              <FaIcons.FaPlus />
+                            </Avatar>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+                <TableFooter className="FooterArticulos d-flex justify-content-center">
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    labelRowsPerPage="Lineas por Pagina"
+                    count={sugeridos.length}
+                    rowsPerPage={rowsPerPage2}
+                    page={page2}
+                    onPageChange={handleChangePage2}
+                    onRowsPerPageChange={handleChangeRowsPerPage2}
+                    className="FooterArticulos"
+                  />
+                </TableFooter>
+              </TableContainer>
+            )}
+          </section>
+
+          <section className="divSideBar col-3">
+            <div className="divImagen d-flex justify-content-center">
+              <img
+                src={Imagen}
+                onError={addDefaultSrc}
+                alt="default"
+                width="90%"
+              />
             </div>
-            <div className="flex-grow-1" align="center">
-              {verPrecios && (
-                <div className="col-sm-12 column" align="center">
-                  <Avatar
-                    align="right"
-                    variant="rounded"
-                    className="avatarPrecio-bg"
-                    src="."
-                  >
-                    Precio:
-                  </Avatar>
-                  <Avatar
-                    variant="rounded"
-                    className="avatarPrecio2-bg"
-                    src="."
-                  >
-                    {articuloSeleccionado &&
-                      "$ " + financial(articuloSeleccionado.PrecioConDescuento)}
-                  </Avatar>
-                </div>
-              )}
+            <p></p>
+            <div className="d-flex flex-row nowrap" align="center">
+              <div className="flex-grow-1" align="center">
+                {verPrecios && (
+                  <div className="" align="center">
+                    <Avatar
+                      align="right"
+                      variant="rounded"
+                      className="avatarPrecio-bg"
+                      src="."
+                    >
+                      Ahorro:
+                    </Avatar>
+                    <Avatar
+                      variant="rounded"
+                      className="avatarPrecio2-bg"
+                      src="."
+                    >
+                      {articuloSeleccionado &&
+                        "$ " +
+                          financial(
+                            articuloSeleccionado.Precio -
+                              articuloSeleccionado.PrecioConDescuento
+                          )}
+                    </Avatar>
+                  </div>
+                )}
+              </div>
+              <div className="flex-grow-1" align="center">
+                {verPrecios && (
+                  <div className="col-sm-12 column" align="center">
+                    <Avatar
+                      align="right"
+                      variant="rounded"
+                      className="avatarPrecio-bg"
+                      src="."
+                    >
+                      Precio:
+                    </Avatar>
+                    <Avatar
+                      variant="rounded"
+                      className="avatarPrecio2-bg"
+                      src="."
+                    >
+                      {articuloSeleccionado &&
+                        "$ " +
+                          financial(articuloSeleccionado.PrecioConDescuento)}
+                    </Avatar>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          <p></p>
-          {verSugeridosSucursales &&
-            disponibles.length > 0 &&
-            Conexion === "Linea" && (
-              <section className="divDisponibles">
-                <div align="center" className="divDisponibleHeader">
-                  <h4>Disponibles</h4>
-                </div>
-                <div className="">
-                  <article
-                    className="artHeaderDisponibles d-flex flex-row"
-                    align="center"
-                  >
-                    <item className="d-flex flex-grow-1 justify-content-center">
-                      <h5>Sucursal</h5>
-                    </item>
-                    <item className="d-flex flex-grow-1 justify-content-center">
-                      <h5>Existencia</h5>
-                    </item>
-                  </article>
-                </div>
-                <div className="divDisponiblesContainer">
-                  {disponibles.slice(0, 10).map((row) => (
-                    <article className="d-flex flex-row" align="center">
-                      <item
-                        key={row.Sucursal}
-                        className="d-flex flex-grow-1 justify-content-center"
-                      >
-                        <h5>{row.Sucursal}</h5>
+            <p></p>
+            {verSugeridosSucursales &&
+              disponibles.length > 0 &&
+              Conexion === "Linea" && (
+                <section className="divDisponibles">
+                  <div align="center" className="divDisponibleHeader">
+                    <h4>Disponibles</h4>
+                  </div>
+                  <div className="">
+                    <article
+                      className="artHeaderDisponibles d-flex flex-row"
+                      align="center"
+                    >
+                      <item className="d-flex flex-grow-1 justify-content-center">
+                        <h5>Sucursal</h5>
                       </item>
                       <item className="d-flex flex-grow-1 justify-content-center">
-                        <h5>{row.Existencia}</h5>
+                        <h5>Existencia</h5>
                       </item>
                     </article>
-                  ))}
-                </div>
-                <div className="divDisponibleFooter d-flex justify-content-end">
-                  <h5 onClick={() => abrirCerrarModalSucursal()}>ver mas</h5>
-                </div>
-              </section>
-            )}
+                  </div>
+                  <div className="divDisponiblesContainer">
+                    {disponibles.slice(0, 10).map((row) => (
+                      <article className="d-flex flex-row" align="center">
+                        <item
+                          key={row.Sucursal}
+                          className="d-flex flex-grow-1 justify-content-center"
+                        >
+                          <h5>{row.Sucursal}</h5>
+                        </item>
+                        <item className="d-flex flex-grow-1 justify-content-center">
+                          <h5>{row.Existencia}</h5>
+                        </item>
+                      </article>
+                    ))}
+                  </div>
+                  <div className="divDisponibleFooter d-flex justify-content-end">
+                    <h5 onClick={() => abrirCerrarModalSucursal()}>ver mas</h5>
+                  </div>
+                </section>
+              )}
+          </section>
         </section>
-      </section>
+      )}
+
+      {mostrarHistorial && (
+        <section className="secMainHistorial d-flex flex-row">
+          <section className="divContenidoHistorial flex-grow-1" align="center">
+            mostrar tabla
+          </section>
+          <section className="divSideBarHistorial col-4" align="center">
+            <section className="secHeaderDatosBusqueda d-flex flex-column">
+              <h4>Datos de Busqueda</h4>
+            </section>
+            <section className="d-flex flex-column">
+              <h4>Agente</h4>
+            </section>
+            <section className="SecDatosAgente d-flex flex-row" align="center">
+              <article className="InputsAgentes col-2">
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  placeholder="#"
+                  value={NumAgente}
+                  readOnly
+                ></input>
+              </article>
+              <article className="InputsAgentes flex-grow-1">
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  value={AgenteABuscar}
+                  onChange={hancleChangeAgente}
+                  placeholder="Nombre"
+                ></input>
+              </article>
+              <article className="col-1 d-flex align-items-end" align="left">
+                <BiIcons.BiSearchAlt
+                  className="LupaIcon"
+                  onClick={() => clickBusquedaAgente()}
+                />
+              </article>
+            </section>
+            <br />
+            <section className="d-flex flex-column">
+              <h4>Cliente</h4>
+            </section>
+            <section className="SecDatosCliente d-flex flex-row" align="center">
+              <article className="InputsCliente col-2">
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  placeholder="#"
+                  value={NumCliente}
+                  readOnly
+                ></input>
+              </article>
+              <article className="InputsClientes flex-grow-1">
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  value={ClienteABuscar}
+                  onChange={hancleChangeCliente}
+                  placeholder="Nombre"
+                ></input>
+              </article>
+              <article className="col-1 d-flex align-items-end" align="left">
+                <BiIcons.BiSearchAlt
+                  className="LupaIcon"
+                  onClick={() => clickBusquedaCliente()}
+                />
+              </article>
+            </section>
+            <section className="d-flex flex-column">
+              <h4>Fechas</h4>
+            </section>
+            <section className="d-flex flex-row" align="center">
+              <article className="col-6">Desde</article>
+              <article className="col-6">Hasta</article>
+            </section>
+            <section className="d-flex flex-row" align="center">
+              <article className="col-6">Desde</article>
+              <article className="col-6">Hasta</article>
+            </section>
+          </section>
+        </section>
+      )}
 
       <Modal isOpen={ModalSucursal}>
         <ModalBody>
           <div align="center" className="divDisponibleHeader2 p-2">
             <h3>Disponibilidad por Sucursal</h3>
           </div>
-          <div className="">
-            <article
-              className="artHeaderDisponibles d-flex flex-row"
-              align="center"
-            >
-              <item className="d-flex flex-grow-1 justify-content-center">
-                <h5>Sucursal</h5>
-              </item>
-              <item className="d-flex flex-grow-1 justify-content-center">
-                <h5>Existencia</h5>
-              </item>
-            </article>
-          </div>
-          <div className="divDisponiblesContainer2">
-            {disponibles.map((row) => (
-              <article className="d-flex flex-row">
-                <item
-                  key={row.Sucursal}
-                  className="d-flex flex-grow-1 justify-content-center"
-                  align="center"
-                >
-                  <h5>{row.Sucursal}</h5>
-                </item>
-                <item className="d-flex flex-grow-1 justify-content-center">
-                  <h5>{row.Existencia}</h5>
-                </item>
-              </article>
-            ))}
-          </div>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell className="custom-bg" align="center">
+                    <h5>Sucursal</h5>
+                  </TableCell>
+                  <TableCell className="custom-bg" align="center">
+                    <h5>Existencia</h5>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+            </Table>
+          </TableContainer>
+          <TableContainer
+            component={Paper}
+            className="responsive"
+            style={{ maxHeight: 400 }}
+          >
+            <Table>
+              <TableBody>
+                {disponibles.map((row) => (
+                  <TableRow>
+                    <TableCell align="center">
+                      <h5>{row.Sucursal}</h5>
+                    </TableCell>
+                    <TableCell align="center">
+                      <h5>{row.Existencia}</h5>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </ModalBody>
         <ModalFooter>
           <button
             className="form-control btnCerrarModal"
             onClick={() => abrirCerrarModalSucursal()}
           >
-            Cerrar
+            <h5>
+              {"Cerrar  "}
+              <AiIcons.AiOutlineCloseCircle />
+            </h5>
           </button>
         </ModalFooter>
       </Modal>
@@ -1372,7 +1594,10 @@ export default function Articulos() {
             className="btnCerrarModal btn-lg"
             onClick={() => abrirCerrarModalArticulo()}
           >
-            <h6>Cerrar</h6>
+            <h5>
+              {"Cerrar  "}
+              <AiIcons.AiOutlineCloseCircle />
+            </h5>
           </button>
         </ModalFooter>
       </Modal>
@@ -1387,181 +1612,219 @@ export default function Articulos() {
 
       <Modal className="Carrito modal-xl" isOpen={ModalCarrito}>
         <ModalBody>
-          <div align="center">
-            <div className="row">
-              <div className="col-sm-12 my-1">
-                <h4>
-                  <strong>Carrito de Compras</strong>
-                </h4>
-                <TableContainer
-                  component={Paper}
-                  className="responsive"
-                  style={{ maxHeight: 400 }}
-                >
-                  <Table aria-label="simple table">
-                    <TableHead className="custom-bg">
-                      <TableRow className="TablaRowHead">
-                        <TableCell align="center">
-                          <label className="custom-bg">#</label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">
-                            Articulo
-                            <br />
-                            Código
-                          </label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">Descripción</label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">Precio</label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">Ahorro</label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">
-                            Precio
-                            <br />
-                            Final
-                          </label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">Cant</label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <label className="custom-bg">Total</label>
-                        </TableCell>
-                        <TableCell align="center"></TableCell>
-                        <TableCell align="center"></TableCell>
-                        <TableCell align="center"></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody className="TablaContainerCarrito">
-                      {car.map((row, i) => (
-                        <TableRow
-                          className="CustomRows"
-                          hover
-                          key={i}
-                          value={row.Articulo}
+          <section align="center">
+            <section className="row">
+              <h4>
+                <strong>Carrito de Compras</strong>
+              </h4>
+            </section>
+            <TableContainer
+              component={Paper}
+              className="responsive"
+              style={{ maxHeight: 400 }}
+            >
+              <Table>
+                <TableHead className="custom-bg">
+                  <TableRow className="TablaRowHead">
+                    <TableCell align="center">
+                      <label className="custom-bg">#</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">
+                        Articulo
+                        <br />
+                        Código
+                      </label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Descripción</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Precio</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Ahorro</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">
+                        Precio
+                        <br />
+                        Final
+                      </label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Cant</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Total</label>
+                    </TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className="TablaContainerCarrito">
+                  {car.map((row, i) => (
+                    <TableRow
+                      className="CustomRows"
+                      hover
+                      key={i}
+                      value={row.Articulo}
+                    >
+                      <TableCell align="center">
+                        <Avatar className="avatar-bg" src=".">
+                          {i + 1}
+                        </Avatar>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <text className="tipoOpe">{row.Articulo}</text>
+                        <br />
+                        {row.Codigo}
+                      </TableCell>
+                      <TableCell>
+                        {row.Descripcion}
+                        <br />
+                        {row.SustanciaActiva !== null &&
+                          "[" + row.SustanciaActiva + "]"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.Precio)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.Precio - row.PrecioConDescuento)}
+                        <br />
+                        {"(" + row.Descuento + " %)"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.PrecioConDescuento)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <TextField
+                          inputProps={{
+                            style: { textAlign: "center" },
+                          }}
+                          name={row.Articulo}
+                          onChange={handleChangeCar}
+                          value={row.Cantidad}
+                          readOnly={false}
+                        ></TextField>
+                      </TableCell>
+                      <TableCell align="center">
+                        {" "}
+                        {"$" + financial(row.PrecioConDescuento * row.Cantidad)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.Cantidad !== row.Existencia && (
+                          <Avatar
+                            className="avatar-bg"
+                            src="."
+                            onClick={() => addToCar(row)}
+                          >
+                            <FaIcons.FaPlus />
+                          </Avatar>
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.Cantidad > 1 && (
+                          <Avatar
+                            className="avatar-bg"
+                            src="."
+                            onClick={() => delFromCar(row.Articulo)}
+                          >
+                            <FaIcons.FaMinus />
+                          </Avatar>
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Avatar
+                          className="avatar-bg"
+                          src="."
+                          onClick={() => delFromCar(row.Articulo, true)}
                         >
-                          <TableCell align="center">
-                            <Avatar className="avatar-bg" src=".">
-                              {i + 1}
-                            </Avatar>
-                          </TableCell>
-                          <TableCell component="th" scope="row">
-                            <text className="tipoOpe">{row.Articulo}</text>
-                            <br />
-                            {row.Codigo}
-                          </TableCell>
-                          <TableCell>
-                            {row.Descripcion}
-                            <br />
-                            {row.SustanciaActiva !== null &&
-                              "[" + row.SustanciaActiva + "]"}
-                          </TableCell>
-                          <TableCell align="center">
-                            {"$" + financial(row.Precio)}
-                          </TableCell>
-                          <TableCell align="center">
-                            {"$" +
-                              financial(row.Precio - row.PrecioConDescuento)}
-                            <br />
-                            {"(" + row.Descuento + " %)"}
-                          </TableCell>
-                          <TableCell align="center">
-                            {"$" + financial(row.PrecioConDescuento)}
-                          </TableCell>
-                          <TableCell align="center">
-                            <TextField
-                              inputProps={{
-                                style: { textAlign: "center" },
-                              }}
-                              name={row.Articulo}
-                              onChange={handleChangeCar}
-                              value={row.quantity}
-                              readOnly={false}
-                            ></TextField>
-                          </TableCell>
-                          <TableCell align="center">
-                            {" "}
-                            {"$" +
-                              financial(row.PrecioConDescuento * row.quantity)}
-                          </TableCell>
-                          {row.quantity !== row.Existencia && (
-                            <TableCell align="center">
-                              <Avatar
-                                className="avatar-bg"
-                                src="."
-                                onClick={() => addToCar(row)}
-                              >
-                                <FaIcons.FaPlus />
-                              </Avatar>
-                            </TableCell>
-                          )}
-                          {row.quantity > 1 && (
-                            <TableCell align="center">
-                              <Avatar
-                                className="avatar-bg"
-                                src="."
-                                onClick={() => delFromCar(row.Articulo)}
-                              >
-                                <FaIcons.FaMinus />
-                              </Avatar>
-                            </TableCell>
-                          )}
-                          <TableCell align="center">
-                            <Avatar
-                              className="avatar-bg"
-                              src="."
-                              onClick={() => delFromCar(row.Articulo, true)}
-                            >
-                              <FaIcons.FaTrashAlt />
-                            </Avatar>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TableContainer
-                  component={Paper}
-                  className="TablaContainerModalSuc responsive"
-                  style={{ maxHeight: 350 }}
-                >
-                  <Table aria-label="simple table">
-                    <TableBody></TableBody>
-                  </Table>
-                </TableContainer>
-              </div>
+                          <FaIcons.FaTrashAlt />
+                        </Avatar>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </section>
+          <section className="d-flex flex-row">
+            <article
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total Unidades:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {QtyItems}
+              </Avatar>
+            </article>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Ahorro Total:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(Ahorro)}
+              </Avatar>
             </div>
-          </div>
-          <div className="d-flex flex-row-reverse ">
+
             {Conexion === "Linea" && (
-              <div className="" align="center">
+              <div
+                className="d-flex flex-column flex-grow-1 flex-shrink-1"
+                align="center"
+              >
                 <Avatar
-                  align="right"
+                  align="center"
                   variant="rounded"
                   className="avatarPrecio-bg"
                   src="."
                 >
-                  Total DLLS:
+                  T.C.
                 </Avatar>
                 <Avatar
-                  align="right"
+                  align="center"
                   variant="rounded"
                   className="avatarPrecio2-bg"
                   src="."
                 >
-                  {"$" + financial(Monto / TipoCambio)}
+                  {"$" + financial(TipoCambio)}
                 </Avatar>
               </div>
             )}
-            <div className="" align="center">
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
               <Avatar
-                align="right"
+                align="center"
                 variant="rounded"
                 className="avatarPrecio-bg"
                 src="."
@@ -1569,7 +1832,7 @@ export default function Articulos() {
                 Total MXN:
               </Avatar>
               <Avatar
-                align="right"
+                align="center"
                 variant="rounded"
                 className="avatarPrecio2-bg"
                 src="."
@@ -1579,97 +1842,84 @@ export default function Articulos() {
             </div>
 
             {Conexion === "Linea" && (
-              <div className="" align="center">
+              <div
+                className="d-flex flex-column flex-grow-1 flex-shrink-1"
+                align="center"
+              >
                 <Avatar
-                  align="right"
+                  align="center"
                   variant="rounded"
                   className="avatarPrecio-bg"
                   src="."
                 >
-                  T.C.
+                  Total DLLS:
                 </Avatar>
                 <Avatar
-                  align="right"
+                  align="center"
                   variant="rounded"
                   className="avatarPrecio2-bg"
                   src="."
                 >
-                  {"$" + financial(TipoCambio)}
+                  {"$" + financial(Monto / TipoCambio)}
                 </Avatar>
               </div>
             )}
-            <div className="" align="center">
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio-bg"
-                src="."
-              >
-                Ahorro Total:
-              </Avatar>
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio2-bg"
-                src="."
-              >
-                {"$" + financial(Ahorro)}
-              </Avatar>
-            </div>
-            <div className="" align="center">
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio-bg"
-                src="."
-              >
-                Total Unidades:
-              </Avatar>
-              <Avatar
-                align="right"
-                variant="rounded"
-                className="avatarPrecio2-bg"
-                src="."
-              >
-                {QtyItems}
-              </Avatar>
-            </div>
-          </div>
+          </section>
         </ModalBody>
-        <ModalFooter>
-          <div className="d-flex justify-content-center ">
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => enviarAImprimir()}
-            >
-              <h6>Imprimir</h6>
-            </button>
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => clearCar()}
-            >
-              <h6>Limpiar Carrito</h6>
-            </button>
-            {Conexion === "Linea" && (
+        <section className="secModalCarritoFooter  justify-content-center">
+          <section className="d-flex flex-row justify-content-center">
+            <article className="artFooterCarrito">
               <button
                 type="button"
-                onClick={() => enviarcheckout()}
-                className="custom-bg btn-lg"
+                className="btnCarrito  form-control"
+                onClick={() => enviarAImprimir()}
               >
-                <h6>Guardar</h6>
+                <h5>
+                  {"Imprimir  "}
+                  <BiIcons.BiPrinter />
+                </h5>
               </button>
+            </article>
+            <article className="artFooterCarrito">
+              <button
+                type="button"
+                className="btnCarrito  form-control"
+                onClick={() => clearCar()}
+              >
+                <h5>
+                  {"Limpiar Carrito  "}
+                  <AiIcons.AiOutlineClear />
+                </h5>
+              </button>
+            </article>
+            {Conexion === "Linea" && (
+              <article className="artFooterCarrito">
+                <button
+                  type="button"
+                  onClick={() => enviarcheckout()}
+                  className="btnCarrito form-control"
+                >
+                  <h5>
+                    {"Guardar  "}
+                    <BiIcons.BiSave />
+                  </h5>
+                </button>
+              </article>
             )}
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => abrirCerrarModalCarrito()}
-            >
-              <h6>Cerrar</h6>
-            </button>
-          </div>
-        </ModalFooter>
+            <article className="artFooterCarrito">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={() => abrirCerrarModalCarrito()}
+              >
+                <h5>
+                  {"Cerrar  "}
+                  <AiIcons.AiOutlineCloseCircle />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
       </Modal>
 
       <Modal /*** MODAL IMPRIMIR **/
@@ -1686,6 +1936,11 @@ export default function Articulos() {
             {" * * FARMACIA LA MAS BARATA * * "}
           </small>
           <small className="titularTicket">{"Sucursal " + Sucursal}</small>
+          {ClienteABuscar.length > 3 && (
+            <small className="titularTicket">
+              {"Cliente:  " + ClienteABuscar}
+            </small>
+          )}
         </section>
         <section className="secHeaderImprimir d-flex flex-row" align="center">
           <article className="TitularesTicket col-3">
@@ -1710,7 +1965,7 @@ export default function Articulos() {
               <small>{row.Descripcion}</small>
             </article>
             <article className="artDetalleTicket col-2">
-              <small>{row.quantity}</small>
+              <small>{row.Cantidad}</small>
             </article>
             <article className="artDetalleTicket col-2">
               <small>{"$" + financial(row.PrecioConDescuento)}</small>
@@ -1730,7 +1985,9 @@ export default function Articulos() {
         </section>
         <section className="secAtendio d-flex flex-column" align="center">
           <br />
-          <article className="">Le atendio: LUIS</article>
+          {AgenteABuscar.length > 3 && (
+            <article className="">Le atendio: {AgenteABuscar}</article>
+          )}
         </section>
         <br />
         <section
@@ -1842,34 +2099,48 @@ export default function Articulos() {
             </article>
           </section>
         </ModalBody>
-        <ModalFooter>
-          <div className="d-flex">
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => enviarAImprimir()}
-            >
-              <h6>Imprimir</h6>
-            </button>
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => enviarcheckout()}
-            >
-              <h6>regresar</h6>
-            </button>
-            <button type="button" className="custom-bg btn-lg">
-              <h6>Guardar</h6>
-            </button>
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={() => abrirCerrarModalCheckOut()}
-            >
-              <h6>Cerrar</h6>
-            </button>
-          </div>
-        </ModalFooter>
+        <section className="secModalAgClieFooter">
+          <section className="secModalCarritoFooter d-flex flex-row justify-content-center">
+            <article className="artFooterAgeClient">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={() => enviarcheckout()}
+              >
+                <h5>
+                  {"Regresar  "}
+                  <FaIcons.FaBackspace />
+                </h5>
+              </button>
+            </article>
+            {NumAgente.length > 0 && (
+              <article className="artFooterAgeClient">
+                <button
+                  type="button"
+                  className="btnCarrito form-control"
+                  onClick={() => peticionGuardarCotizacion()}
+                >
+                  <h5>
+                    {"Guardar  "}
+                    <BiIcons.BiSave />
+                  </h5>
+                </button>
+              </article>
+            )}
+            <article className="artFooterAgeClient">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={() => abrirCerrarModalCheckOut()}
+              >
+                <h5>
+                  {"Cerrar  "}
+                  <AiIcons.AiOutlineCloseCircle />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
       </Modal>
 
       <Modal className="d-flex modal-lg" isOpen={ModalDatosClienteAgente}>

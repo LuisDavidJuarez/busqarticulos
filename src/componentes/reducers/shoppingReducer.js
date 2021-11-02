@@ -16,13 +16,13 @@ export function shoppingReducer(state, action) {
             ...state,
             car: state.car.map((item) =>
               item.Articulo === newItem.Articulo
-                ? { ...item, quantity: item.quantity + 1 }
+                ? { ...item, Cantidad: item.Cantidad + 1 }
                 : item
             ),
           }
         : {
             ...state,
-            car: [...state.car, { ...newItem, quantity: 1 }],
+            car: [...state.car, { ...newItem, Cantidad: 1 }],
           };
     }
     case TYPES.REMOVE_ONE_FROM_CAR: {
@@ -30,12 +30,12 @@ export function shoppingReducer(state, action) {
         (item) => item.Articulo === action.payload
       );
 
-      return itemToDelete.quantity > 1
+      return itemToDelete.Cantidad > 1
         ? {
             ...state,
             car: state.car.map((item) =>
               item.Articulo === action.payload
-                ? { ...item, quantity: item.quantity - 1 }
+                ? { ...item, Cantidad: item.Cantidad - 1 }
                 : item
             ),
           }
