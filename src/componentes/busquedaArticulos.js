@@ -69,6 +69,8 @@ export default function Articulos() {
   const [Sucursal, setSucursal] = useState(0);
   const [TipoCambio, setTipoCambio] = useState(0);
   const [TipoBusqueda, setTipoBusqueda] = useState(1);
+  const [FechaInicial, setFechaInicial] = useState(new Date());
+  const [FechaFinal, setFechaFinal] = useState(new Date());
 
   const [Imagen, setImagen] = useState(
     `${process.env.PUBLIC_URL}/images/page/default.png`
