@@ -432,6 +432,31 @@ export default function Articulos() {
     abrirCerrarModalCarrito();
   };
 
+  const buscarCotizaciones = () => {
+    console.log(
+      "Agente: ",
+      NumAgente,
+      ", Cliente: ",
+      NumCliente,
+      "FechaInicial: ",
+      formatDate(FechaInicial),
+      ", FechaFinal: ",
+      formatDate(FechaFinal)
+    );
+  };
+
+  function formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
+
   /**************************** Todo para el Carrito de compras *****************************/
 
   const articuloLimpio = useState({
@@ -1345,6 +1370,7 @@ export default function Articulos() {
                 <DatePickerInput
                   onChange={setFechaFinal}
                   minDate={FechaInicial}
+                  maxDate={new Date()}
                   value={FechaFinal}
                   className="my-custom-datepicker-component"
                 />
@@ -1414,7 +1440,10 @@ export default function Articulos() {
             <br />
             <section className="secBotonBuscar d-flex justify-content-center">
               <article className="col-6">
-                <button className="btnBusquedaCotizacion">
+                <button
+                  className="btnBusquedaCotizacion"
+                  onClick={buscarCotizaciones}
+                >
                   {"Buscar  "}
                   <BiIcons.BiSearchAlt className="IconBuscar" />
                 </button>
