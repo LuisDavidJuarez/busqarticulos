@@ -3,7 +3,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./busquedaArticulos.css";
 import axios from "axios";
 //import LogoImg from '@file://192.168.13.30/Imagenes/Articulos/default.png';
-import { Modal, ModalBody, ModalFooter } from "reactstrap";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  Modal,
+  ModalBody,
+  ModalFooter,
+} from "reactstrap";
 import { DatePickerInput } from "rc-datepicker";
 import "rc-datepicker/lib/style.css";
 
@@ -48,11 +55,13 @@ export default function Articulos() {
   const [ClientesData, setClientesData] = useState([]);
   const [ClientesData2, setClientesData2] = useState([]);
   const [Cotizacion, setCotizacion] = useState([]);
+  const [DatosBusqCotizacion, setDatosBusqCotizacion] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
   const [mostrarMain, setMostrarMain] = useState(true);
+  const [MostrarMenu, setMostrarMenu] = useState(false);
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const [mostrarProgress, setMostrarProgress] = useState(false);
   const [CambiarTipo, setCambiarTipo] = useState(false);
@@ -62,6 +71,7 @@ export default function Articulos() {
   const [ModalCheckOut, setModalCheckOut] = useState(false);
   const [ModalDatosClienteAgente, setModalDatosClienteAgente] = useState(false);
   const [ModalImprimir, setModalImprimir] = useState(false);
+  //const [ModalDetalleCotizacion, setModalDetalleCotizacion] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
   const [ocultarAutoComplAgente, setocultarAutoComplAgente] = useState(true);
   const [ocultarAutoComplCliente, setocultarAutoComplCliente] = useState(true);
@@ -349,8 +359,6 @@ export default function Articulos() {
   const seleccionarAgente = (e) => {
     setNumAgente(e.target.value);
 
-    if (e.target.value !== "#") setocultarAutoComplAgente(true);
-
     AgentesData.map(
       (agente) =>
         agente.Agente === e.target.value && setAgenteABuscar(agente.Nombre)
@@ -363,10 +371,27 @@ export default function Articulos() {
     console.log("Cotizacion: ", Cotizacion);
   };
 
+  const seleccionarAgente2 = (e) => {
+    setNumAgente(e.target.value);
+    setocultarAutoComplAgente(true);
+
+    AgentesData.map(
+      (agente) =>
+        agente.Agente === e.target.value && setAgenteABuscar(agente.Nombre)
+    );
+
+    setDatosBusqCotizacion({
+      ...DatosBusqCotizacion,
+      Agente: e.target.value,
+      FechaInicial: formatDate(FechaInicial).toString(),
+      FechaFinal: formatDate(FechaFinal).toString(),
+    });
+    console.log("DatosBusqCotizacion: ", DatosBusqCotizacion);
+    buscarCotizaciones(DatosBusqCotizacion);
+  };
+
   const seleccionarCliente = (e) => {
     setNumCliente(e.target.value);
-
-    if (e.target.value !== "#") setocultarAutoComplCliente(true);
 
     ClientesData.map(
       (cliente) =>
@@ -380,6 +405,23 @@ export default function Articulos() {
     console.log("Cotizacion: ", Cotizacion);
   };
 
+  const seleccionarCliente2 = (e) => {
+    setNumCliente(e.target.value);
+    setocultarAutoComplCliente(true);
+
+    ClientesData.map(
+      (cliente) =>
+        cliente.Cliente === e.target.value && setClienteABuscar(cliente.Nombre)
+    );
+
+    setDatosBusqCotizacion({
+      ...DatosBusqCotizacion,
+      Cliente: e.target.value,
+    });
+    console.log("DatosBusqCotizacion: ", DatosBusqCotizacion);
+    buscarCotizaciones(DatosBusqCotizacion);
+  };
+
   const GenerarCotizacion = () => {
     setCotizacion({
       ...Cotizacion,
@@ -389,8 +431,6 @@ export default function Articulos() {
     });
 
     console.log("Cotizacion: ", Cotizacion);
-    /* peticionGuardarCotizacion();
-    console.log("Cotizacion Guardada...!!!"); */
   };
 
   const peticionGuardarCotizacion = async () => {
@@ -434,19 +474,9 @@ export default function Articulos() {
   };
 
   const buscarCotizaciones = async () => {
-    console.log(
-      "Agente: ",
-      NumAgente,
-      ", Cliente: ",
-      NumCliente,
-      "FechaInicial: ",
-      formatDate(FechaInicial),
-      ", FechaFinal: ",
-      formatDate(FechaFinal)
-    );
-    console.log("Cotizacion: ", Cotizacion);
-    var varLiga = baseUrlCotizador;
-    console.log("Liga Guardar: " + varLiga);
+    console.log("DatosBusqCotizacion: " + DatosBusqCotizacion);
+    var varLiga = baseUrlCotizador + DatosBusqCotizacion;
+    console.log("Liga Buscar Cotizacion: " + varLiga);
     await axios
       .get(varLiga)
       .then((response) => {
@@ -573,6 +603,10 @@ export default function Articulos() {
 
   const abrirCerrarModalSucursal = () => {
     setModalSucursal(!ModalSucursal);
+  };
+
+  const abrirCerrarMenu = () => {
+    setMostrarMenu(!MostrarMenu);
   };
 
   const abrirCerrarModalCarrito = () => {
@@ -886,8 +920,18 @@ export default function Articulos() {
 
       <section className="secNavBar">
         <div className="d-flex flex-row">
-          <div className="ContainerMenuIcon p-1">
-            <ImIcons.ImMenu className="MenuIcon" />
+          <div className="ContainerMenuIcon">
+            <ImIcons.ImMenu
+              className="MenuIcon border"
+              onClick={abrirCerrarMenu}
+            />
+            <Dropdown className="ddMenuDrop" isOpen={MostrarMenu}>
+              <DropdownMenu>
+                <DropdownItem onClick={abrirCerrarHistorial}>
+                  Historial de Cotizaciones
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
           <div className="ContainerLogoIcon">
             <img
@@ -911,57 +955,53 @@ export default function Articulos() {
                   ))}
                 </select>
               </div>
-              <div className="divSearchItem flex-grow-1 flex-shrink-1">
+              <div className="divSearchItem col-7 flex-shrink-1">
                 <input
                   type="text"
                   className="form-control custom-input"
                   name="textoabuscar"
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
-                  rows={autocompletar.length}
                   value={TextoCompleto}
                 />
-              </div>
-              <div
-                hidden={ocultarAutoCompletar}
-                className="divSearchItem col-4 flex-shrink-1"
-              >
-                {TextoCompleto.length > 2 && (
-                  <select
-                    name="Autocompletar"
-                    onChange={handleChangeSelect}
-                    className="form-control custom-drop"
-                    readOnly="false"
+                <Dropdown
+                  className="ddDropAutocompletar"
+                  isOpen={!ocultarAutoCompletar}
+                >
+                  <DropdownMenu
+                    className="ddMenuDesplegable"
+                    style={{ maxHeight: 200 }}
                   >
-                    <option header>Seleccione</option>
                     {autocompletar.map((opcion) =>
                       verSustanciaActiva ? (
-                        <option align="left" value={opcion.SustanciaActiva}>
+                        <DropdownItem
+                          align="left"
+                          value={opcion.SustanciaActiva}
+                          onClick={handleChangeSelect}
+                        >
                           {opcion.SustanciaActiva}
-                        </option>
+                        </DropdownItem>
                       ) : (
-                        <option align="left" value={opcion.Articulo}>
+                        <DropdownItem
+                          align="left"
+                          value={opcion.Articulo}
+                          onClick={handleChangeSelect}
+                        >
                           {opcion.Articulo + ": " + opcion.Descripcion}
-                        </option>
+                        </DropdownItem>
                       )
                     )}
-                  </select>
-                )}
+                  </DropdownMenu>
+                </Dropdown>
               </div>
             </div>
           </div>
           <div /** div Carrito*/
             className="QtyItemsCar"
-            onClick={
-              QtyItems > 0 ? abrirCerrarModalCarrito : abrirCerrarHistorial
-            }
+            onClick={abrirCerrarModalCarrito}
           >
             <div className="divCar-bg" src=".">
-              {QtyItems > 0 ? (
-                <h7 className="qtyItemsH7">{QtyItems}</h7>
-              ) : (
-                <FaIcons.FaHistory className="qtyItemsH7" />
-              )}
+              {QtyItems > 0 && <h7 className="qtyItemsH7">{QtyItems}</h7>}
             </div>
             <RiIcons.RiShoppingCartLine className="CarIcon" />
           </div>
@@ -1513,6 +1553,25 @@ export default function Articulos() {
                   onChange={hancleChangeAgente}
                   placeholder="Nombre"
                 ></input>
+                <Dropdown
+                  className="ddDropAutocompletar"
+                  isOpen={!ocultarAutoComplAgente}
+                >
+                  <DropdownMenu
+                    className="ddMenuDesplegable"
+                    style={{ maxHeight: 200 }}
+                  >
+                    {AgentesData.map((opcion) => (
+                      <DropdownItem
+                        align="left"
+                        value={opcion.Agente}
+                        onClick={seleccionarAgente2}
+                      >
+                        {opcion.Nombre}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
               </article>
               <article className="col-1 d-flex align-items-end" align="left">
                 <BiIcons.BiSearchAlt
@@ -1526,7 +1585,7 @@ export default function Articulos() {
               <h4>Cliente</h4>
             </section>
             <section className="SecDatosCliente d-flex flex-row" align="center">
-              <article className="InputsCliente col-2">
+              <article className="InputsClientes col-2">
                 <input
                   type="text"
                   class="form-control custom-input"
@@ -1543,6 +1602,25 @@ export default function Articulos() {
                   onChange={hancleChangeCliente}
                   placeholder="Nombre"
                 ></input>
+                <Dropdown
+                  className="ddDropAutocompletar"
+                  isOpen={!ocultarAutoComplCliente}
+                >
+                  <DropdownMenu
+                    className="ddMenuDesplegable"
+                    style={{ maxHeight: 200 }}
+                  >
+                    {ClientesData.map((opcion) => (
+                      <DropdownItem
+                        align="left"
+                        value={opcion.Cliente}
+                        onClick={seleccionarCliente2}
+                      >
+                        {opcion.Nombre}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
               </article>
               <article className="col-1 d-flex align-items-end" align="left">
                 <BiIcons.BiSearchAlt
@@ -1553,7 +1631,7 @@ export default function Articulos() {
             </section>
             <br />
             <br />
-            <section className="secBotonBuscar d-flex justify-content-center">
+            {/* <section className="secBotonBuscar d-flex justify-content-center">
               <article className="col-6">
                 <button
                   className="btnBusquedaCotizacion"
@@ -1563,7 +1641,7 @@ export default function Articulos() {
                   <BiIcons.BiSearchAlt className="IconBuscar" />
                 </button>
               </article>
-            </section>
+            </section> */}
           </section>
         </section>
       )}
@@ -2200,6 +2278,25 @@ export default function Articulos() {
                 onChange={hancleChangeAgente}
                 placeholder="Nombre"
               ></input>
+              <Dropdown
+                className="ddDropAutocompletar"
+                isOpen={!ocultarAutoComplAgente}
+              >
+                <DropdownMenu
+                  className="ddMenuDesplegable"
+                  style={{ maxHeight: 200 }}
+                >
+                  {AgentesData.map((opcion) => (
+                    <DropdownItem
+                      align="left"
+                      value={opcion.Agente}
+                      onClick={seleccionarAgente}
+                    >
+                      {opcion.Nombre}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
             </article>
             <article className="col-1 d-flex align-items-end" align="left">
               <BiIcons.BiSearchAlt
@@ -2207,29 +2304,12 @@ export default function Articulos() {
                 onClick={() => clickBusquedaAgente()}
               />
             </article>
-            <article className="col-3 d-flex align-items-end">
-              {AgentesData.length > 0 && (
-                <select
-                  hidden={ocultarAutoComplAgente}
-                  name="AutoAgente"
-                  className="form-control custom-drop"
-                  onChange={seleccionarAgente}
-                >
-                  <option header value="#">
-                    Seleccione
-                  </option>
-                  {AgentesData.map((opcion) => (
-                    <option value={opcion.Agente}>{opcion.Nombre}</option>
-                  ))}
-                </select>
-              )}
-            </article>
           </section>
           <section className="secHeaderCheckout2 d-flex flex-column">
             <h4>Cliente</h4>
           </section>
           <section className="SecDatosCliente d-flex flex-row" align="center">
-            <article className="InputsCliente col-2">
+            <article className="InputsClientes col-2">
               <input
                 type="text"
                 class="form-control custom-input"
@@ -2246,29 +2326,31 @@ export default function Articulos() {
                 onChange={hancleChangeCliente}
                 placeholder="Nombre"
               ></input>
+              <Dropdown
+                className="ddDropAutocompletar"
+                isOpen={!ocultarAutoComplCliente}
+              >
+                <DropdownMenu
+                  className="ddMenuDesplegable"
+                  style={{ maxHeight: 200 }}
+                >
+                  {ClientesData.map((opcion) => (
+                    <DropdownItem
+                      align="left"
+                      value={opcion.Cliente}
+                      onClick={seleccionarCliente}
+                    >
+                      {opcion.Nombre}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
             </article>
             <article className="col-1 d-flex align-items-end" align="left">
               <BiIcons.BiSearchAlt
                 className="LupaIcon"
                 onClick={() => clickBusquedaCliente()}
               />
-            </article>
-            <article className="col-3 d-flex align-items-end">
-              {ClientesData.length > 0 && (
-                <select
-                  hidden={ocultarAutoComplCliente}
-                  name="AutoAgente"
-                  className="form-control custom-drop"
-                  onChange={seleccionarCliente}
-                >
-                  <option header value="#">
-                    Seleccione
-                  </option>
-                  {ClientesData.map((opcion) => (
-                    <option value={opcion.Cliente}>{opcion.Nombre}</option>
-                  ))}
-                </select>
-              )}
             </article>
           </section>
         </ModalBody>

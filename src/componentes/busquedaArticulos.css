@@ -43,9 +43,27 @@
   border-bottom-left-radius: 10% !important;
 }
 
+.ddMenuDrop {
+  height: 0% !important;
+}
+
+.ToggleMenu {
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  margin-top: 0.5vh;
+  margin-left: 0.5vh;
+  margin-right: 0.5vh;
+  height: 11vh;
+  width: 7vw;
+}
+
+.ddMenuDesplegable {
+  max-height: 250 px !important;
+}
+
 .MenuIcon {
-  height: 8vh;
   width: 8vw;
+  height: 11vh;
 }
 
 .ContainerLogoIcon {
@@ -76,6 +94,11 @@
   background-color: white !important;
   border-color: #d11a2c !important;
   border-width: medium !important;
+}
+
+.ddDropAutocompletar {
+  height: 0 !important;
+  width: 100% !important;
 }
 
 .custom-input {
@@ -166,6 +189,16 @@
 }
 
 .secMain::-webkit-scrollbar {
+  display: none;
+}
+
+.ddMenuDesplegable {
+  position: relative !important;
+  max-height: 10vh;
+  overflow-y: auto;
+}
+
+.ddMenuDesplegable::-webkit-scrollbar {
   display: none;
 }
 
@@ -472,7 +505,7 @@ textarea {
 .LupaIcon {
   color: #fbd134 !important;
   background-color: #d11a2c !important;
-  height: 5.4vh;
+  height: 5.1vh;
   width: 4vw;
   margin-left: -1vh;
   border-top-right-radius: 1vh !important;
