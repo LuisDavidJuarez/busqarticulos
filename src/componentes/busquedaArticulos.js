@@ -4,6 +4,8 @@ import "./busquedaArticulos.css";
 import axios from "axios";
 //import LogoImg from '@file://192.168.13.30/Imagenes/Articulos/default.png';
 import { Modal, ModalBody, ModalFooter } from "reactstrap";
+import { DatePickerInput } from "rc-datepicker";
+import "rc-datepicker/lib/style.css";
 
 import {
   Avatar,
@@ -1324,6 +1326,32 @@ export default function Articulos() {
               <h4>Datos de Busqueda</h4>
             </section>
             <section className="d-flex flex-column">
+              <h4>Fechas</h4>
+            </section>
+            <section className="d-flex flex-row" align="center">
+              <article className="col-6">Desde</article>
+              <article className="col-6">Hasta</article>
+            </section>
+            <section className="d-flex flex-row" align="center">
+              <article className="artFechas flex-grow-1">
+                <DatePickerInput
+                  onChange={setFechaInicial}
+                  maxDate={FechaFinal}
+                  value={FechaInicial}
+                  className="my-custom-datepicker-component danger"
+                />
+              </article>
+              <article className="artFechas flex-grow-1">
+                <DatePickerInput
+                  onChange={setFechaFinal}
+                  minDate={FechaInicial}
+                  value={FechaFinal}
+                  className="my-custom-datepicker-component"
+                />
+              </article>
+            </section>
+            <br />
+            <section className="d-flex flex-column">
               <h4>Agente</h4>
             </section>
             <section className="SecDatosAgente d-flex flex-row" align="center">
@@ -1382,16 +1410,15 @@ export default function Articulos() {
                 />
               </article>
             </section>
-            <section className="d-flex flex-column">
-              <h4>Fechas</h4>
-            </section>
-            <section className="d-flex flex-row" align="center">
-              <article className="col-6">Desde</article>
-              <article className="col-6">Hasta</article>
-            </section>
-            <section className="d-flex flex-row" align="center">
-              <article className="col-6">Desde</article>
-              <article className="col-6">Hasta</article>
+            <br />
+            <br />
+            <section className="secBotonBuscar d-flex justify-content-center">
+              <article className="col-6">
+                <button className="btnBusquedaCotizacion">
+                  {"Buscar  "}
+                  <BiIcons.BiSearchAlt className="IconBuscar" />
+                </button>
+              </article>
             </section>
           </section>
         </section>

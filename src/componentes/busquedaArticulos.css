@@ -522,6 +522,25 @@ textarea {
   font-weight: bold !important;
 }
 
+.artFechas {
+  margin-left: 1% !important;
+  margin-right: 1% !important;
+}
+
+.btnBusquedaCotizacion {
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  border-color: black !important;
+  font-weight: bold !important;
+  border-radius: 1vh;
+  width: 100% !important;
+  font-size: larger !important;
+}
+
+.IconBuscar {
+  height: 100% !important;
+}
+
 /*************** LUGAR DE IMPRESION **************************/
 
 @media print {
