@@ -48,6 +48,7 @@ export default function Articulos() {
   const [ClientesData, setClientesData] = useState([]);
   const [ClientesData2, setClientesData2] = useState([]);
   const [Cotizacion, setCotizacion] = useState([]);
+  const [Cotizaciones, setCotizaciones] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
@@ -397,7 +398,7 @@ export default function Articulos() {
     var varLiga = baseUrlCotizador;
     console.log("Liga Guardar: " + varLiga);
     await axios
-      .post(varLiga, Cotizacion)
+      .post(varLiga)
       .then((response) => {
         //setData(data.concat(response.data));
       })
@@ -432,7 +433,7 @@ export default function Articulos() {
     abrirCerrarModalCarrito();
   };
 
-  const buscarCotizaciones = () => {
+  const buscarCotizaciones = async () => {
     console.log(
       "Agente: ",
       NumAgente,
@@ -443,6 +444,17 @@ export default function Articulos() {
       ", FechaFinal: ",
       formatDate(FechaFinal)
     );
+    console.log("Cotizacion: ", Cotizacion);
+    var varLiga = baseUrlCotizador;
+    console.log("Liga Guardar: " + varLiga);
+    await axios
+      .get(varLiga)
+      .then((response) => {
+        setCotizaciones(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   function formatDate(date) {
@@ -541,6 +553,18 @@ export default function Articulos() {
   const handleChangeRowsPerPage2 = (event) => {
     setRowsPerPage2(+event.target.value);
     setPage2(0);
+  };
+
+  const [page3, setPage3] = React.useState(0);
+  const [rowsPerPage3, setRowsPerPage3] = React.useState(5);
+
+  const handleChangePage3 = (event, newPage) => {
+    setPage3(newPage);
+  };
+
+  const handleChangeRowsPerPage3 = (event) => {
+    setRowsPerPage3(+event.target.value);
+    setPage3(0);
   };
 
   const abrirCerrarModalArticulo = () => {
@@ -663,7 +687,9 @@ export default function Articulos() {
         setMostrarTabla(false);
         setMostrarProgress(true);
         setImagen("/images/page/default.png");
-        abrirCerrarHistorial();
+        if (mostrarMain === false) {
+          abrirCerrarHistorial();
+        }
       }
       e.target.blur();
     }
@@ -695,7 +721,9 @@ export default function Articulos() {
   const handleChangeSelect = (e) => {
     setTextoCompleto("");
     setTextoABuscar(e.target.value);
-    abrirCerrarHistorial();
+    if (mostrarMain === false) {
+      abrirCerrarHistorial();
+    }
     if (TipoBusqueda !== 2) {
       setTextoSugerido(e.target.value);
       setVerSugeridosSucursales(true);
@@ -890,6 +918,7 @@ export default function Articulos() {
                   name="textoabuscar"
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
+                  rows={autocompletar.length}
                   value={TextoCompleto}
                 />
               </div>
@@ -902,6 +931,7 @@ export default function Articulos() {
                     name="Autocompletar"
                     onChange={handleChangeSelect}
                     className="form-control custom-drop"
+                    readOnly="false"
                   >
                     <option header>Seleccione</option>
                     {autocompletar.map((opcion) =>
@@ -1344,7 +1374,92 @@ export default function Articulos() {
       {mostrarHistorial && (
         <section className="secMainHistorial d-flex flex-row">
           <section className="divContenidoHistorial flex-grow-1" align="center">
-            mostrar tabla
+            <TableContainer
+              component={Paper}
+              className="responsive"
+              style={{ maxHeight: 400 }}
+            >
+              <Table>
+                <TableHead className="custom-bg">
+                  <TableRow className="TablaRowHead">
+                    <TableCell className="" align="center">
+                      <label className="custom-bg">#</label>
+                    </TableCell>
+                    <TableCell className="flex-grow-1" align="center">
+                      <label className="custom-bg">Agente</label>
+                    </TableCell>
+                    <TableCell className="flex-grow-1" align="center">
+                      <label className="custom-bg">Cliente</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label className="custom-bg">{"Total\nUnidades"}</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label className="custom-bg">{"Ahorro\nTotal"}</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label className="custom-bg">{"Tipo\nCambio"}</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label className="custom-bg">{"Total\nMxn"}</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label className="custom-bg">{"Total\nDlls"}</label>
+                    </TableCell>
+                    <TableCell className="" align="center">
+                      <label className="custom-bg">Ver</label>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow className="CustomRows" hover>
+                    <TableCell className="" align="center">
+                      <label className="tipoOpe">1</label>
+                    </TableCell>
+                    <TableCell className="flex-grow-1" align="left">
+                      <label className="tipoOpe">{"G36200013"}</label>
+                      <label>{"DANIEL CUEVAS RUIZ"}</label>
+                    </TableCell>
+                    <TableCell className="flex-grow-1" align="left">
+                      <label className="tipoOpe">{"CTE-43827"}</label>
+                      <label>{"CARLOS HECTOR RODRIGUEZ"}</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label>6</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label>$230.40</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label>$19.30</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label>$789.60</label>
+                    </TableCell>
+                    <TableCell className="col-1" align="center">
+                      <label>$40.91</label>
+                    </TableCell>
+                    <TableCell className="" align="center">
+                      <label>+</label>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              {Cotizaciones.length > 0 && (
+                <TableFooter className="d-flex justify-content-center">
+                  <TablePagination
+                    className=""
+                    rowsPerPageOptions={[5, 10, 25]}
+                    labelRowsPerPage="Lineas por Pagina"
+                    count={Cotizaciones.length}
+                    page={page3}
+                    rowsPerPage={rowsPerPage3}
+                    onPageChange={handleChangePage3}
+                    onRowsPerPageChange={handleChangeRowsPerPage3}
+                  />
+                </TableFooter>
+              )}
+            </TableContainer>
           </section>
           <section className="divSideBarHistorial col-4" align="center">
             <section className="secHeaderDatosBusqueda d-flex flex-column">
