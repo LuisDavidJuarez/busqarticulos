@@ -21,6 +21,15 @@
   color: #fbd134;
 }
 
+.secHeaderConfirmacion {
+  border-top-left-radius: 1vh !important;
+  border-top-right-radius: 1vh !important;
+  margin-bottom: 2vh !important;
+  height: 4vh;
+  background-color: #d11a2c;
+  color: #fbd134;
+}
+
 .secFooter {
   height: 4vh;
   background-color: #d11a2c;
@@ -99,6 +108,11 @@
 .ddDropAutocompletar {
   height: 0 !important;
   width: 100% !important;
+}
+
+.ddDropAutocompletar2 {
+  height: 0 !important;
+  width: 50% !important;
 }
 
 .custom-input {
@@ -572,6 +586,38 @@ textarea {
 
 .IconBuscar {
   height: 100% !important;
+}
+
+.lblConfirmacion {
+  font-weight: bold !important;
+}
+
+.artBtnConfirmacion {
+  width: 45% !important;
+}
+
+.btnConfirmacion {
+  margin-left: 2%;
+  width: 96% !important;
+  height: 6vh !important;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  border-color: black !important;
+  font-weight: bold !important;
+}
+
+.btnRegresar {
+  margin-top: 2vh !important;
+  width: 30% !important;
+  height: 6vh !important;
+  color: #fbd134 !important;
+  background-color: #d11a2c !important;
+  border-color: black !important;
+  font-weight: bold !important;
+}
+
+.secDatosCotizacion {
+  margin-top: 2vh !important;
 }
 
 /*************** LUGAR DE IMPRESION **************************/

@@ -32,6 +32,7 @@ import * as FaIcons from "react-icons/fa";
 import * as RiIcons from "react-icons/ri";
 import * as BiIcons from "react-icons/bi";
 import * as AiIcons from "react-icons/ai";
+import * as FiIcons from "react-icons/fi"; //FiIcons.FiEdit
 
 /* Todo para el Carrito de compras */
 import {
@@ -57,6 +58,9 @@ export default function Articulos() {
   const [Cotizacion, setCotizacion] = useState([]);
   const [DatosBusqCotizacion, setDatosBusqCotizacion] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
+  const [DetalleCotizacion, setDetalleCotizacion] = useState([]);
+  //const [CotizacionAEditar, setCotizacionAEditar] = useState([]);
+  const [DetalleCot, setDetalleCot] = useState([]);
 
   const [verTabla, setVerTabla] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
@@ -68,13 +72,23 @@ export default function Articulos() {
   const [ModalArticulo, setModalArticulo] = useState(false);
   const [ModalSucursal, setModalSucursal] = useState(false);
   const [ModalCarrito, setModalCarrito] = useState(false);
+  const [ModalDetalleCotizacion, setModalDetalleCotizacion] = useState(false);
+  const [ModalConfirmacion, setModalConfirmacion] = useState(false);
+  const [ModalDetalleCotizacionAEditar, setModalDetalleCotizacionAEditar] =
+    useState(false);
   const [ModalCheckOut, setModalCheckOut] = useState(false);
   const [ModalDatosClienteAgente, setModalDatosClienteAgente] = useState(false);
+  const [ModalDatosClienteAgente2, setModalDatosClienteAgente2] =
+    useState(false);
   const [ModalImprimir, setModalImprimir] = useState(false);
-  //const [ModalDetalleCotizacion, setModalDetalleCotizacion] = useState(false);
+  const [ModalEditarCotizacion, setModalEditarCotizacion] = useState(false);
   const [ocultarAutoCompletar, setOcultarAutoCompletar] = useState(true);
   const [ocultarAutoComplAgente, setocultarAutoComplAgente] = useState(true);
+  const [ocultarAutoComplAgente2, setocultarAutoComplAgente2] = useState(true);
   const [ocultarAutoComplCliente, setocultarAutoComplCliente] = useState(true);
+  const [Editando, setEditando] = useState(false);
+  const [ocultarAutoComplCliente2, setocultarAutoComplCliente2] =
+    useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
   const [verPrecios, SetVerPrecios] = useState(false);
   const [verSustanciaActiva, setVerSustanciaActiva] = useState(false);
@@ -82,6 +96,8 @@ export default function Articulos() {
   const [Sucursal, setSucursal] = useState(0);
   const [TipoCambio, setTipoCambio] = useState(0);
   const [TipoBusqueda, setTipoBusqueda] = useState(1);
+  const [NumCotizacion, setNumCotizacion] = useState(0);
+  const [IdDetalleEliminar, setIdDetalleEliminar] = useState(0);
   const [FechaInicial, setFechaInicial] = useState(new Date());
   const [FechaFinal, setFechaFinal] = useState(new Date());
 
@@ -89,14 +105,20 @@ export default function Articulos() {
     `${process.env.PUBLIC_URL}/images/page/default.png`
   );
   const [TextoCompleto, setTextoCompleto] = useState("");
+  const [TipoConfirmacion, setTipoConfirmacion] = useState("");
   const [TextoABuscar, setTextoABuscar] = useState("");
   const [AgenteABuscar, setAgenteABuscar] = useState("");
+  const [ClienteABuscar, setClienteABuscar] = useState("");
   const [NumAgente, setNumAgente] = useState("");
   const [NumCliente, setNumCliente] = useState("");
-  const [ClienteABuscar, setClienteABuscar] = useState("");
+  const [AgenteABuscar2, setAgenteABuscar2] = useState("");
+  const [ClienteABuscar2, setClienteABuscar2] = useState("");
+  const [NumAgente2, setNumAgente2] = useState("");
+  const [NumCliente2, setNumCliente2] = useState("");
   const [TextoSugerido, setTextoSugerido] = useState("");
   const [Getway, setGetway] = useState("");
   const [Conexion, setConexion] = useState("");
+  const [Mensaje, setMensaje] = useState("");
   const [TipoBusquedaAgenteCliente, setTipoBusquedaAgenteCliente] =
     useState("");
   const [articuloSeleccionado, setarticuloSeleccionado] = useState({
@@ -115,9 +137,12 @@ export default function Articulos() {
   /**************************** Todo para el Carrito de compras *****************************/
   const [Monto, setMonto] = useState(0);
   const [Ahorro, setAhorro] = useState(0);
+  const [Monto2, setMonto2] = useState(0);
+  const [Ahorro2, setAhorro2] = useState(0);
   const [QtyItems, setQtyItems] = useState(0);
+  const [QtyItems2, setQtyItems2] = useState(0);
   const [state, dispatch] = useReducer(shoppingReducer, shoppinInitialState);
-  const { car } = state;
+  const { car, car2 } = state;
 
   const calcularMontos = () => {
     var monto = 0;
@@ -139,6 +164,28 @@ export default function Articulos() {
     setMonto(monto);
     setAhorro(ahorro);
     setQtyItems(qty);
+  };
+
+  const calcularMontos2 = () => {
+    var monto = 0;
+    var ahorro = 0;
+    var qty = 0;
+
+    car2.map(
+      (item) => (monto = monto + item.PrecioConDescuento * item.Cantidad)
+    );
+
+    car2.map(
+      (item) =>
+        (ahorro =
+          ahorro + (item.Precio - item.PrecioConDescuento) * item.Cantidad)
+    );
+
+    car2.map((item) => (qty = qty + item.Cantidad));
+
+    setMonto2(monto);
+    setAhorro2(ahorro);
+    setQtyItems2(qty);
   };
 
   const handleChangeCar = (e) => {
@@ -190,6 +237,145 @@ export default function Articulos() {
     }
   };
 
+  const handleChangeCar2 = (e) => {
+    setEditando(true);
+    const { name, value } = e.target;
+    console.log(name, value);
+    if (value !== null && value !== "") {
+      let itemDet = parseInt(name);
+      let articuloDetalle = car2.find((item) => item.ID === itemDet);
+      console.log(articuloDetalle);
+
+      var qtyAnt = parseInt(articuloDetalle.Cantidad);
+      var qtyNew = parseInt(value);
+      var Exist = parseInt(articuloDetalle.Existencia);
+      var times = 0;
+
+      console.log("Antes", qtyAnt, "New", qtyNew, "Exist", Exist);
+      if (qtyAnt < qtyNew) {
+        if (qtyNew > Exist) {
+          times = Exist - qtyAnt;
+        } else {
+          times = qtyNew - qtyAnt;
+        }
+        for (var i = 0; i < times; i++) {
+          dispatch({ type: TYPES.ADD_TO_CAR2, payload: articuloDetalle });
+        }
+        /* articuloDetalle.Cantidad = articuloDetalle.Cantidad + times;
+        console.log("times", times);
+        DetalleCot.map((item) =>
+          item.ID === parseInt(name)
+            ? { ...item, Cantidad: articuloDetalle.Cantidad }
+            : item
+        ); */
+        console.log(DetalleCot);
+        setMonto2(Monto2 + times * articuloDetalle.PrecioConDescuento);
+        setAhorro2(
+          Ahorro2 +
+            times *
+              (articuloDetalle.Precio - articuloDetalle.PrecioConDescuento)
+        );
+        setQtyItems2(QtyItems2 + times);
+      } else {
+        if (qtyNew < 1) {
+          qtyNew = 1;
+        }
+        times = qtyAnt - qtyNew;
+        for (var indx = 0; indx < times; indx++) {
+          dispatch({
+            type: TYPES.REMOVE_ONE_FROM_CAR2,
+            payload: articuloDetalle.Articulo,
+          });
+        }
+        /* articuloDetalle.Cantidad = articuloDetalle.Cantidad - times;
+        console.log("times", times);
+        DetalleCot.map((item) =>
+          item.ID === parseInt(name)
+            ? { ...item, Cantidad: articuloDetalle.Cantidad }
+            : item
+        ); */
+        setMonto2(Monto2 - times * articuloDetalle.PrecioConDescuento);
+        setAhorro2(
+          Ahorro2 -
+            times *
+              (articuloDetalle.Precio - articuloDetalle.PrecioConDescuento)
+        );
+        setQtyItems2(QtyItems2 - times);
+      }
+    }
+  };
+
+  /* const AgregarUnoDetalle = (ID) => {
+    let articuloDetalle = DetalleCot.find((item) => item.ID === ID);
+    articuloDetalle.Cantidad = articuloDetalle.Cantidad + 1;
+    DetalleCot.map((item) =>
+      item.ID === parseInt(ID)
+        ? { ...item, Cantidad: articuloDetalle.Cantidad }
+        : item
+    );
+    setMonto(Monto + articuloDetalle.PrecioConDescuento);
+    setAhorro(
+      Ahorro + (articuloDetalle.Precio - articuloDetalle.PrecioConDescuento)
+    );
+    setQtyItems2(QtyItems2 + 1);
+  }; */
+
+  /* const EliminarUnoDetalle = (ID) => {
+    let articuloDetalle = DetalleCot.find((item) => item.ID === ID);
+    articuloDetalle.Cantidad = articuloDetalle.Cantidad - 1;
+    DetalleCot.map((item) =>
+      item.ID === parseInt(ID)
+        ? { ...item, Cantidad: articuloDetalle.Cantidad }
+        : item
+    );
+    setMonto(Monto - articuloDetalle.PrecioConDescuento);
+    setAhorro(
+      Ahorro - (articuloDetalle.Precio - articuloDetalle.PrecioConDescuento)
+    );
+    setQtyItems2(QtyItems2 - 1);
+  }; */
+
+  const EliminarTodoDetalle = (ID) => {
+    let articuloDetalle = DetalleCot.find((item) => item.ID === ID);
+    setMensaje(
+      "Esta seguro de Eliminar el Articulo : " + articuloDetalle.Articulo
+    );
+    setIdDetalleEliminar(ID);
+    setTipoConfirmacion("EliminaDetalle");
+    abrirCerrarModalConfirmacion();
+  };
+
+  const peticionEliminarDetalle = () => {
+    let articuloDetalle = DetalleCot.find(
+      (item) => item.ID === IdDetalleEliminar
+    );
+    delFromCar2(articuloDetalle.Articulo, true);
+    abrirCerrarModalDetallescotizacionAEditar();
+    peticionDeleteDetalle();
+  };
+
+  const peticionDeleteDetalle = async () => {
+    var varLiga =
+      baseUrlCotizador + "/" + NumCotizacion + "/Detalle/" + IdDetalleEliminar;
+    console.log("Liga EliminarDetalle: " + varLiga);
+    await axios
+      .delete(varLiga)
+      .then((response) => {
+        /* iTipo === 1
+          ? setAgentesData(response.data)
+          : setAgentesData2(response.data); */
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /*   const handleRemove = (id) => {
+    const temp = DetalleCot.filter((item) => item.ID !== id);
+
+    setDetalleCot(temp);
+  }; */
+
   const addToCar = (articulo) => {
     var agregar = false;
     let itemInCar = null;
@@ -223,6 +409,39 @@ export default function Articulos() {
     }
   };
 
+  const addToCar2 = (articulo) => {
+    var agregar = false;
+    let itemInCar = null;
+    let existe = false;
+    if (car2.length > 0) {
+      itemInCar = car2.find((items) =>
+        items.Articulo === articulo.Articulo ? true : undefined
+      );
+    }
+    if (itemInCar !== null && itemInCar !== undefined) {
+      existe = true;
+    } else {
+      existe = false;
+    }
+
+    if (existe) {
+      if (itemInCar.Existencia > itemInCar.Cantidad) {
+        agregar = true;
+      }
+    } else {
+      if (articulo.Existencia > 0) {
+        agregar = true;
+      }
+    }
+    if (agregar === true) {
+      dispatch({ type: TYPES.ADD_TO_CAR2, payload: articulo });
+      setMonto2(Monto2 + articulo.PrecioConDescuento);
+      setAhorro2(Ahorro2 + (articulo.Precio - articulo.PrecioConDescuento));
+      setQtyItems2(QtyItems2 + 1);
+      agregar = false;
+    }
+  };
+
   const delFromCar = (Articulo, all = false) => {
     let articuloInCar = car.find((item) => item.Articulo === Articulo);
 
@@ -250,6 +469,33 @@ export default function Articulos() {
     }
   };
 
+  const delFromCar2 = (Articulo, all = false) => {
+    let articuloInCar = car2.find((item) => item.Articulo === Articulo);
+
+    if (all) {
+      if (car2.length === 1) {
+        setModalCarrito();
+      }
+      dispatch({ type: TYPES.REMOVE_ALL_FROM_CAR2, payload: Articulo });
+      setMonto2(
+        Monto2 - articuloInCar.Cantidad * articuloInCar.PrecioConDescuento
+      );
+      setAhorro2(
+        Ahorro2 -
+          (articuloInCar.Precio - articuloInCar.PrecioConDescuento) *
+            articuloInCar.Cantidad
+      );
+      setQtyItems2(QtyItems2 - articuloInCar.Cantidad);
+    } else {
+      dispatch({ type: TYPES.REMOVE_ONE_FROM_CAR2, payload: Articulo });
+      setMonto2(Monto2 - articuloInCar.PrecioConDescuento);
+      setAhorro2(
+        Ahorro2 - (articuloInCar.Precio - articuloInCar.PrecioConDescuento)
+      );
+      setQtyItems2(QtyItems2 - 1);
+    }
+  };
+
   const clearCar = () => {
     dispatch({ type: TYPES.CLEAR_CAR });
     setModalCarrito();
@@ -258,7 +504,7 @@ export default function Articulos() {
     setQtyItems(0);
   };
 
-  const hancleChangeAgente = (e) => {
+  const handleChangeAgente = (e) => {
     setAgenteABuscar(e.target.value);
     if (e.target.value.length > 3) {
       peticionGetAgentes(1, e.target.value);
@@ -267,6 +513,24 @@ export default function Articulos() {
     } else {
       setocultarAutoComplAgente(true);
       setNumAgente("");
+    }
+  };
+
+  const handleChangeAgente3 = (e) => {
+    setAgenteABuscar2(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetAgentes(1, e.target.value);
+      peticionGetAgentes(2, e.target.value);
+      setocultarAutoComplAgente2(false);
+    } else {
+      setocultarAutoComplAgente2(true);
+      setNumAgente2("");
+    }
+  };
+
+  const handleKeyDownAgenteCliente = (e) => {
+    if (e.key === "Enter") {
+      clickBusquedaAgente();
     }
   };
 
@@ -282,6 +546,13 @@ export default function Articulos() {
     console.log("Cotizacion: ", Cotizacion);
   };
 
+  const asignarAgente2 = (numAg, nombAg) => {
+    setNumAgente2(numAg);
+    setAgenteABuscar2(nombAg);
+    abrirCerrarModalAgenteCliente2();
+    setocultarAutoComplAgente2(true);
+  };
+
   const asignarCliente = (numClie, nombClie) => {
     setNumCliente(numClie);
     setClienteABuscar(nombClie);
@@ -294,7 +565,14 @@ export default function Articulos() {
     console.log("Cotizacion: ", Cotizacion);
   };
 
-  const hancleChangeAgente2 = (e) => {
+  const asignarCliente2 = (numClie, nombClie) => {
+    setNumCliente2(numClie);
+    setClienteABuscar2(nombClie);
+    abrirCerrarModalAgenteCliente2();
+    setocultarAutoComplCliente2(true);
+  };
+
+  const handleChangeAgente2 = (e) => {
     setAgenteABuscar(e.target.value);
     if (e.target.value.length > 3) {
       peticionGetAgentes(2, e.target.value);
@@ -313,6 +591,18 @@ export default function Articulos() {
     } else {
       setocultarAutoComplCliente(true);
       setNumCliente("");
+    }
+  };
+
+  const hancleChangeCliente3 = (e) => {
+    setClienteABuscar2(e.target.value);
+    if (e.target.value.length > 3) {
+      peticionGetClientes(1, e.target.value);
+      peticionGetClientes(2, e.target.value);
+      setocultarAutoComplCliente2(false);
+    } else {
+      setocultarAutoComplCliente2(true);
+      setNumCliente2("");
     }
   };
 
@@ -358,6 +648,7 @@ export default function Articulos() {
 
   const seleccionarAgente = (e) => {
     setNumAgente(e.target.value);
+    setocultarAutoComplAgente(true);
 
     AgentesData.map(
       (agente) =>
@@ -379,19 +670,21 @@ export default function Articulos() {
       (agente) =>
         agente.Agente === e.target.value && setAgenteABuscar(agente.Nombre)
     );
+  };
 
-    setDatosBusqCotizacion({
-      ...DatosBusqCotizacion,
-      Agente: e.target.value,
-      FechaInicial: formatDate(FechaInicial).toString(),
-      FechaFinal: formatDate(FechaFinal).toString(),
-    });
-    console.log("DatosBusqCotizacion: ", DatosBusqCotizacion);
-    buscarCotizaciones(DatosBusqCotizacion);
+  const seleccionarAgente3 = (e) => {
+    setNumAgente2(e.target.value);
+    setocultarAutoComplAgente2(true);
+
+    AgentesData.map(
+      (agente) =>
+        agente.Agente === e.target.value && setAgenteABuscar2(agente.Nombre)
+    );
   };
 
   const seleccionarCliente = (e) => {
     setNumCliente(e.target.value);
+    setocultarAutoComplCliente(true);
 
     ClientesData.map(
       (cliente) =>
@@ -419,7 +712,16 @@ export default function Articulos() {
       Cliente: e.target.value,
     });
     console.log("DatosBusqCotizacion: ", DatosBusqCotizacion);
-    buscarCotizaciones(DatosBusqCotizacion);
+  };
+
+  const seleccionarCliente3 = (e) => {
+    setNumCliente2(e.target.value);
+    setocultarAutoComplCliente2(true);
+
+    ClientesData.map(
+      (cliente) =>
+        cliente.Cliente === e.target.value && setClienteABuscar2(cliente.Nombre)
+    );
   };
 
   const GenerarCotizacion = () => {
@@ -438,22 +740,22 @@ export default function Articulos() {
     var varLiga = baseUrlCotizador;
     console.log("Liga Guardar: " + varLiga);
     await axios
-      .post(varLiga)
+      .post(varLiga, Cotizacion)
       .then((response) => {
-        //setData(data.concat(response.data));
+        //(data.concat(response.data));
       })
       .catch((error) => {
         console.log(error);
       });
     ImprimirCotizacionGuardada();
-    limpiarCotizacion();
   };
 
   const ImprimirCotizacionGuardada = () => {
     abrirCerrarModalCheckOut();
-    abrirCerrarModalImprimir();
-    window.print();
-    abrirCerrarModalImprimir();
+    //abrirCerrarModalImprimir();
+    //window.print();
+    //abrirCerrarModalImprimir();
+    limpiarCotizacion();
   };
 
   const limpiarCotizacion = () => {
@@ -470,13 +772,23 @@ export default function Articulos() {
       Sucursal: "",
       CarritoD: car,
     });
-    abrirCerrarModalCarrito();
   };
 
   const buscarCotizaciones = async () => {
-    console.log("DatosBusqCotizacion: " + DatosBusqCotizacion);
-    var varLiga = baseUrlCotizador + DatosBusqCotizacion;
-    console.log("Liga Buscar Cotizacion: " + varLiga);
+    console.log("DatosBusqCotizacion: ");
+    console.log(DatosBusqCotizacion);
+    var varLiga =
+      baseUrlCotizador +
+      "?Agente=" +
+      NumAgente +
+      "&Cliente=" +
+      NumCliente +
+      "&FechaInicial=" +
+      formatDate(FechaInicial) +
+      "&FechaFinal=" +
+      formatDate(FechaFinal);
+
+    console.log(varLiga);
     await axios
       .get(varLiga)
       .then((response) => {
@@ -498,6 +810,47 @@ export default function Articulos() {
 
     return [year, month, day].join("-");
   }
+
+  const MostrarDetalles = (iNumCotizacion) => {
+    vercotizacion(iNumCotizacion);
+    abrirCerrarModalDetallescotizacion();
+  };
+
+  const vercotizacion = async (iNum) => {
+    setNumCotizacion(iNum);
+    var varLiga = baseUrlCotizador + "/" + iNum + "/Detalle";
+    console.log(varLiga);
+    await axios
+      .get(varLiga)
+      .then((response) => {
+        setDetalleCotizacion(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const EliminarCotizacion = (iNumero) => {
+    setNumCotizacion(iNumero);
+    abrirCerrarModalConfirmacion();
+    setMensaje("Estas Seguro de Eliminar la Cotizacion  " + iNumero);
+    setTipoConfirmacion("EliminaCot");
+  };
+
+  const peticionEliminarCotizacion = async () => {
+    var varLiga = baseUrlCotizador + "/" + NumCotizacion;
+    console.log(varLiga);
+    await axios
+      .delete(varLiga)
+      .then((response) => {
+        //setCotizaciones(data.filter((cotizacion) => cotizacion.id !== response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    buscarCotizaciones();
+    abrirCerrarModalConfirmacion();
+  };
 
   /**************************** Todo para el Carrito de compras *****************************/
 
@@ -601,6 +954,14 @@ export default function Articulos() {
     setModalArticulo(!ModalArticulo);
   };
 
+  const abrirCerrarModalDetallescotizacion = () => {
+    setModalDetalleCotizacion(!ModalDetalleCotizacion);
+  };
+
+  const abrirCerrarModalDetallescotizacionAEditar = () => {
+    setModalDetalleCotizacionAEditar(!ModalDetalleCotizacionAEditar);
+  };
+
   const abrirCerrarModalSucursal = () => {
     setModalSucursal(!ModalSucursal);
   };
@@ -614,9 +975,68 @@ export default function Articulos() {
     setModalCarrito(!ModalCarrito);
   };
 
+  const ClickBusqArticulos = () => {
+    if (mostrarHistorial) abrirCerrarHistorial();
+    if (MostrarMenu) setMostrarMenu(false);
+  };
+
+  const clickHistorial = () => {
+    setDatosBusqCotizacion({
+      ...DatosBusqCotizacion,
+      Agente: "",
+      Cliente: "",
+      FechaInicial: formatDate(new Date()).toString(),
+      FechaFinal: formatDate(new Date()).toString(),
+    });
+    if (!mostrarHistorial) abrirCerrarHistorial();
+    if (MostrarMenu) setMostrarMenu(false);
+  };
+
+  const cambiarFechaInicial = (date) => {
+    setFechaInicial(date);
+    setDatosBusqCotizacion({
+      ...DatosBusqCotizacion,
+      FechaInicial: formatDate(date).toString(),
+    });
+  };
+
+  const cambiarFechaFinal = (date) => {
+    setFechaFinal(date);
+    setDatosBusqCotizacion({
+      ...DatosBusqCotizacion,
+      FechaFinal: formatDate(date).toString(),
+    });
+  };
+
   const abrirCerrarHistorial = () => {
     setMostrarMain(!mostrarMain);
     setMostrarHistorial(!mostrarHistorial);
+  };
+
+  const keyDownCliente = (e) => {
+    if (e.key === "Enter") {
+      clickBusquedaCliente2();
+    }
+  };
+
+  const keyDownAgente = (e) => {
+    if (e.key === "Enter") {
+      clickBusquedaAgente2();
+    }
+  };
+
+  const clickBusquedaCliente2 = () => {
+    if (ClienteABuscar2.length > 3) {
+      setTipoBusquedaAgenteCliente("Cliente");
+      abrirCerrarModalAgenteCliente2();
+    }
+  };
+
+  const clickBusquedaAgente2 = () => {
+    if (AgenteABuscar2.length > 3) {
+      setTipoBusquedaAgenteCliente("Agente");
+      abrirCerrarModalAgenteCliente2();
+    }
   };
 
   const clickBusquedaCliente = () => {
@@ -637,8 +1057,59 @@ export default function Articulos() {
     setModalDatosClienteAgente(!ModalDatosClienteAgente);
   };
 
+  const abrirCerrarModalAgenteCliente2 = () => {
+    setModalDatosClienteAgente2(!ModalDatosClienteAgente2);
+  };
+
+  const abrirCerrarModalConfirmacion = () => {
+    setModalConfirmacion(!ModalConfirmacion);
+  };
+
   const abrirCerrarModalImprimir = () => {
     setModalImprimir(!ModalImprimir);
+  };
+
+  const EditarCotizacion2 = () => {
+    PeticionDetallesAEditar();
+    calcularMontos2();
+    abrirCerrarModalDetallescotizacionAEditar();
+    setEditando(true);
+  };
+
+  const PeticionDetallesAEditar = async () => {
+    var varLiga = baseUrlCotizador + "/" + NumCotizacion + "/DetalleEditar";
+    console.log(Editando);
+    console.log(varLiga);
+    if (Editando === false) {
+      await axios
+        .get(varLiga)
+        .then((response) => {
+          setDetalleCot(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      DetalleCot.map((item) => addToCar2(item));
+      //setEditando(true);
+    }
+  };
+
+  const EditarCotizacion = (row) => {
+    //setCotizacionAEditar(row);
+    setNumCotizacion(row.NoCotizacion);
+    setNumAgente2(row.NoAgente);
+    setNumCliente2(row.NoCliente);
+    setAgenteABuscar2(row.Agente);
+    setClienteABuscar2(row.Cliente);
+    setQtyItems2(row.TotalUnidades);
+    console.log(row.TotalUnidades);
+    setAhorro(row.AhorroTotal);
+    setMonto(row.TotalMxn);
+    abrirCerrarModalEditarCotizacion();
+  };
+
+  const abrirCerrarModalEditarCotizacion = () => {
+    setModalEditarCotizacion(!ModalEditarCotizacion);
   };
 
   const abrirCerrarModalCheckOut = () => {
@@ -725,7 +1196,10 @@ export default function Articulos() {
           abrirCerrarHistorial();
         }
       }
-      e.target.blur();
+      //e.target.blur();
+    }
+    if (e.key === "ArrowDown") {
+      console.log("Presiono Down key");
     }
   };
 
@@ -742,7 +1216,7 @@ export default function Articulos() {
       }
       setTextoCompleto("");
     } else {
-      setOcultarAutoCompletar(false);
+      //setOcultarAutoCompletar(false);
       setVerSugeridosSucursales(false);
       setTextoCompleto(value);
       //console.log("value", value);
@@ -859,11 +1333,11 @@ export default function Articulos() {
       .catch((error) => {
         console.log(error);
       });
-    if (TextoCompleto !== "") {
-      setOcultarAutoCompletar(false);
-    } else {
+    /* if (TextoCompleto === "" && TextoCompleto.length < 2) {
       setOcultarAutoCompletar(true);
-    }
+    } else {
+      setOcultarAutoCompletar(false);
+    } */
   };
 
   const peticionGetGatewayData = async () => {
@@ -902,6 +1376,11 @@ export default function Articulos() {
       setOcultarAutoCompletar(true);
     }
 
+    if (TextoCompleto.length > 2) setOcultarAutoCompletar(true);
+    else {
+      setOcultarAutoCompletar(false);
+    }
+
     if (verSugeridosSucursales && TextoSugerido !== "") {
       peticionGetSugeridos();
       if (Conexion === "Linea") {
@@ -921,13 +1400,13 @@ export default function Articulos() {
       <section className="secNavBar">
         <div className="d-flex flex-row">
           <div className="ContainerMenuIcon">
-            <ImIcons.ImMenu
-              className="MenuIcon border"
-              onClick={abrirCerrarMenu}
-            />
+            <ImIcons.ImMenu className="MenuIcon" onClick={abrirCerrarMenu} />
             <Dropdown className="ddMenuDrop" isOpen={MostrarMenu}>
               <DropdownMenu>
-                <DropdownItem onClick={abrirCerrarHistorial}>
+                <DropdownItem onClick={ClickBusqArticulos}>
+                  BusquedaArticulos
+                </DropdownItem>
+                <DropdownItem onClick={clickHistorial}>
                   Historial de Cotizaciones
                 </DropdownItem>
               </DropdownMenu>
@@ -960,14 +1439,26 @@ export default function Articulos() {
                   type="text"
                   className="form-control custom-input"
                   name="textoabuscar"
+                  autocomplete="off"
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
                   value={TextoCompleto}
                 />
                 <Dropdown
+                  name="ddAutocompletarBusqueda"
                   className="ddDropAutocompletar"
-                  isOpen={!ocultarAutoCompletar}
+                  isOpen={ocultarAutoCompletar}
                 >
+                  {/* <DropdownToggle
+                    type="text"
+                    className="form-control custom-input"
+                    name="textoabuscar"
+                    readOnly={false}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                  >
+                    {TextoCompleto}
+                  </DropdownToggle> */}
                   <DropdownMenu
                     className="ddMenuDesplegable"
                     style={{ maxHeight: 200 }}
@@ -998,7 +1489,7 @@ export default function Articulos() {
           </div>
           <div /** div Carrito*/
             className="QtyItemsCar"
-            onClick={abrirCerrarModalCarrito}
+            onClick={QtyItems > 0 && abrirCerrarModalCarrito}
           >
             <div className="divCar-bg" src=".">
               {QtyItems > 0 && <h7 className="qtyItemsH7">{QtyItems}</h7>}
@@ -1109,8 +1600,9 @@ export default function Articulos() {
                           <TableCell>
                             {row.Descripcion}
                             <br />
-                            {row.SustanciaActiva !== null &&
-                              "[" + row.SustanciaActiva + "]"}
+                            {row.SustanciaActiva !== null ||
+                              (row.SustanciaActiva !== "" &&
+                                "[" + row.SustanciaActiva + "]")}
                           </TableCell>
                           <TableCell align="center">
                             {"$" + financial(row.Precio)}
@@ -1260,8 +1752,9 @@ export default function Articulos() {
                           <TableCell>
                             {row.Descripcion}
                             <br />
-                            {row.SustanciaActiva !== null &&
-                              "[" + row.SustanciaActiva + "]"}
+                            {row.SustanciaActiva !== null ||
+                              (row.SustanciaActiva !== "" &&
+                                "[" + row.SustanciaActiva + "]")}
                           </TableCell>
                           <TableCell>{"$ " + financial(row.Precio)}</TableCell>
                           <TableCell align="center">
@@ -1414,11 +1907,7 @@ export default function Articulos() {
       {mostrarHistorial && (
         <section className="secMainHistorial d-flex flex-row">
           <section className="divContenidoHistorial flex-grow-1" align="center">
-            <TableContainer
-              component={Paper}
-              className="responsive"
-              style={{ maxHeight: 400 }}
-            >
+            <TableContainer component={Paper} className="responsive">
               <Table>
                 <TableHead className="custom-bg">
                   <TableRow className="TablaRowHead">
@@ -1446,43 +1935,68 @@ export default function Articulos() {
                     <TableCell className="col-1" align="center">
                       <label className="custom-bg">{"Total\nDlls"}</label>
                     </TableCell>
-                    <TableCell className="" align="center">
-                      <label className="custom-bg">Ver</label>
-                    </TableCell>
+                    <TableCell className="" align="center"></TableCell>
+                    <TableCell className="" align="center"></TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  <TableRow className="CustomRows" hover>
-                    <TableCell className="" align="center">
-                      <label className="tipoOpe">1</label>
-                    </TableCell>
-                    <TableCell className="flex-grow-1" align="left">
-                      <label className="tipoOpe">{"G36200013"}</label>
-                      <label>{"DANIEL CUEVAS RUIZ"}</label>
-                    </TableCell>
-                    <TableCell className="flex-grow-1" align="left">
-                      <label className="tipoOpe">{"CTE-43827"}</label>
-                      <label>{"CARLOS HECTOR RODRIGUEZ"}</label>
-                    </TableCell>
-                    <TableCell className="col-1" align="center">
-                      <label>6</label>
-                    </TableCell>
-                    <TableCell className="col-1" align="center">
-                      <label>$230.40</label>
-                    </TableCell>
-                    <TableCell className="col-1" align="center">
-                      <label>$19.30</label>
-                    </TableCell>
-                    <TableCell className="col-1" align="center">
-                      <label>$789.60</label>
-                    </TableCell>
-                    <TableCell className="col-1" align="center">
-                      <label>$40.91</label>
-                    </TableCell>
-                    <TableCell className="" align="center">
-                      <label>+</label>
-                    </TableCell>
-                  </TableRow>
+                <TableBody style={{ maxHeight: 400 }}>
+                  {Cotizaciones.slice(
+                    page3 * rowsPerPage3,
+                    page3 * rowsPerPage3 + rowsPerPage3
+                  ).map((row, i) => (
+                    <TableRow className="CustomRows" hover>
+                      <TableCell className="" align="center">
+                        <Avatar
+                          className="avatar-bg"
+                          src="."
+                          onClick={() => MostrarDetalles(row.NoCotizacion)}
+                        >
+                          {row.NoCotizacion}
+                        </Avatar>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="left">
+                        <label className="tipoOpe">{row.NoAgente}</label>
+                        <label>{row.Agente}</label>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="left">
+                        <label className="tipoOpe">{row.NoCliente}</label>
+                        <label>{row.Cliente}</label>
+                      </TableCell>
+                      <TableCell className="col-1" align="center">
+                        <label>{row.TotalUnidades}</label>
+                      </TableCell>
+                      <TableCell className="col-1" align="center">
+                        <label>{"$" + row.AhorroTotal}</label>
+                      </TableCell>
+                      <TableCell className="col-1" align="center">
+                        <label>{"$" + row.TipoCambio}</label>
+                      </TableCell>
+                      <TableCell className="col-1" align="center">
+                        <label>{"$" + row.TotalMxn}</label>
+                      </TableCell>
+                      <TableCell className="col-1" align="center">
+                        <label>{"$" + row.TotalDlls}</label>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Avatar
+                          className="avatar-bg"
+                          src="."
+                          onClick={() => EditarCotizacion(row)}
+                        >
+                          <FiIcons.FiEdit />
+                        </Avatar>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Avatar
+                          className="avatar-bg"
+                          src="."
+                          onClick={() => EliminarCotizacion(row.NoCotizacion)}
+                        >
+                          <FaIcons.FaTrashAlt />
+                        </Avatar>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
               {Cotizaciones.length > 0 && (
@@ -1501,7 +2015,7 @@ export default function Articulos() {
               )}
             </TableContainer>
           </section>
-          <section className="divSideBarHistorial col-4" align="center">
+          <section className="divSideBarHistorial col-3" align="center">
             <section className="secHeaderDatosBusqueda d-flex flex-column">
               <h4>Datos de Busqueda</h4>
             </section>
@@ -1515,7 +2029,7 @@ export default function Articulos() {
             <section className="d-flex flex-row" align="center">
               <article className="artFechas flex-grow-1">
                 <DatePickerInput
-                  onChange={setFechaInicial}
+                  onChange={cambiarFechaInicial}
                   maxDate={FechaFinal}
                   value={FechaInicial}
                   className="my-custom-datepicker-component danger"
@@ -1523,7 +2037,7 @@ export default function Articulos() {
               </article>
               <article className="artFechas flex-grow-1">
                 <DatePickerInput
-                  onChange={setFechaFinal}
+                  onChange={cambiarFechaFinal}
                   minDate={FechaInicial}
                   maxDate={new Date()}
                   value={FechaFinal}
@@ -1550,7 +2064,8 @@ export default function Articulos() {
                   type="text"
                   class="form-control custom-input"
                   value={AgenteABuscar}
-                  onChange={hancleChangeAgente}
+                  onChange={handleChangeAgente}
+                  onKeyDown={handleKeyDownAgenteCliente}
                   placeholder="Nombre"
                 ></input>
                 <Dropdown
@@ -1567,18 +2082,18 @@ export default function Articulos() {
                         value={opcion.Agente}
                         onClick={seleccionarAgente2}
                       >
-                        {opcion.Nombre}
+                        {"(" + opcion.Agente + ") - " + opcion.Nombre}
                       </DropdownItem>
                     ))}
                   </DropdownMenu>
                 </Dropdown>
               </article>
-              <article className="col-1 d-flex align-items-end" align="left">
+              {/*              <article className="col-1 d-flex align-items-end" align="left">
                 <BiIcons.BiSearchAlt
                   className="LupaIcon"
                   onClick={() => clickBusquedaAgente()}
                 />
-              </article>
+              </article> */}
             </section>
             <br />
             <section className="d-flex flex-column">
@@ -1600,6 +2115,7 @@ export default function Articulos() {
                   class="form-control custom-input"
                   value={ClienteABuscar}
                   onChange={hancleChangeCliente}
+                  onKeyDown={handleKeyDownAgenteCliente}
                   placeholder="Nombre"
                 ></input>
                 <Dropdown
@@ -1616,22 +2132,22 @@ export default function Articulos() {
                         value={opcion.Cliente}
                         onClick={seleccionarCliente2}
                       >
-                        {opcion.Nombre}
+                        {"(" + opcion.Cliente + ") - " + opcion.Nombre}
                       </DropdownItem>
                     ))}
                   </DropdownMenu>
                 </Dropdown>
               </article>
-              <article className="col-1 d-flex align-items-end" align="left">
+              {/* <article className="col-1 d-flex align-items-end" align="left">
                 <BiIcons.BiSearchAlt
                   className="LupaIcon"
                   onClick={() => clickBusquedaCliente()}
                 />
-              </article>
+              </article> */}
             </section>
             <br />
             <br />
-            {/* <section className="secBotonBuscar d-flex justify-content-center">
+            <section className="secBotonBuscar d-flex justify-content-center">
               <article className="col-6">
                 <button
                   className="btnBusquedaCotizacion"
@@ -1641,7 +2157,7 @@ export default function Articulos() {
                   <BiIcons.BiSearchAlt className="IconBuscar" />
                 </button>
               </article>
-            </section> */}
+            </section>
           </section>
         </section>
       )}
@@ -1935,8 +2451,9 @@ export default function Articulos() {
                       <TableCell>
                         {row.Descripcion}
                         <br />
-                        {row.SustanciaActiva !== null &&
-                          "[" + row.SustanciaActiva + "]"}
+                        {row.SustanciaActiva !== null ||
+                          (row.SustanciaActiva !== "" &&
+                            "[" + row.SustanciaActiva + "]")}
                       </TableCell>
                       <TableCell align="center">
                         {"$" + financial(row.Precio)}
@@ -2275,7 +2792,8 @@ export default function Articulos() {
                 type="text"
                 class="form-control custom-input"
                 value={AgenteABuscar}
-                onChange={hancleChangeAgente}
+                onChange={handleChangeAgente}
+                onKeyDown={handleKeyDownAgenteCliente}
                 placeholder="Nombre"
               ></input>
               <Dropdown
@@ -2292,7 +2810,7 @@ export default function Articulos() {
                       value={opcion.Agente}
                       onClick={seleccionarAgente}
                     >
-                      {opcion.Nombre}
+                      {"(" + opcion.Agente + ") - " + opcion.Nombre}
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
@@ -2301,7 +2819,7 @@ export default function Articulos() {
             <article className="col-1 d-flex align-items-end" align="left">
               <BiIcons.BiSearchAlt
                 className="LupaIcon"
-                onClick={() => clickBusquedaAgente()}
+                onClick={clickBusquedaAgente}
               />
             </article>
           </section>
@@ -2324,6 +2842,7 @@ export default function Articulos() {
                 class="form-control custom-input"
                 value={ClienteABuscar}
                 onChange={hancleChangeCliente}
+                onKeyDown={handleKeyDownAgenteCliente}
                 placeholder="Nombre"
               ></input>
               <Dropdown
@@ -2340,7 +2859,7 @@ export default function Articulos() {
                       value={opcion.Cliente}
                       onClick={seleccionarCliente}
                     >
-                      {opcion.Nombre}
+                      {"(" + opcion.Cliente + ") - " + opcion.Nombre}
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
@@ -2471,7 +2990,7 @@ export default function Articulos() {
                   type="text"
                   class="form-control custom-input flex-grow-1"
                   value={AgenteABuscar}
-                  onChange={hancleChangeAgente2}
+                  onChange={handleChangeAgente2}
                   placeholder="Nombre"
                 ></input>
                 <article className="col-5"></article>
@@ -2525,17 +3044,864 @@ export default function Articulos() {
             </section>
           )}
         </ModalBody>
-        <ModalFooter>
-          <div className="d-flex">
-            <button
-              type="button"
-              className="custom-bg btn-lg"
-              onClick={abrirCerrarModalAgenteCliente}
+        <section className="d-flex justify-content-center" align="center">
+          <button
+            type="button"
+            className="btnRegresar form-control"
+            onClick={abrirCerrarModalAgenteCliente}
+          >
+            {"Regresar  "}
+            <FaIcons.FaBackspace />
+          </button>
+        </section>
+      </Modal>
+
+      <Modal className="d-flex modal-lg" isOpen={ModalDatosClienteAgente2}>
+        <ModalBody>
+          <section className="secHeaderCheckout d-flex flex-column">
+            <h4>{"Datos del " + TipoBusquedaAgenteCliente}</h4>
+          </section>
+          {TipoBusquedaAgenteCliente === "Cliente" && (
+            <section className=" d-flex flex-column">
+              <section className=" d-flex flex-row">
+                <input
+                  type="text"
+                  class="form-control custom-input flex-grow-1"
+                  value={ClienteABuscar2}
+                  onChange={hancleChangeCliente3}
+                  placeholder="Nombre"
+                ></input>
+                <article className="col-5"></article>
+              </section>
+              <TableContainer component={Paper} className="tablaAgentes">
+                <Table aria-label="simple table">
+                  <TableHead className="custom-bg">
+                    <TableRow className="TablaRowHead d-flex flex-row">
+                      <TableCell className="col-2" align="center">
+                        <label className="custom-bg">#</label>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="center">
+                        <label className="custom-bg">Nombre</label>
+                      </TableCell>
+                      <TableCell className="col-3" align="left">
+                        <label className="custom-bg">Telefono</label>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              {AgenteABuscar2.length > 3 && (
+                <TableContainer
+                  component={Paper}
+                  className="tablaAgentes2"
+                  style={{ maxHeight: 350 }}
+                >
+                  <Table aria-label="simple table">
+                    <TableBody>
+                      {ClientesData2.map((cliente) => (
+                        <TableRow
+                          className="d-flex flex-row"
+                          onClick={() =>
+                            asignarCliente2(cliente.Cliente, cliente.Nombre)
+                          }
+                        >
+                          <TableCell className="col-2" align="center">
+                            <label>{cliente.Cliente}</label>
+                          </TableCell>
+                          <TableCell className="flex-grow-1" align="center">
+                            <label>{cliente.Nombre}</label>
+                          </TableCell>
+                          <TableCell className="col-3" align="left">
+                            <label>{cliente.Telefonos}</label>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </section>
+          )}
+          {TipoBusquedaAgenteCliente === "Agente" && (
+            <section className=" d-flex flex-column">
+              <section className=" d-flex flex-row">
+                <input
+                  type="text"
+                  class="form-control custom-input flex-grow-1"
+                  value={AgenteABuscar2}
+                  onChange={handleChangeAgente3}
+                  placeholder="Nombre"
+                ></input>
+                <article className="col-5"></article>
+              </section>
+              <TableContainer component={Paper} className="tablaAgentes">
+                <Table aria-label="simple table">
+                  <TableHead className="custom-bg">
+                    <TableRow className="TablaRowHead">
+                      <TableCell className="col-2" align="center">
+                        <label className="custom-bg">Agente</label>
+                      </TableCell>
+                      <TableCell className="flex-grow-1" align="center">
+                        <label className="custom-bg">Nombre</label>
+                      </TableCell>
+                      <TableCell className="col-3" align="center">
+                        <label className="custom-bg">Tipo</label>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </TableContainer>
+              {AgenteABuscar2.length > 3 && (
+                <TableContainer
+                  component={Paper}
+                  className="tablaAgentes2"
+                  style={{ maxHeight: 350 }}
+                >
+                  <Table aria-label="simple table">
+                    <TableBody>
+                      {AgentesData2.map((agente) => (
+                        <TableRow
+                          onClick={() =>
+                            asignarAgente2(agente.Agente, agente.Nombre)
+                          }
+                        >
+                          <TableCell className="col-2" align="center">
+                            <label>{agente.Agente}</label>
+                          </TableCell>
+                          <TableCell className="flex-grow-1" align="center">
+                            <label>{agente.Nombre}</label>
+                          </TableCell>
+                          <TableCell className="col-3" align="center">
+                            <label>{agente.Tipo}</label>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </section>
+          )}
+        </ModalBody>
+        <section className="d-flex justify-content-center" align="center">
+          <button
+            type="button"
+            className="btnRegresar form-control"
+            onClick={abrirCerrarModalAgenteCliente2}
+          >
+            {"Regresar  "}
+            <FaIcons.FaBackspace />
+          </button>
+        </section>
+      </Modal>
+
+      <Modal className="d-flex modal-lg" isOpen={ModalDetalleCotizacion}>
+        <ModalBody>
+          <section className="row" align="center">
+            <h4>
+              <strong>{"Cotizacion Numero " + NumCotizacion}</strong>
+            </h4>
+          </section>
+          <TableContainer component={Paper} className="responsive">
+            <Table>
+              <TableHead className="custom-bg">
+                <TableRow className="TablaRowHead">
+                  <TableCell align="center">
+                    <label className="custom-bg">#</label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">
+                      Articulo
+                      <br />
+                      Código
+                    </label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">Descripción</label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">Precio</label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">Ahorro</label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">
+                      Precio
+                      <br />
+                      Final
+                    </label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">Cant</label>
+                  </TableCell>
+                  <TableCell align="center">
+                    <label className="custom-bg">Total</label>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody
+                className="TablaContainerCarrito"
+                style={{ maxHeight: 400 }}
+              >
+                {DetalleCotizacion.map((row, i) => (
+                  <TableRow
+                    className="CustomRows"
+                    hover
+                    key={i}
+                    value={row.Articulo}
+                  >
+                    <TableCell align="center">
+                      <Avatar className="avatar-bg" src=".">
+                        {i + 1}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <text className="tipoOpe">{row.Articulo}</text>
+                      <br />
+                      {row.Codigo}
+                    </TableCell>
+                    <TableCell>
+                      {row.Descripcion}
+                      <br />
+                      {row.SustanciaActiva !== null ||
+                        (row.SustanciaActiva !== "" &&
+                          "[" + row.SustanciaActiva + "]")}
+                    </TableCell>
+                    <TableCell align="center">
+                      {"$" + financial(row.Precio)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {"$" + financial(row.Precio - row.PrecioConDescuento)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {"$" + financial(row.PrecioConDescuento)}
+                    </TableCell>
+                    <TableCell align="center">{row.Cantidad}</TableCell>
+                    <TableCell align="center">
+                      {" "}
+                      {"$" + financial(row.PrecioConDescuento * row.Cantidad)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </ModalBody>
+        <section className="secModalCarritoFooter  justify-content-center">
+          <section className="d-flex flex-row justify-content-center">
+            <article className="artFooterCarrito">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={() => abrirCerrarModalDetallescotizacion()}
+              >
+                <h5>
+                  {"Cerrar  "}
+                  <AiIcons.AiOutlineCloseCircle />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
+      </Modal>
+
+      <Modal className="d-flex modal-md" isOpen={ModalConfirmacion}>
+        <section className="secHeaderConfirmacion" align="center">
+          <article>
+            <h4>Confirmacion</h4>
+          </article>
+        </section>
+        <ModalBody>
+          <section>
+            <article align="center">
+              <label className="lblConfirmacion">{Mensaje}</label>
+            </article>
+          </section>
+        </ModalBody>
+        <section className="secModalCarritoFooter  justify-content-center">
+          <section className="d-flex flex-row justify-content-center">
+            {TipoConfirmacion === "EliminaCot" && (
+              <article className="artBtnConfirmacion">
+                <button
+                  type="button"
+                  className="btnConfirmacion form-control"
+                  onClick={peticionEliminarCotizacion}
+                >
+                  <h5>
+                    {"Eliminar  "}
+                    <FaIcons.FaTrashAlt />
+                  </h5>
+                </button>
+              </article>
+            )}
+            {TipoConfirmacion === "EliminaDetalle" && (
+              <article className="artBtnConfirmacion">
+                <button
+                  type="button"
+                  className="btnConfirmacion form-control"
+                  onClick={peticionEliminarDetalle}
+                >
+                  <h5>
+                    {"Eliminar  "}
+                    <FaIcons.FaTrashAlt />
+                  </h5>
+                </button>
+              </article>
+            )}
+            <article className="artBtnConfirmacion">
+              <button
+                type="button"
+                className="btnConfirmacion form-control"
+                onClick={abrirCerrarModalConfirmacion}
+              >
+                <h5>
+                  {"Cancelar"}
+                  <AiIcons.AiOutlineCloseCircle />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
+      </Modal>
+
+      <Modal className="d-flex modal-lg" isOpen={ModalEditarCotizacion}>
+        <section className="secHeaderConfirmacion" align="center">
+          <article>
+            <h4>{"Cotizacion " + NumCotizacion}</h4>
+          </article>
+        </section>
+        <ModalBody>
+          <section className="d-flex flex-column" align="center">
+            <h4>Agente</h4>
+          </section>
+          <section className="SecDatosAgente d-flex flex-row" align="center">
+            <article className="InputsAgentes col-2">
+              <input
+                type="text"
+                class="form-control custom-input"
+                placeholder="#"
+                value={NumAgente2}
+                readOnly
+              ></input>
+            </article>
+            <article className="InputsAgentes flex-grow-1">
+              <input
+                type="text"
+                class="form-control custom-input"
+                value={AgenteABuscar2}
+                onChange={handleChangeAgente3}
+                onKeyDown={keyDownAgente}
+                placeholder="Nombre"
+              ></input>
+              <Dropdown
+                className="ddDropAutocompletar"
+                isOpen={!ocultarAutoComplAgente2}
+              >
+                <DropdownMenu
+                  className="ddMenuDesplegable"
+                  style={{ maxHeight: 200 }}
+                >
+                  {AgentesData.map((opcion) => (
+                    <DropdownItem
+                      align="left"
+                      value={opcion.Agente}
+                      onClick={seleccionarAgente3}
+                    >
+                      {"(" + opcion.Agente + ") - " + opcion.Nombre}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            </article>
+            <article className="col-1 d-flex align-items-end" align="left">
+              <BiIcons.BiSearchAlt
+                className="LupaIcon"
+                onClick={() => clickBusquedaAgente2()}
+              />
+            </article>
+          </section>
+          <br />
+          <section className="d-flex flex-column" align="center">
+            <h4>Cliente</h4>
+          </section>
+          <section className="SecDatosCliente d-flex flex-row" align="center">
+            <article className="InputsClientes col-2">
+              <input
+                type="text"
+                class="form-control custom-input"
+                placeholder="#"
+                value={NumCliente2}
+                readOnly
+              ></input>
+            </article>
+            <article className="InputsClientes flex-grow-1">
+              <input
+                type="text"
+                class="form-control custom-input"
+                value={ClienteABuscar2}
+                onChange={hancleChangeCliente3}
+                onKeyDown={keyDownCliente}
+                placeholder="Nombre"
+              ></input>
+              <Dropdown
+                className="ddDropAutocompletar2"
+                isOpen={!ocultarAutoComplCliente2}
+              >
+                <DropdownMenu
+                  className="ddMenuDesplegable"
+                  style={{ maxHeight: 200 }}
+                >
+                  {ClientesData.map((opcion) => (
+                    <DropdownItem
+                      align="left"
+                      value={opcion.Cliente}
+                      onClick={seleccionarCliente3}
+                    >
+                      {"(" + opcion.Cliente + ") - " + opcion.Nombre}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            </article>
+            <article className="col-1 d-flex align-items-end" align="left">
+              <BiIcons.BiSearchAlt
+                className="LupaIcon"
+                onClick={clickBusquedaCliente2}
+              />
+            </article>
+          </section>
+          <br />
+          {/* <section className="secDatosCotizacion d-flex flex-row">
+            <article
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
             >
-              <h6>Regresar</h6>
-            </button>
-          </div>
-        </ModalFooter>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total Unidades:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {QtyItems}
+              </Avatar>
+            </article>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Ahorro Total:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(CotizacionAEditar.AhorroTotal)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                T.C.
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(CotizacionAEditar.TipoCambio)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total MXN:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(CotizacionAEditar.TotalMxn)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total DLLS:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(CotizacionAEditar.TotalDlls)}
+              </Avatar>
+            </div>
+          </section> */}
+        </ModalBody>
+        <section className="secModalCarritoFooter  justify-content-center">
+          <section className="d-flex flex-row justify-content-center">
+            <article className="artBtnConfirmacion">
+              <button type="button" className="btnConfirmacion form-control">
+                <h5>
+                  {"Guardar  "}
+                  <BiIcons.BiSave />
+                </h5>
+              </button>
+            </article>
+            <article className="artBtnConfirmacion">
+              <button
+                type="button"
+                className="btnConfirmacion form-control"
+                onClick={EditarCotizacion2}
+              >
+                <h5>
+                  {"Editar "}
+                  <FiIcons.FiEdit />
+                </h5>
+              </button>
+            </article>
+            <article className="artBtnConfirmacion">
+              <button
+                type="button"
+                className="btnConfirmacion form-control"
+                onClick={abrirCerrarModalEditarCotizacion}
+              >
+                <h5>
+                  {"Regresar "}
+                  <FaIcons.FaBackspace />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
+      </Modal>
+
+      <Modal className="modal-xl" isOpen={ModalDetalleCotizacionAEditar}>
+        <ModalBody>
+          <section align="center">
+            <section className="row">
+              <h4>
+                <strong>{"Cotizacion Numero: " + NumCotizacion}</strong>
+              </h4>
+            </section>
+            <TableContainer
+              component={Paper}
+              className="responsive"
+              style={{ maxHeight: 400 }}
+            >
+              <Table>
+                <TableHead className="custom-bg">
+                  <TableRow className="TablaRowHead">
+                    <TableCell align="center">
+                      <label className="custom-bg">#</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">
+                        Articulo
+                        <br />
+                        Código
+                      </label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Descripción</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Precio</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Ahorro</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">
+                        Precio
+                        <br />
+                        Final
+                      </label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Cant</label>
+                    </TableCell>
+                    <TableCell align="center">
+                      <label className="custom-bg">Total</label>
+                    </TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className="TablaContainerCarrito">
+                  {car2.map((row, i) => (
+                    <TableRow
+                      className="CustomRows"
+                      hover
+                      key={i}
+                      value={row.Articulo}
+                    >
+                      <TableCell align="center">
+                        <Avatar className="avatar-bg" src=".">
+                          {i + 1}
+                        </Avatar>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <text className="tipoOpe">{row.Articulo}</text>
+                        <br />
+                        {row.Codigo}
+                      </TableCell>
+                      <TableCell>
+                        {row.Descripcion}
+                        <br />
+                        {row.SustanciaActiva !== null ||
+                          (row.SustanciaActiva !== "" &&
+                            "[" + row.SustanciaActiva + "]")}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.Precio)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.Precio - row.PrecioConDescuento)}
+                        <br />
+                        {"(" + row.Descuento + " %)"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {"$" + financial(row.PrecioConDescuento)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <TextField
+                          inputProps={{
+                            style: { textAlign: "center" },
+                          }}
+                          name={row.ID}
+                          onChange={handleChangeCar2}
+                          value={row.Cantidad}
+                          readOnly={false}
+                        ></TextField>
+                      </TableCell>
+                      <TableCell align="center">
+                        {" "}
+                        {"$" + financial(row.PrecioConDescuento * row.Cantidad)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.Cantidad !== row.Existencia && (
+                          <Avatar
+                            className="avatar-bg"
+                            src="."
+                            //onClick={() => AgregarUnoDetalle(row.ID)}
+                            onClick={() => addToCar2(row)}
+                          >
+                            <FaIcons.FaPlus />
+                          </Avatar>
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.Cantidad > 1 && (
+                          <Avatar
+                            className="avatar-bg"
+                            src="."
+                            //onClick={() => EliminarUnoDetalle(row.ID)}
+                            onClick={() => delFromCar2(row.Articulo)}
+                          >
+                            <FaIcons.FaMinus />
+                          </Avatar>
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Avatar
+                          className="avatar-bg"
+                          src="."
+                          onClick={() => EliminarTodoDetalle(row.ID)}
+                          //onClick={() => delFromCar2(row.Articulo, true)}
+                        >
+                          <FaIcons.FaTrashAlt />
+                        </Avatar>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </section>
+          <section className="d-flex flex-row">
+            <article
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total Unidades:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {QtyItems2}
+              </Avatar>
+            </article>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Ahorro Total:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(Ahorro2)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                T.C.
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(TipoCambio)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total MXN:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(Monto2)}
+              </Avatar>
+            </div>
+
+            <div
+              className="d-flex flex-column flex-grow-1 flex-shrink-1"
+              align="center"
+            >
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio-bg"
+                src="."
+              >
+                Total DLLS:
+              </Avatar>
+              <Avatar
+                align="center"
+                variant="rounded"
+                className="avatarPrecio2-bg"
+                src="."
+              >
+                {"$" + financial(Monto2 / TipoCambio)}
+              </Avatar>
+            </div>
+          </section>
+        </ModalBody>
+        <section className="secModalCarritoFooter  justify-content-center">
+          <section className="d-flex flex-row justify-content-center">
+            <article className="artFooterCarrito">
+              <button type="button" className="btnCarrito form-control">
+                <h5>
+                  {"Guardar  "}
+                  <BiIcons.BiSave />
+                </h5>
+              </button>
+            </article>
+            <article className="artFooterCarrito">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={() => abrirCerrarModalDetallescotizacionAEditar()}
+              >
+                <h5>
+                  {"Cerrar  "}
+                  <AiIcons.AiOutlineCloseCircle />
+                </h5>
+              </button>
+            </article>
+          </section>
+        </section>
       </Modal>
 
       <section className="secFooter d-flex p-1">
