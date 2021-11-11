@@ -56,6 +56,7 @@ export default function Articulos() {
   const [ClientesData, setClientesData] = useState([]);
   const [ClientesData2, setClientesData2] = useState([]);
   const [Cotizacion, setCotizacion] = useState([]);
+  const [CotizacionAEditar, setCotizacionAEditar] = useState([]);
   const [DatosBusqCotizacion, setDatosBusqCotizacion] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
   const [DetalleCotizacion, setDetalleCotizacion] = useState([]);
@@ -361,9 +362,7 @@ export default function Articulos() {
     await axios
       .delete(varLiga)
       .then((response) => {
-        /* iTipo === 1
-          ? setAgentesData(response.data)
-          : setAgentesData2(response.data); */
+        //setCotizaciones(data.filter((cotizacion) => cotizacion.id !== response.data));
       })
       .catch((error) => {
         console.log(error);
@@ -502,6 +501,13 @@ export default function Articulos() {
     setMonto(0);
     setAhorro(0);
     setQtyItems(0);
+  };
+
+  const clearCar2 = () => {
+    dispatch({ type: TYPES.CLEAR_CAR2 });
+    setMonto2(0);
+    setAhorro2(0);
+    setQtyItems2(0);
   };
 
   const handleChangeAgente = (e) => {
@@ -1070,14 +1076,14 @@ export default function Articulos() {
   };
 
   const EditarCotizacion2 = () => {
-    PeticionDetallesAEditar();
+    //PeticionDetallesAEditar();
     calcularMontos2();
     abrirCerrarModalDetallescotizacionAEditar();
-    setEditando(true);
+    if (car2.length > 0) setEditando(true);
   };
 
-  const PeticionDetallesAEditar = async () => {
-    var varLiga = baseUrlCotizador + "/" + NumCotizacion + "/DetalleEditar";
+  const PeticionDetallesAEditar = async (numCot) => {
+    var varLiga = baseUrlCotizador + "/" + numCot + "/DetalleEditar";
     console.log(Editando);
     console.log(varLiga);
     if (Editando === false) {
@@ -1085,11 +1091,11 @@ export default function Articulos() {
         .get(varLiga)
         .then((response) => {
           setDetalleCot(response.data);
+          DetalleCot.map((item) => addToCar2(item));
         })
         .catch((error) => {
           console.log(error);
         });
-      DetalleCot.map((item) => addToCar2(item));
       //setEditando(true);
     }
   };
@@ -1105,6 +1111,36 @@ export default function Articulos() {
     console.log(row.TotalUnidades);
     setAhorro(row.AhorroTotal);
     setMonto(row.TotalMxn);
+    abrirCerrarModalEditarCotizacion();
+    PeticionDetallesAEditar(row.NoCotizacion);
+  };
+
+  const GenerarArchivo = () => {
+    setCotizacionAEditar({
+      ...Cotizacion,
+      ID: NumCotizacion,
+      TipoCambio: TipoCambio,
+      Sucursal: parseInt(Sucursal),
+      CarritoD: car2,
+    });
+    console.log(CotizacionAEditar);
+    abrirCerrarModalDetallescotizacionAEditar();
+  };
+
+  const peticionModificarCot = async () => {
+    var varLiga = baseUrlCotizador + "/" + NumCotizacion;
+    console.log(varLiga);
+    console.log(CotizacionAEditar);
+    await axios
+      .put(varLiga, CotizacionAEditar)
+      .then((response) => {
+        //setCotizaciones(data.filter((cotizacion) => cotizacion.id !== response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    clearCar2();
+
     abrirCerrarModalEditarCotizacion();
   };
 
@@ -3587,7 +3623,11 @@ export default function Articulos() {
         <section className="secModalCarritoFooter  justify-content-center">
           <section className="d-flex flex-row justify-content-center">
             <article className="artBtnConfirmacion">
-              <button type="button" className="btnConfirmacion form-control">
+              <button
+                type="button"
+                className="btnConfirmacion form-control"
+                onClick={peticionModificarCot}
+              >
                 <h5>
                   {"Guardar  "}
                   <BiIcons.BiSave />
@@ -3881,7 +3921,11 @@ export default function Articulos() {
         <section className="secModalCarritoFooter  justify-content-center">
           <section className="d-flex flex-row justify-content-center">
             <article className="artFooterCarrito">
-              <button type="button" className="btnCarrito form-control">
+              <button
+                type="button"
+                className="btnCarrito form-control"
+                onClick={GenerarArchivo}
+              >
                 <h5>
                   {"Guardar  "}
                   <BiIcons.BiSave />

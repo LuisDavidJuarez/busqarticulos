@@ -103,5 +103,7 @@ export function shoppingReducer(state, action) {
         car2: state.car2.filter((item) => item.Articulo !== action.payload),
       };
     }
+    case TYPES.CLEAR_CAR2:
+      return shoppinInitialState;
   }
 }
