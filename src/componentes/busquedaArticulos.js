@@ -87,7 +87,6 @@ export default function Articulos() {
   const [ocultarAutoComplAgente, setocultarAutoComplAgente] = useState(true);
   const [ocultarAutoComplAgente2, setocultarAutoComplAgente2] = useState(true);
   const [ocultarAutoComplCliente, setocultarAutoComplCliente] = useState(true);
-  const [Editando, setEditando] = useState(false);
   const [ocultarAutoComplCliente2, setocultarAutoComplCliente2] =
     useState(true);
   const [verSugeridosSucursales, setVerSugeridosSucursales] = useState(false);
@@ -138,9 +137,9 @@ export default function Articulos() {
   /**************************** Todo para el Carrito de compras *****************************/
   const [Monto, setMonto] = useState(0);
   const [Ahorro, setAhorro] = useState(0);
+  const [QtyItems, setQtyItems] = useState(0);
   const [Monto2, setMonto2] = useState(0);
   const [Ahorro2, setAhorro2] = useState(0);
-  const [QtyItems, setQtyItems] = useState(0);
   const [QtyItems2, setQtyItems2] = useState(0);
   const [state, dispatch] = useReducer(shoppingReducer, shoppinInitialState);
   const { car, car2 } = state;
@@ -239,7 +238,6 @@ export default function Articulos() {
   };
 
   const handleChangeCar2 = (e) => {
-    setEditando(true);
     const { name, value } = e.target;
     console.log(name, value);
     if (value !== null && value !== "") {
@@ -1082,42 +1080,35 @@ export default function Articulos() {
   };
 
   const EditarCotizacion2 = () => {
-    //PeticionDetallesAEditar();
     calcularMontos2();
-    if (car2.length > 0) setEditando(true);
     abrirCerrarModalDetallescotizacionAEditar();
   };
 
   const PeticionDetallesAEditar = async (numCot) => {
     var varLiga = baseUrlCotizador + "/" + numCot + "/DetalleEditar";
-    console.log(Editando);
     console.log(varLiga);
-    if (Editando === false) {
-      await axios
-        .get(varLiga)
-        .then((response) => {
-          setDetalleCot(response.data);
-          DetalleCot.map((item) => item.Cantidad.map((qty) => addToCar2(item)));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      //setEditando(true);
-    }
+    await axios
+      .get(varLiga)
+      .then((response) => {
+        setDetalleCot(response.data);
+        DetalleCot.map((item) => item.Cantidad.map((qty) => addToCar2(item)));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const EditarCotizacion = (row) => {
     //setCotizacionAEditar(row);
+    PeticionDetallesAEditar(row.NoCotizacion);
     setNumCotizacion(row.NoCotizacion);
     setNumAgente2(row.NoAgente);
     setNumCliente2(row.NoCliente);
     setAgenteABuscar2(row.Agente);
     setClienteABuscar2(row.Cliente);
     setQtyItems2(row.TotalUnidades);
-    console.log(row.TotalUnidades);
     setAhorro2(row.AhorroTotal);
     setMonto2(row.TotalMxn);
-    PeticionDetallesAEditar(row.NoCotizacion);
     abrirCerrarModalEditarCotizacion();
   };
 
@@ -1135,8 +1126,8 @@ export default function Articulos() {
 
   const peticionModificarCot = async () => {
     var varLiga = baseUrlCotizador + "/" + NumCotizacion;
-    console.log(varLiga);
     console.log(CotizacionAEditar);
+    console.log(varLiga);
     await axios
       .put(varLiga, CotizacionAEditar)
       .then((response) => {
@@ -1146,7 +1137,6 @@ export default function Articulos() {
         console.log(error);
       });
     clearCar2();
-
     abrirCerrarModalEditarCotizacion();
   };
 
@@ -3743,9 +3733,9 @@ export default function Articulos() {
                       <TableCell>
                         {row.Descripcion}
                         <br />
-                        {row.SustanciaActiva !== null ||
-                          (row.SustanciaActiva !== "" &&
-                            "[" + row.SustanciaActiva + "]")}
+                        {row.SustanciaActiva !== null &&
+                          row.SustanciaActiva !== "" &&
+                          "\n [" + row.SustanciaActiva + "]"}
                       </TableCell>
                       <TableCell align="center">
                         {"$" + financial(row.Precio)}
