@@ -351,7 +351,7 @@ export default function Articulos() {
       (item) => item.ID === IdDetalleEliminar
     );
     delFromCar2(articuloDetalle.Articulo, true);
-    abrirCerrarModalDetallescotizacionAEditar();
+    abrirCerrarModalConfirmacion();
     peticionDeleteDetalle();
   };
 
@@ -534,9 +534,15 @@ export default function Articulos() {
     }
   };
 
-  const handleKeyDownAgenteCliente = (e) => {
+  const handleKeyDownAgente = (e) => {
     if (e.key === "Enter") {
       clickBusquedaAgente();
+    }
+  };
+
+  const handleKeyDownCliente = (e) => {
+    if (e.key === "Enter") {
+      clickBusquedaCliente();
     }
   };
 
@@ -1078,8 +1084,8 @@ export default function Articulos() {
   const EditarCotizacion2 = () => {
     //PeticionDetallesAEditar();
     calcularMontos2();
-    abrirCerrarModalDetallescotizacionAEditar();
     if (car2.length > 0) setEditando(true);
+    abrirCerrarModalDetallescotizacionAEditar();
   };
 
   const PeticionDetallesAEditar = async (numCot) => {
@@ -1091,7 +1097,7 @@ export default function Articulos() {
         .get(varLiga)
         .then((response) => {
           setDetalleCot(response.data);
-          DetalleCot.map((item) => addToCar2(item));
+          DetalleCot.map((item) => item.Cantidad.map((qty) => addToCar2(item)));
         })
         .catch((error) => {
           console.log(error);
@@ -1109,10 +1115,10 @@ export default function Articulos() {
     setClienteABuscar2(row.Cliente);
     setQtyItems2(row.TotalUnidades);
     console.log(row.TotalUnidades);
-    setAhorro(row.AhorroTotal);
-    setMonto(row.TotalMxn);
-    abrirCerrarModalEditarCotizacion();
+    setAhorro2(row.AhorroTotal);
+    setMonto2(row.TotalMxn);
     PeticionDetallesAEditar(row.NoCotizacion);
+    abrirCerrarModalEditarCotizacion();
   };
 
   const GenerarArchivo = () => {
@@ -1328,6 +1334,8 @@ export default function Articulos() {
       });
     setMostrarTabla(true);
     setMostrarProgress(false);
+    setOcultarAutoCompletar(true);
+    setAutocompletar([]);
   };
 
   const peticionGetSugeridos = async () => {
@@ -1635,10 +1643,10 @@ export default function Articulos() {
                           </TableCell>
                           <TableCell>
                             {row.Descripcion}
-                            <br />
-                            {row.SustanciaActiva !== null ||
-                              (row.SustanciaActiva !== "" &&
-                                "[" + row.SustanciaActiva + "]")}
+
+                            {row.SustanciaActiva !== null &&
+                              row.SustanciaActiva !== "" &&
+                              "\n [" + row.SustanciaActiva + "]"}
                           </TableCell>
                           <TableCell align="center">
                             {"$" + financial(row.Precio)}
@@ -2101,7 +2109,7 @@ export default function Articulos() {
                   class="form-control custom-input"
                   value={AgenteABuscar}
                   onChange={handleChangeAgente}
-                  onKeyDown={handleKeyDownAgenteCliente}
+                  onKeyDown={handleKeyDownAgente}
                   placeholder="Nombre"
                 ></input>
                 <Dropdown
@@ -2151,7 +2159,7 @@ export default function Articulos() {
                   class="form-control custom-input"
                   value={ClienteABuscar}
                   onChange={hancleChangeCliente}
-                  onKeyDown={handleKeyDownAgenteCliente}
+                  onKeyDown={handleKeyDownCliente}
                   placeholder="Nombre"
                 ></input>
                 <Dropdown
@@ -2486,10 +2494,9 @@ export default function Articulos() {
                       </TableCell>
                       <TableCell>
                         {row.Descripcion}
-                        <br />
-                        {row.SustanciaActiva !== null ||
-                          (row.SustanciaActiva !== "" &&
-                            "[" + row.SustanciaActiva + "]")}
+                        {row.SustanciaActiva !== null &&
+                          row.SustanciaActiva !== "" &&
+                          "\n [" + row.SustanciaActiva + "]"}
                       </TableCell>
                       <TableCell align="center">
                         {"$" + financial(row.Precio)}
@@ -2829,7 +2836,7 @@ export default function Articulos() {
                 class="form-control custom-input"
                 value={AgenteABuscar}
                 onChange={handleChangeAgente}
-                onKeyDown={handleKeyDownAgenteCliente}
+                onKeyDown={handleKeyDownAgente}
                 placeholder="Nombre"
               ></input>
               <Dropdown
@@ -2878,7 +2885,7 @@ export default function Articulos() {
                 class="form-control custom-input"
                 value={ClienteABuscar}
                 onChange={hancleChangeCliente}
-                onKeyDown={handleKeyDownAgenteCliente}
+                onKeyDown={handleKeyDownCliente}
                 placeholder="Nombre"
               ></input>
               <Dropdown
@@ -3481,7 +3488,7 @@ export default function Articulos() {
                 placeholder="Nombre"
               ></input>
               <Dropdown
-                className="ddDropAutocompletar2"
+                className="ddDropAutocompletar"
                 isOpen={!ocultarAutoComplCliente2}
               >
                 <DropdownMenu
